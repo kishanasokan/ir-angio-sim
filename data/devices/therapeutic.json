@@ -1,0 +1,257 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "therapeutic",
+  "notes": "Balloons, stents, thrombectomy systems, IVC filters, TIPS tools and snares. Ranges describe each product family; not every diameter and length combination exists. Stent and drug-coated balloon specifications are a phase-2 import (spec 05).",
+  "items": [
+    {
+      "id": "pta-mustang",
+      "kind": "pta-balloon",
+      "brandName": "Mustang",
+      "manufacturer": "Boston Scientific",
+      "genericName": "0.035 in high-pressure PTA balloon",
+      "platform": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "evt-guide-pta"},
+      "diameters": {"text": "3 to 10 mm and 12 mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "lengths": {"min": 20, "max": 200, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "nominalPressure": {"min": 8, "max": 10, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "ratedBurstPressure": {"max": 24, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta", "note": "Up to 24 atm depending on size."},
+      "sheath": {"min": 5, "max": 7, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-pta"}
+    },
+    {
+      "id": "pta-conquest-40",
+      "kind": "pta-balloon",
+      "brandName": "Conquest 40",
+      "manufacturer": "BD",
+      "genericName": "0.035 in ultra-high-pressure PTA balloon",
+      "platform": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "evt-guide-pta"},
+      "diameters": {"min": 4, "max": 12, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "lengths": {"min": 20, "max": 100, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "nominalPressure": {"value": 8, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "ratedBurstPressure": {"max": 40, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta", "note": "Up to 40 atm depending on size."},
+      "sheath": {"min": 6, "max": 8, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-pta"}
+    },
+    {
+      "id": "pta-atlas-gold",
+      "kind": "pta-balloon",
+      "brandName": "Atlas Gold",
+      "manufacturer": "BD",
+      "genericName": "0.035 in large-diameter PTA balloon",
+      "platform": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "evt-guide-pta"},
+      "diameters": {"min": 12, "max": 26, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "lengths": {"min": 20, "max": 60, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "nominalPressure": {"min": 4, "max": 6, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "ratedBurstPressure": {"max": 18, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta", "note": "Up to 18 atm depending on size."},
+      "sheath": {"min": 7, "max": 12, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-pta"}
+    },
+    {
+      "id": "pta-armada-18",
+      "kind": "pta-balloon",
+      "brandName": "Armada 18",
+      "manufacturer": "Abbott",
+      "genericName": "0.018 in PTA balloon",
+      "platform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "evt-guide-pta"},
+      "diameters": {"min": 2, "max": 6, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "lengths": {"min": 20, "max": 200, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "nominalPressure": {"value": 8, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "ratedBurstPressure": {"value": 14, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "sheath": {"min": 4, "max": 5, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-pta"}
+    },
+    {
+      "id": "pta-sterling-otw",
+      "kind": "pta-balloon",
+      "brandName": "Sterling OTW",
+      "manufacturer": "Boston Scientific",
+      "genericName": "0.018 in PTA balloon",
+      "platform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "evt-guide-pta"},
+      "diameters": {"min": 2, "max": 10, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "lengths": {"min": 20, "max": 220, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "nominalPressure": {"value": 6, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "ratedBurstPressure": {"min": 10, "max": 14, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "sheath": {"min": 4, "max": 5, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-pta"}
+    },
+    {
+      "id": "pta-coyote-otw",
+      "kind": "pta-balloon",
+      "brandName": "Coyote OTW",
+      "manufacturer": "Boston Scientific",
+      "genericName": "0.014 in PTA balloon",
+      "platform": {"value": 0.014, "unit": "in", "confidence": "sourced", "source": "evt-guide-pta"},
+      "diameters": {"min": 1.5, "max": 4, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "lengths": {"min": 40, "max": 220, "unit": "mm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "nominalPressure": {"value": 8, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "ratedBurstPressure": {"value": 14, "unit": "atm", "confidence": "sourced", "source": "evt-guide-pta"},
+      "sheath": {"value": 4, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-pta"}
+    },
+    {
+      "id": "stent-categories",
+      "kind": "stent-class",
+      "genericName": "Stent categories the library needs",
+      "categories": {
+        "options": ["balloon-expandable", "self-expanding", "covered", "venous", "drug-eluting"],
+        "confidence": "estimated",
+        "note": "Design list from the research notes. Each needs nominal diameter and length, delivery sheath, foreshortening and a pressure-diameter rule; named products are a phase-2 import."
+      }
+    },
+    {
+      "id": "thrombectomy-flowtriever",
+      "kind": "thrombectomy-system",
+      "brandName": "FlowTriever",
+      "manufacturer": "Inari Medical",
+      "genericName": "Large-bore mechanical thrombectomy system",
+      "catheters": {"options": ["Triever24", "Triever20", "Triever16"], "confidence": "sourced", "source": "cit-pe-thrombectomy-2022", "note": "Triever20 fits through Triever24."},
+      "sheath": {"options": [22, 24], "unit": "Fr", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"},
+      "diskSizes": {"options": ["6-10 mm", "11-14 mm", "15-18 mm", "19-25 mm"], "confidence": "sourced", "source": "cit-pe-thrombectomy-2022", "note": "Nitinol disks matched to vessel diameter; FlowTriever 2 is a single disk for 6-16 mm vessels."},
+      "bloodReturnFilter": {"value": 40, "unit": "um", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022", "note": "FlowSaver filters aspirated blood for return."}
+    },
+    {
+      "id": "thrombectomy-indigo-lightning",
+      "kind": "thrombectomy-system",
+      "brandName": "Indigo Lightning",
+      "manufacturer": "Penumbra",
+      "genericName": "Computer-aided continuous aspiration system",
+      "catheters": {"options": ["Lightning 12 (12F, 100 cm)", "Lightning 8 (115 cm, telescopes through Lightning 12)"], "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"},
+      "sheath": {"text": "14 to 16F, 65 cm", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"},
+      "behavior": {"text": "Continuous aspiration with clicks and lights as cues; Separator 12 for organized clot", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"}
+    },
+    {
+      "id": "pe-access-kit",
+      "kind": "procedure-kit",
+      "genericName": "Pulmonary embolism access",
+      "steps": [
+        {"text": "Ultrasound-guided femoral vein access.", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"},
+        {"text": "Pigtail or balloon-tipped catheter for pulmonary angiography.", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"},
+        {"text": "Amplatz Super Stiff wire with 1 cm tip, 260 cm, as the rail.", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"}
+      ],
+      "warnings": {"text": "Watch for hemoptysis, tamponade, tricuspid injury and a sudden rise in pulmonary artery pressure.", "confidence": "sourced", "source": "cit-pe-thrombectomy-2022"}
+    },
+    {
+      "id": "ivcf-option-elite",
+      "kind": "ivc-filter",
+      "brandName": "Option Elite",
+      "manufacturer": "Argon",
+      "genericName": "Retrievable nitinol IVC filter",
+      "introducer": {"value": 5, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-filters"},
+      "maxCavaDiameter": {"value": 30, "unit": "mm", "confidence": "sourced", "source": "evt-guide-filters"},
+      "routes": {"options": ["femoral", "jugular", "antecubital", "popliteal"], "confidence": "sourced", "source": "evt-guide-filters"},
+      "material": {"text": "nitinol", "confidence": "sourced", "source": "evt-guide-filters"}
+    },
+    {
+      "id": "ivcf-optease",
+      "kind": "ivc-filter",
+      "brandName": "OptEase",
+      "manufacturer": "Cordis",
+      "genericName": "Retrievable IVC filter",
+      "introducer": {"value": 6, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-filters"},
+      "maxCavaDiameter": {"value": 30, "unit": "mm", "confidence": "sourced", "source": "evt-guide-filters"},
+      "notes": {"text": "TrapEase is its permanent sibling.", "confidence": "sourced", "source": "evt-guide-filters"}
+    },
+    {
+      "id": "ivcf-celect-platinum",
+      "kind": "ivc-filter",
+      "brandName": "Celect Platinum",
+      "manufacturer": "Cook",
+      "genericName": "Retrievable IVC filter",
+      "introducer": {"value": 7, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-filters"},
+      "maxCavaDiameter": {"value": 30, "unit": "mm", "confidence": "sourced", "source": "evt-guide-filters"},
+      "routes": {"options": ["femoral", "jugular"], "confidence": "sourced", "source": "evt-guide-filters"},
+      "material": {"text": "Conichrome", "confidence": "sourced", "source": "evt-guide-filters"}
+    },
+    {
+      "id": "ivcf-gunther-tulip",
+      "kind": "ivc-filter",
+      "brandName": "Günther Tulip",
+      "manufacturer": "Cook",
+      "genericName": "Retrievable IVC filter",
+      "introducer": {"value": 7, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-filters"},
+      "maxCavaDiameter": {"value": 30, "unit": "mm", "confidence": "sourced", "source": "evt-guide-filters"},
+      "routes": {"options": ["femoral", "jugular"], "confidence": "sourced", "source": "evt-guide-filters"},
+      "material": {"text": "Conichrome", "confidence": "sourced", "source": "evt-guide-filters"}
+    },
+    {
+      "id": "ivcf-aln",
+      "kind": "ivc-filter",
+      "brandName": "ALN",
+      "genericName": "Retrievable stainless steel IVC filter",
+      "introducer": {"value": 7, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-filters"},
+      "maxCavaDiameter": {"value": 32, "unit": "mm", "confidence": "sourced", "source": "evt-guide-filters"},
+      "routes": {"options": ["femoral", "jugular", "brachial"], "confidence": "sourced", "source": "evt-guide-filters"},
+      "material": {"text": "stainless steel", "confidence": "sourced", "source": "evt-guide-filters"}
+    },
+    {
+      "id": "ivcf-denali",
+      "kind": "ivc-filter",
+      "brandName": "Denali",
+      "manufacturer": "BD",
+      "genericName": "Retrievable nitinol IVC filter",
+      "introducer": {"value": 8.4, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-filters"},
+      "maxCavaDiameter": {"value": 28, "unit": "mm", "confidence": "sourced", "source": "evt-guide-filters"},
+      "routes": {"options": ["femoral", "jugular"], "confidence": "sourced", "source": "evt-guide-filters"},
+      "material": {"text": "nitinol", "confidence": "sourced", "source": "evt-guide-filters"}
+    },
+    {
+      "id": "ivcf-retrieval",
+      "kind": "procedure-facts",
+      "genericName": "IVC filter retrieval",
+      "standardSuccess": {"value": 93, "unit": "%", "confidence": "sourced", "source": "thoracickey-filter-retrieval", "note": "Standard snare-and-sheath retrieval from the right internal jugular vein; approximately."},
+      "tiltThreshold": {"value": 15, "unit": "deg", "confidence": "sourced", "source": "thoracickey-filter-retrieval", "note": "Tilt above 15 degrees complicates retrieval."},
+      "bestWindow": {"min": 29, "max": 54, "unit": "day", "confidence": "sourced", "source": "thoracickey-filter-retrieval", "note": "Days after placement."},
+      "advancedTechniques": {"options": ["loop-snare (Bentson wire, EN Snare, 18F inner and 22F outer coaxial sheaths)", "wire displacement", "dual-access traction", "balloon displacement"], "confidence": "sourced", "source": "thoracickey-filter-retrieval"}
+    },
+    {
+      "id": "tips-procedure",
+      "kind": "procedure-facts",
+      "genericName": "TIPS creation",
+      "steps": [
+        {"text": "Right internal jugular venous access.", "confidence": "sourced", "source": "articl-tips"},
+        {"text": "Select the right or middle hepatic vein with a 5F angled catheter; CO2 wedged hepatic venography.", "confidence": "sourced", "source": "articl-tips"},
+        {"text": "Pass a 10F Colapinto sheath and 16G needle from the hepatic vein to the portal vein.", "confidence": "sourced", "source": "articl-tips"},
+        {"text": "Place a stiff wire into the portal vein and dilate the tract to 10 to 12 mm.", "confidence": "sourced", "source": "articl-tips"},
+        {"text": "Deploy an 8 to 10 mm covered stent-graft with 1 to 2 cm landing zones.", "confidence": "sourced", "source": "articl-tips"}
+      ],
+      "targetGradient": {"max": 12, "unit": "mmHg", "confidence": "sourced", "source": "articl-tips", "note": "Portosystemic gradient target under 12 mmHg, from a typical 18 to 25 mmHg. Secondary summary; verify against a society guideline."},
+      "toSource": {"text": "Viatorr controlled-expansion graft and the Rösch-Uchida set", "confidence": "placeholder"}
+    },
+    {
+      "id": "snare-gooseneck",
+      "kind": "snare",
+      "brandName": "Amplatz GooseNeck snare and microsnare",
+      "manufacturer": "Medtronic",
+      "genericName": "Single-loop snare",
+      "loopSizes": {"text": "Snare 5 to 35 mm; microsnare 2, 4 and 7 mm", "confidence": "sourced", "source": "evt-guide-snares"},
+      "design": {"text": "Single loop at 90 degrees to the shaft", "confidence": "sourced", "source": "evt-guide-snares"},
+      "catheter": {"text": "4 to 6F (snare); 2.3 to 3F (microsnare)", "confidence": "sourced", "source": "evt-guide-snares"}
+    },
+    {
+      "id": "snare-en-snare",
+      "kind": "snare",
+      "brandName": "EN Snare",
+      "manufacturer": "Merit Medical",
+      "genericName": "Three-loop snare",
+      "loopSizes": {"text": "Standard 6 to 45 mm; mini 2 to 8 mm", "confidence": "sourced", "source": "evt-guide-snares"},
+      "design": {"text": "Three interlaced loops", "confidence": "sourced", "source": "evt-guide-snares"},
+      "catheter": {"text": "6 to 7F (standard); 3.2F (mini)", "confidence": "sourced", "source": "evt-guide-snares"}
+    },
+    {
+      "id": "snare-atrieve",
+      "kind": "snare",
+      "brandName": "Atrieve",
+      "manufacturer": "Argon",
+      "genericName": "Three-loop snare",
+      "loopSizes": {"min": 6, "max": 45, "unit": "mm", "confidence": "sourced", "source": "evt-guide-snares"},
+      "design": {"text": "Three loops", "confidence": "sourced", "source": "evt-guide-snares"},
+      "catheter": {"min": 3.2, "max": 7, "unit": "Fr", "confidence": "sourced", "source": "evt-guide-snares"}
+    },
+    {
+      "id": "retrieval-alligator",
+      "kind": "retrieval-device",
+      "brandName": "Alligator retrieval device",
+      "manufacturer": "Medtronic",
+      "genericName": "Four-jaw retrieval forceps",
+      "jawOpening": {"min": 2, "max": 5, "unit": "mm", "confidence": "sourced", "source": "evt-guide-snares"},
+      "catheter": {"text": "0.021 in microcatheter", "confidence": "sourced", "source": "evt-guide-snares"}
+    }
+  ],
+  "rules": [
+    {"id": "snare-bailout", "text": "Snares retrieve migrated coils, fractured wires and filters; they are the sim's main bailout tool.", "confidence": "sourced", "source": "evt-guide-snares"},
+    {"id": "balloon-platform", "text": "A balloon or stent tracks only on its labeled wire platform and enters only its labeled sheath size.", "confidence": "sourced", "source": "evt-guide-pta"}
+  ]
+}

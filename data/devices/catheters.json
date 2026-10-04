@@ -1,0 +1,223 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "catheter",
+  "notes": "Curve geometry (segment lengths, angles) and stiffness are not published in the sources read; they are placeholders to be built from manufacturer drawings or instructions for use and tuned with faculty. French size of a catheter is its outer diameter (1 Fr = 1/3 mm).",
+  "items": [
+    {
+      "id": "cath-pigtail",
+      "kind": "flush-catheter",
+      "brandName": "Pigtail",
+      "genericName": "Pigtail flush catheter",
+      "family": {"text": "flush", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "geometry": {
+        "outerDiameter": {"min": 5, "max": 8, "unit": "Fr", "confidence": "sourced", "source": "dir-catheters-2023"},
+        "length": {"min": 65, "max": 110, "unit": "cm", "confidence": "sourced", "source": "dir-catheters-2023"},
+        "sideHoles": {"text": "4-12 non-opposed side holes in the last 5 cm", "confidence": "sourced", "source": "dir-catheters-2023"}
+      },
+      "targets": {"options": ["aortography", "high-flow vessels"], "confidence": "sourced", "source": "dir-catheters-2023"}
+    },
+    {
+      "id": "cath-omni-flush",
+      "kind": "flush-catheter",
+      "brandName": "Omni Flush (Soft-Vu)",
+      "manufacturer": "AngioDynamics",
+      "genericName": "Omni-type flush catheter",
+      "family": {"text": "flush", "confidence": "sourced", "source": "lsu-primer"},
+      "geometry": {
+        "sizesAndLengths": {"text": "4F: 65, 90, 100, 110 cm; 5F: 65, 90, 100 cm; 6F: 65 cm", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "wireCompatibility": {"options": [0.035, 0.038], "unit": "in", "confidence": "sourced", "source": "angiodynamics-softvu"}
+      },
+      "targets": {"options": ["aortography", "crossing the aortic bifurcation"], "confidence": "estimated", "note": "Up-and-over use is standard teaching; confirm with faculty."}
+    },
+    {
+      "id": "cath-multipurpose",
+      "kind": "selective-catheter",
+      "brandName": "Multipurpose (MPA, MPB)",
+      "genericName": "Multipurpose catheter",
+      "family": {"text": "simple curve, gentle 120 deg primary curve", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "targets": {"options": ["general selective angiography"], "confidence": "sourced", "source": "dir-catheters-2023"}
+    },
+    {
+      "id": "cath-berenstein",
+      "kind": "selective-catheter",
+      "brandName": "Berenstein (Soft-Vu)",
+      "manufacturer": "AngioDynamics",
+      "genericName": "Angled-tip selective catheter",
+      "family": {"text": "simple curve", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "geometry": {
+        "outerDiameter": {"options": [4, 5, 6], "unit": "Fr", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "length": {"min": 40, "max": 140, "unit": "cm", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "wireCompatibility": {"options": [0.035, 0.038], "unit": "in", "confidence": "sourced", "source": "angiodynamics-softvu"}
+      }
+    },
+    {
+      "id": "cath-kumpe",
+      "kind": "selective-catheter",
+      "brandName": "Kumpe (Soft-Vu)",
+      "manufacturer": "AngioDynamics",
+      "genericName": "Short-angle selective catheter",
+      "geometry": {
+        "outerDiameter": {"options": [4, 5], "unit": "Fr", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "length": {"min": 40, "max": 100, "unit": "cm", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "wireCompatibility": {"options": [0.035, 0.038], "unit": "in", "confidence": "sourced", "source": "angiodynamics-softvu"}
+      }
+    },
+    {
+      "id": "cath-headhunter",
+      "kind": "selective-catheter",
+      "brandName": "Headhunter H1, H3 (Soft-Vu)",
+      "manufacturer": "AngioDynamics",
+      "genericName": "Headhunter catheter",
+      "family": {"text": "H1 simple curve; H2, H3 complex curve", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "geometry": {"outerDiameter": {"options": [4, 5], "unit": "Fr", "confidence": "sourced", "source": "angiodynamics-softvu"}, "length": {"min": 65, "max": 100, "unit": "cm", "confidence": "sourced", "source": "angiodynamics-softvu"}},
+      "targets": {"options": ["arch vessels"], "confidence": "sourced", "source": "thoracickey-angiography"}
+    },
+    {
+      "id": "cath-vertebral",
+      "kind": "selective-catheter",
+      "brandName": "Vertebral (Soft-Vu)",
+      "manufacturer": "AngioDynamics",
+      "genericName": "Vertebral catheter",
+      "family": {"text": "simple curve", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "geometry": {"outerDiameter": {"value": 5, "unit": "Fr", "confidence": "sourced", "source": "angiodynamics-softvu"}, "length": {"min": 100, "max": 130, "unit": "cm", "confidence": "sourced", "source": "angiodynamics-softvu"}}
+    },
+    {
+      "id": "cath-glidecath",
+      "kind": "selective-catheter",
+      "brandName": "Glidecath",
+      "manufacturer": "Terumo",
+      "genericName": "Hydrophilic selective catheter",
+      "geometry": {"tipShapes": {"text": "many tip types; commonly a 45 deg angle", "confidence": "sourced", "source": "lsu-primer"}},
+      "mechanics": {"coating": {"text": "hydrophilic", "confidence": "sourced", "source": "lsu-primer"}}
+    },
+    {
+      "id": "cath-cobra",
+      "kind": "selective-catheter",
+      "brandName": "Cobra C1, C2, C3",
+      "genericName": "Cobra double-curve catheter",
+      "family": {"text": "complex (double) curve; C1 to C3 grow in curve size", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "geometry": {
+        "outerDiameter": {"options": [4, 5, 6], "unit": "Fr", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "length": {"min": 65, "max": 100, "unit": "cm", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "wireCompatibility": {"options": [0.035, 0.038], "unit": "in", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "curveGeometry": {"text": "primary and secondary curve lengths and angles", "confidence": "placeholder"}
+      },
+      "targets": {"options": ["renal", "bronchial", "celiac"], "confidence": "sourced", "source": "dir-catheters-2023"}
+    },
+    {
+      "id": "cath-rdc",
+      "kind": "selective-catheter",
+      "brandName": "Renal double curve (RDC)",
+      "genericName": "Renal double-curve catheter",
+      "geometry": {"outerDiameter": {"options": [4, 5], "unit": "Fr", "confidence": "sourced", "source": "angiodynamics-softvu"}, "length": {"value": 65, "unit": "cm", "confidence": "sourced", "source": "angiodynamics-softvu"}},
+      "targets": {"options": ["acutely angled renal artery origin"], "confidence": "sourced", "source": "dir-catheters-2023"}
+    },
+    {
+      "id": "cath-simmons",
+      "kind": "selective-catheter",
+      "brandName": "Simmons (Sidewinder) 1, 2, 3",
+      "genericName": "Simmons reverse-curve catheter",
+      "family": {"text": "reverse curve with three curves; advances into the branch with a withdrawal motion", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "formation": {"options": ["left subclavian (best and safest)", "renal artery", "aortic bifurcation", "ascending aorta"], "confidence": "sourced", "source": "dir-catheters-2023"},
+      "targets": {"options": ["tortuous arch anatomy"], "confidence": "sourced", "source": "dir-catheters-2023"},
+      "teaching": [
+        {"text": "Sim 1 to 3 differ in length.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "cath-sos-omni",
+      "kind": "selective-catheter",
+      "brandName": "Sos Omni 0, 0 Jr, 0 Mini, 1, 2, 3 (Soft-Vu)",
+      "manufacturer": "AngioDynamics",
+      "genericName": "Sos reverse-curve catheter",
+      "family": {"text": "reverse curve", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "geometry": {
+        "outerDiameter": {"options": [4, 5], "unit": "Fr", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "length": {"min": 65, "max": 80, "unit": "cm", "confidence": "sourced", "source": "angiodynamics-softvu"},
+        "wireCompatibility": {"options": [0.035, 0.038], "unit": "in", "confidence": "sourced", "source": "angiodynamics-softvu"}
+      },
+      "targets": {"options": ["visceral and renal arteries"], "confidence": "sourced", "source": "thoracickey-angiography"}
+    },
+    {
+      "id": "cath-rosch-celiac",
+      "kind": "selective-catheter",
+      "brandName": "Rosch Celiac RC1, RC2, RC3",
+      "genericName": "Rosch celiac reverse-curve catheter",
+      "family": {"text": "reverse curve", "confidence": "sourced", "source": "dir-catheters-2023"},
+      "targets": {"options": ["celiac", "SMA", "IMA (RC3)"], "confidence": "sourced", "source": "dir-catheters-2023"}
+    },
+    {
+      "id": "cath-rosch-specialty",
+      "kind": "selective-catheter",
+      "brandName": "Rosch Left Gastric, Hepatic, Dorsal Pancreatic",
+      "genericName": "Rosch superselective catheters",
+      "targets": {"options": ["left gastric", "hepatic", "dorsal pancreatic"], "confidence": "sourced", "source": "dir-catheters-2023"}
+    },
+    {
+      "id": "cath-mikaelsson",
+      "kind": "selective-catheter",
+      "brandName": "Mikaelsson",
+      "manufacturer": "AngioDynamics",
+      "genericName": "Mikaelsson reverse-curve catheter",
+      "teaching": [
+        {"text": "Shape helps anchor the catheter in place.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "cath-roberts-uterine",
+      "kind": "selective-catheter",
+      "brandName": "Roberts Uterine Artery catheter",
+      "genericName": "Uterine artery catheter",
+      "targets": {"options": ["both uterine arteries"], "confidence": "sourced", "source": "dir-catheters-2023"}
+    },
+    {
+      "id": "cath-radial-sarah",
+      "kind": "selective-catheter",
+      "brandName": "Optitorque Sarah",
+      "manufacturer": "Terumo",
+      "genericName": "Radial-length visceral catheter",
+      "geometry": {"outerDiameter": {"value": 5, "unit": "Fr", "confidence": "sourced", "source": "evt-radial-2019"}, "length": {"value": 110, "unit": "cm", "confidence": "sourced", "source": "evt-radial-2019"}}
+    },
+    {
+      "id": "cath-radial-ultimate-2",
+      "kind": "selective-catheter",
+      "brandName": "Ultimate 2 (Performa)",
+      "manufacturer": "Merit Medical",
+      "genericName": "Radial-length visceral catheter",
+      "geometry": {"outerDiameter": {"value": 5, "unit": "Fr", "confidence": "sourced", "source": "evt-radial-2019"}, "length": {"value": 125, "unit": "cm", "confidence": "sourced", "source": "evt-radial-2019"}}
+    },
+    {
+      "id": "cath-guide",
+      "kind": "guide-catheter",
+      "genericName": "Guide catheter (reinforced, non-tapered)",
+      "geometry": {
+        "outerDiameter": {"min": 6, "max": 8, "unit": "Fr", "confidence": "sourced", "source": "dir-catheters-2023"},
+        "length": {"min": 65, "max": 100, "unit": "cm", "confidence": "sourced", "source": "dir-catheters-2023"},
+        "innerDiameterExample": {"value": 1.8, "unit": "mm", "confidence": "sourced", "source": "dir-catheters-2023", "note": "6F Heartrail III guide versus 1.3 mm for a 6F Optitorque diagnostic catheter"}
+      }
+    },
+    {
+      "id": "cath-cragg-mcnamara",
+      "kind": "infusion-catheter",
+      "brandName": "Cragg-McNamara",
+      "genericName": "Side-slit infusion catheter for thrombolysis",
+      "geometry": {"outerDiameter": {"options": [4, 5], "unit": "Fr", "confidence": "sourced", "source": "dir-catheters-2023"}, "infusionLength": {"min": 5, "max": 50, "unit": "cm", "confidence": "sourced", "source": "dir-catheters-2023"}}
+    },
+    {
+      "id": "cath-micromewi",
+      "kind": "infusion-catheter",
+      "brandName": "MicroMewi",
+      "genericName": "Small infusion catheter",
+      "geometry": {"outerDiameter": {"value": 2.9, "unit": "Fr", "confidence": "sourced", "source": "dir-catheters-2023"}, "infusionLength": {"min": 5, "max": 10, "unit": "cm", "confidence": "sourced", "source": "dir-catheters-2023"}}
+    }
+  ],
+  "rules": [
+    {"id": "cath-over-wire", "text": "Catheters are advanced in the vessel only over a wire.", "confidence": "sourced", "source": "radiologykey-tools"},
+    {"id": "cath-diagnostic-size", "text": "Most diagnostic angiography uses 4 or 5F catheters over 0.035 or 0.038 in wires.", "confidence": "sourced", "source": "dir-catheters-2023"},
+    {"id": "cath-torque", "text": "Torsional strength scales with outer diameter to the fourth minus inner diameter to the fourth; wire braid raises rotational stability about 3-fold.", "confidence": "sourced", "source": "dir-catheters-2023"},
+    {"id": "cath-flow", "text": "Flow follows Poiseuille: doubling the inner diameter gives 16 times the flow; longer catheters flow less.", "confidence": "sourced", "source": "dir-catheters-2023"},
+    {"id": "cath-jet", "text": "A high-pressure jet from an end hole against the wall can inject subintimally; side holes reduce recoil.", "confidence": "sourced", "source": "dir-catheters-2023"},
+    {"id": "cath-steam-shape", "text": "Catheter curves can be reshaped by steam heating, bending and quenching in cold sterile saline.", "confidence": "sourced", "source": "dir-catheters-2023"},
+    {"id": "cath-chuang-110", "text": "Chuang 110 rule: tip length past the primary curve and curve width about 110% of the native artery.", "confidence": "sourced", "source": "dir-catheters-2023"}
+  ]
+}

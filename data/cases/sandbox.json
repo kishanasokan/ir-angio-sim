@@ -1,0 +1,73 @@
+{
+  "schema": "ir-sim/case@0",
+  "id": "sandbox-phantoms",
+  "title": "Device sandbox",
+  "modes": ["sandbox"],
+  "summary": "Free practice with a wire and a 5F catheter in three test phantoms. No patient, no contrast physics, no scoring.",
+  "anatomy": {"options": ["phantom-a-straight", "phantom-b-bend", "phantom-c-bifurcation"], "default": "phantom-c-bifurcation"},
+  "start": {
+    "sheath": {
+      "device": "sheath-introducer",
+      "select": {"innerDiameter": {"value": 5, "unit": "Fr"}},
+      "choices": [4, 5, 6]
+    },
+    "at": "inlet-sheath",
+    "insertion": [
+      {
+        "rodModel": "rm-berenstein-5f-65",
+        "tipBeyondAccess": {"value": 20, "unit": "mm", "confidence": "design", "note": "Catheter tip 20 mm past the sheath tip into the vessel."},
+        "hubRotation": {"value": 0, "unit": "deg", "confidence": "design"}
+      },
+      {
+        "rodModel": "rm-glidewire-035-angled-150",
+        "tipBeyondAccess": {"value": 30, "unit": "mm", "confidence": "design", "note": "Wire tip 10 mm beyond the catheter tip."},
+        "hubRotation": {"value": 180, "unit": "deg", "confidence": "design", "note": "Tip bend starts facing -x, so the demo has to turn it."}
+      }
+    ]
+  },
+  "inventory": [
+    {"rodModel": "rm-glidewire-035-angled-150"},
+    {"rodModel": "rm-bentson-035-145"},
+    {"rodModel": "rm-amplatz-bard-035-180"},
+    {"rodModel": "rm-berenstein-5f-65"}
+  ],
+  "initialStack": ["rm-berenstein-5f-65", "rm-glidewire-035-angled-150"],
+  "autopilot": [
+    {
+      "id": "sandbox-c-left",
+      "anatomy": "phantom-c-bifurcation",
+      "description": "Advance the wire to 60 mm below the carina, turn the angled tip toward +x, advance into the left daughter, then track the catheter until its tip is 20 mm past the carina.",
+      "params": {
+        "wireStopBelowCarina": {"value": 60, "unit": "mm", "confidence": "design"},
+        "wireAdvanceIntoBranch": {"value": 80, "unit": "mm", "confidence": "design"},
+        "catheterPastCarina": {"value": 20, "unit": "mm", "confidence": "design"},
+        "fluoroTapEvery": {"value": 2, "unit": "s", "confidence": "design"},
+        "fluoroTapLength": {"value": 0.5, "unit": "s", "confidence": "design", "note": "Fluoro is held this long on each tap."},
+        "tipAlignTolerance": {"value": 10, "unit": "deg", "confidence": "design", "note": "The script waits until the tip's bend direction is this close to +x before advancing."}
+      }
+    },
+    {
+      "id": "sandbox-b-bend",
+      "anatomy": "phantom-b-bend",
+      "description": "Advance wire then catheter through the bend; pull the wire back until its tip is 50 mm behind the catheter tip so the catheter tip re-forms.",
+      "params": {
+        "catheterPastBend": {"value": 40, "unit": "mm", "confidence": "design", "note": "Catheter tip distance beyond the end of the bend."},
+        "wireWithdrawBehindCatheterTip": {"value": 50, "unit": "mm", "confidence": "design"},
+        "wireLeadOverCatheter": {"value": 20, "unit": "mm", "confidence": "design", "note": "The wire tip stays this far ahead of the catheter tip while both advance."}
+      }
+    },
+    {
+      "id": "sandbox-a-buckle",
+      "anatomy": "phantom-a-straight",
+      "description": "Deliberately bad: advance the wire to the cap, then keep pushing to show buckling, the red resistance meter and rumble.",
+      "params": {
+        "extraPush": {"value": 20, "unit": "mm", "confidence": "design"},
+        "pushSpeed": {"value": 20, "unit": "mm/s", "confidence": "design"},
+        "stallSpeed": {"value": 1, "unit": "mm/s", "confidence": "design", "note": "The tip counts as stopped at the cap below this speed."},
+        "stallTime": {"value": 0.1, "unit": "s", "confidence": "design"}
+      }
+    }
+  ],
+  "disclaimer": "required",
+  "targetDistance": {"value": 30, "unit": "cm", "confidence": "design", "note": "Distance from the access to the farthest phantom target; used by the limit-wire-length rule."}
+}

@@ -1,0 +1,195 @@
+{
+  "schema": "ir-sim/imaging@1",
+  "notes": "Imaging chain reference: gantry and table limits from a Philips Azurion 7 biplane frontal arm (a real, current system; the sim's UI follows Siemens-style conventions without branding), imaging modes, SIR dose thresholds, skin effects, starting injection protocols and contrast limits. The Azurion detector listed is the 30 cm cardiac-size panel; body IR rooms usually have a larger panel (size to confirm).",
+  "gantry": {
+    "rotation": {"min": -120, "max": 120, "unit": "deg", "confidence": "sourced", "source": "philips-azurion-b12", "note": "120 deg LAO to 120 deg RAO. Sim convention: positive = LAO."},
+    "rotationSpeedMax": {"value": 25, "unit": "deg/s", "confidence": "sourced", "source": "philips-azurion-b12"},
+    "angulation": {"min": -45, "max": 45, "unit": "deg", "confidence": "sourced", "source": "philips-azurion-b12", "note": "45 deg cranial to 45 deg caudal. Sim convention: positive = cranial."},
+    "angulationSpeedMax": {"value": 25, "unit": "deg/s", "confidence": "sourced", "source": "philips-azurion-b12"},
+    "sourceToImageDistance": {"min": 89, "max": 123.5, "unit": "cm", "confidence": "sourced", "source": "philips-azurion-b12"},
+    "focalSpotToIsocenter": {"value": 76.5, "unit": "cm", "confidence": "sourced", "source": "philips-azurion-b12"},
+    "detectorDiagonal": {"value": 30, "unit": "cm", "confidence": "sourced", "source": "philips-azurion-b12", "note": "Cardiac-size panel."},
+    "zoomFields": {"options": [30, 27, 23, 19, 16], "unit": "cm", "confidence": "sourced", "source": "philips-azurion-b12"}
+  },
+  "table": {
+    "height": {"min": 74, "max": 102, "unit": "cm", "confidence": "sourced", "source": "philips-azurion-b12"},
+    "longitudinalTravel": {"value": 120, "unit": "cm", "confidence": "sourced", "source": "philips-azurion-b12"},
+    "lateralTravel": {"value": 36, "unit": "cm", "confidence": "sourced", "source": "philips-azurion-b12"},
+    "maxPatientWeight": {"value": 325, "unit": "kg", "confidence": "sourced", "source": "philips-azurion-b12"}
+  },
+  "rates": {
+    "fluoroPulseRates": {"options": [3.75, 7.5, 15, 30], "unit": "Hz", "confidence": "sourced", "source": "philips-azurion-b12", "note": "Pulses per second."},
+    "acquisitionFrameRates": {"min": 0.5, "max": 6, "unit": "Hz", "confidence": "sourced", "source": "philips-azurion-b12", "note": "Standard range; 25/30 and 50/60 frames/s optional."},
+    "lowDosePaeFluoro": {"value": 3.75, "unit": "Hz", "confidence": "sourced", "source": "cvir-pae-guidance"},
+    "lowDosePaeDsa": {"value": 1, "unit": "Hz", "confidence": "sourced", "source": "cvir-pae-guidance", "note": "0.5 frames/s for documentation runs."}
+  },
+  "projections": [
+    {"target": "Aortic arch", "projection": {"text": "30 deg LAO", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {"target": "Carotid arteries", "projection": {"text": "Ipsilateral oblique 30 deg and lateral", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {"target": "Renal arteries", "projection": {"text": "AP plus ipsilateral oblique 20-30 deg", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {"target": "Iliac arteries", "projection": {"text": "AP", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {
+      "target": "Iliac bifurcation (internal and external iliac origins)",
+      "projection": {
+        "text": "Contralateral oblique: RAO about 30 deg opens the left bifurcation, LAO the right",
+        "confidence": "estimated",
+        "note": "Standard teaching; add a source. The planning doc had this row reversed and attributed to Thoracic Key, whose table lists AP for the iliac arteries."
+      }
+    },
+    {"target": "Celiac, SMA and IMA", "projection": {"text": "AP", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {"target": "Celiac and SMA origins", "projection": {"text": "Lateral", "confidence": "estimated", "note": "Draft; confirm with an IR reviewer."}},
+    {"target": "Lower extremity runoff", "projection": {"text": "AP", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {"target": "Pulmonary arteries", "projection": {"text": "LAO or RAO 30 deg", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {
+      "target": "Prostatic arteries",
+      "projection": {
+        "text": "Working angle chosen from a 3D roadmap rather than a fixed 45 deg ipsilateral oblique; ipsilateral oblique for origins at risk of reflux into the internal pudendal; PA otherwise to save dose",
+        "confidence": "sourced",
+        "source": "cvir-pae-guidance"
+      }
+    },
+    {"target": "Common femoral bifurcation", "projection": {"text": "Ipsilateral oblique", "confidence": "estimated", "note": "Draft; confirm with an IR reviewer."}},
+    {"target": "Uterine artery origins", "projection": {"text": "To source", "confidence": "placeholder"}}
+  ],
+  "modes": [
+    {"id": "fluoro", "behavior": {"text": "Pulsed live image, last-image hold, stored fluoro loops", "confidence": "estimated", "note": "Standard behavior; pulse rates are sourced in rates.fluoroPulseRates."}},
+    {"id": "dsa", "behavior": {"text": "Mask frame, then subtraction; motion causes misregistration; pixel shift and remask fix it", "confidence": "estimated", "note": "Standard DSA behavior; add a source."}},
+    {"id": "roadmap", "behavior": {"text": "Subtracted vessel map overlaid on live fluoro; invalid once the C-arm, table or patient moves", "confidence": "estimated", "note": "Standard behavior; add a source."}},
+    {"id": "bolus-chase", "behavior": {"text": "Stepping table follows contrast down the legs", "confidence": "sourced", "source": "thoracickey-angiography"}},
+    {
+      "id": "cone-beam-ct",
+      "behavior": {
+        "text": "Rotational spin reconstructed to 3D. PAE example: 5 s, 180 deg spin; 22-26 mL pure contrast at 2 mL/s with a 6-8 s X-ray delay from the internal iliac; distal spins need an 8-10 s delay",
+        "confidence": "sourced",
+        "source": "cvir-pae-guidance"
+      }
+    },
+    {
+      "id": "3d-roadmap",
+      "behavior": {
+        "text": "Segmented 3D vessels overlaid on live fluoro, staying registered as gantry and table move; predicted territory of a selective injection (for example GE Embo ASSIST). Cone-beam CT changed PAE treatment in 46% of patients",
+        "confidence": "sourced",
+        "source": "cvir-pae-guidance"
+      }
+    }
+  ],
+  "dose": {
+    "metrics": [
+      {
+        "id": "kar",
+        "name": "Reference air kerma (Ka,r)",
+        "definition": {"text": "Air kerma at a point 15 cm from isocenter toward the tube", "confidence": "sourced", "source": "sir-dose-2009"},
+        "firstNotification": {"value": 3000, "unit": "mGy", "confidence": "sourced", "source": "sir-dose-2009"},
+        "notificationStep": {"value": 1000, "unit": "mGy", "confidence": "sourced", "source": "sir-dose-2009"},
+        "followUpLevel": {"value": 5000, "unit": "mGy", "confidence": "sourced", "source": "sir-dose-2009", "note": "Above this level"}
+      },
+      {
+        "id": "pka",
+        "name": "Kerma-area product (PKA)",
+        "definition": {"text": "Air kerma integrated over the beam area", "confidence": "sourced", "source": "sir-dose-2009"},
+        "firstNotification": {"value": 300, "unit": "Gy*cm2", "confidence": "sourced", "source": "sir-dose-2009"},
+        "notificationStep": {"value": 100, "unit": "Gy*cm2", "confidence": "sourced", "source": "sir-dose-2009"},
+        "followUpLevel": {"value": 500, "unit": "Gy*cm2", "confidence": "sourced", "source": "sir-dose-2009", "note": "Above this level"}
+      },
+      {
+        "id": "psd",
+        "name": "Peak skin dose",
+        "definition": {"text": "Highest dose to any skin point, scatter included", "confidence": "sourced", "source": "sir-dose-2009"},
+        "firstNotification": {"value": 2000, "unit": "mGy", "confidence": "sourced", "source": "sir-dose-2009"},
+        "notificationStep": {"value": 500, "unit": "mGy", "confidence": "sourced", "source": "sir-dose-2009"},
+        "followUpLevel": {"value": 3000, "unit": "mGy", "confidence": "sourced", "source": "sir-dose-2009", "note": "Above this level"}
+      },
+      {
+        "id": "fluoro-time",
+        "name": "Fluoroscopy time",
+        "definition": {"text": "Total beam-on fluoro time; correlates poorly with skin dose", "confidence": "sourced", "source": "sir-dose-2009"},
+        "firstNotification": {"value": 30, "unit": "min", "confidence": "sourced", "source": "sir-dose-2009"},
+        "notificationStep": {"value": 15, "unit": "min", "confidence": "sourced", "source": "sir-dose-2009"},
+        "followUpLevel": {"value": 60, "unit": "min", "confidence": "sourced", "source": "sir-dose-2009", "note": "Above this level"}
+      }
+    ],
+    "skinEffects": [
+      {"range": {"min": 0, "max": 2, "unit": "Gy", "confidence": "sourced", "source": "sir-dose-2009"}, "effect": "None observable"},
+      {"range": {"min": 2, "max": 5, "unit": "Gy", "confidence": "sourced", "source": "sir-dose-2009"}, "effect": "Transient erythema; hair loss with recovery"},
+      {"range": {"min": 5, "max": 10, "unit": "Gy", "confidence": "sourced", "source": "sir-dose-2009"}, "effect": "Erythema, epilation; possible permanent partial hair loss"},
+      {"range": {"min": 10, "max": 15, "unit": "Gy", "confidence": "sourced", "source": "sir-dose-2009"}, "effect": "Prolonged erythema, permanent epilation, telangiectasia, dermal atrophy over 6-52 weeks"},
+      {"range": {"min": 15, "unit": "Gy", "confidence": "sourced", "source": "sir-dose-2009", "note": "Above 15 Gy."}, "effect": "Ulceration, moist desquamation, dermal necrosis; surgery likely"}
+    ],
+    "doseSavingBehaviors": {
+      "options": ["lowest usable pulse rate", "tight collimation", "maximum source-to-image distance", "minimum patient-to-detector distance", "magnification only when essential", "vary the C-arm angle to spread skin dose"],
+      "confidence": "sourced",
+      "source": "sir-dose-2009"
+    },
+    "paeDapRange": {"min": 33.2, "max": 863.4, "unit": "Gy*cm2", "confidence": "sourced", "source": "cvir-pae-guidance", "note": "Range of published PAE dose-area products between studies."}
+  },
+  "injections": {
+    "notes": "Starting protocols from Table 3.1 of the Thoracic Key angiography chapter. Local protocols vary: an IR reviewer sets the sim defaults and the debrief judges image adequacy, not exact numbers.",
+    "protocols": [
+      {
+        "territory": "Aortic arch",
+        "rate": {"value": 10, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "duration": {"value": 3, "unit": "s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "catheter": "flush"
+      },
+      {
+        "territory": "Abdominal aorta, mesenteric survey",
+        "rate": {"value": 20, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "duration": {"value": 2, "unit": "s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "catheter": "flush"
+      },
+      {
+        "territory": "Abdominal aorta, renal survey",
+        "rate": {"value": 20, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "duration": {"value": 0.5, "unit": "s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "catheter": "flush",
+        "mode": "dsa"
+      },
+      {
+        "territory": "Pelvis",
+        "rate": {"value": 15, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "duration": {"value": 1, "unit": "s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "volume": {"min": 10, "max": 15, "unit": "mL", "confidence": "sourced", "source": "thoracickey-angiography", "note": "Iso-osmolar contrast"},
+        "catheter": "flush",
+        "mode": "dsa"
+      },
+      {
+        "territory": "Runoff (bolus chase)",
+        "rate": {"value": 8, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "duration": {"value": 10, "unit": "s", "confidence": "sourced", "source": "thoracickey-angiography"},
+        "catheter": "flush",
+        "mode": "dsa",
+        "note": "Halve the volume per leg if each leg is injected separately."
+      },
+      {"territory": "Celiac", "rate": {"value": 10, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"}, "catheter": "selective"},
+      {"territory": "SMA", "rate": {"value": 8, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"}, "catheter": "selective"},
+      {"territory": "IMA", "rate": {"value": 3, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"}, "catheter": "selective"},
+      {"territory": "Renal, carotid", "method": {"text": "Hand injection, DSA", "confidence": "sourced", "source": "thoracickey-angiography"}, "catheter": "selective"},
+      {"territory": "Pulmonary artery", "rate": {"value": 20, "unit": "mL/s", "confidence": "sourced", "source": "thoracickey-angiography"}, "duration": {"value": 2, "unit": "s", "confidence": "sourced", "source": "thoracickey-angiography"}}
+    ]
+  },
+  "contrast": {
+    "agents": [
+      {
+        "id": "iohexol",
+        "name": "Iohexol (Omnipaque)",
+        "iodineConcentration": {"min": 140, "max": 350, "unit": "mgI/mL", "confidence": "sourced", "source": "wikipedia-iohexol"},
+        "osmolality": {"min": 322, "max": 844, "unit": "mOsm/kg", "confidence": "sourced", "source": "wikipedia-iohexol"}
+      },
+      {"id": "iso-osmolar", "name": "Iso-osmolar iodixanol; iopamidol", "details": {"text": "Concentrations and viscosity to source from the labels", "confidence": "placeholder"}}
+    ],
+    "kidney": {
+      "akiDefinition": {"text": "Creatinine up at least 0.3 mg/dL or 1.5-fold within 48 h, or urine under 0.5 mL/kg/h for 6 h (AKIN)", "confidence": "sourced", "source": "wikipedia-cin"},
+      "riskThresholdIntraArterialFirstPass": {"value": 45, "unit": "mL/min/1.73m2", "confidence": "sourced", "source": "wikipedia-cin", "note": "eGFR under 45 for intra-arterial injection with first-pass renal exposure."},
+      "riskThresholdIvOrSecondPass": {"value": 30, "unit": "mL/min/1.73m2", "confidence": "sourced", "source": "wikipedia-cin", "note": "eGFR under 30 for IV or second-pass exposure."},
+      "iodineToGfrCeiling": {"value": 1.1, "unit": "g/(mL/min)", "confidence": "sourced", "source": "wikipedia-cin", "note": "Grams of iodine divided by GFR under 1.1 (European); under 0.5 for at-risk patients (Swedish)."},
+      "iodineToGfrCeilingAtRisk": {"value": 0.5, "unit": "g/(mL/min)", "confidence": "sourced", "source": "wikipedia-cin"}
+    },
+    "co2": {"text": "CO2 angiography (for allergy or kidney failure) and gadolinium are phase-2 topics; the sim blocks CO2 above the diaphragm once sourced.", "confidence": "placeholder"}
+  },
+  "injectionModelRules": [
+    {"id": "inj-cap", "text": "Cap achievable flow by catheter lumen and length (Poiseuille) and by the catheter's pressure rating.", "confidence": "sourced", "source": "dir-catheters-2023"},
+    {"id": "inj-reflux", "text": "Injected flow above the vessel's native flow refluxes into the parent vessel; much less gives a faint, streaming run.", "confidence": "estimated", "note": "Model rule; tune with faculty."},
+    {"id": "inj-wedge", "text": "A forceful injection through a wedged end-hole catheter stains the wall subintimally.", "confidence": "sourced", "source": "dir-catheters-2023"},
+    {"id": "inj-totals", "text": "Track total contrast in mL and grams of iodine against the patient's limit.", "confidence": "derived", "source": "wikipedia-cin"}
+  ]
+}

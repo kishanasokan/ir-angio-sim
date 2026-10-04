@@ -1,0 +1,274 @@
+{
+  "schema": "ir-sim/sources@1",
+  "description": "Registry of every source cited by /data and /spec. A quantity with confidence 'sourced' or 'derived' must point to an id in this list. 'opened' is true only when the page itself was read; a search snippet never counts.",
+  "accessed": "2026-10-04",
+  "sources": [
+    {
+      "id": "harrison2011",
+      "title": "Guidewire Stiffness: What's in a Name? (Harrison et al., J Endovasc Ther 2011)",
+      "url": "https://reanimateconference.com/wp-content/uploads/2019/08/Guidewire-Stiffness.pdf",
+      "type": "journal",
+      "opened": true,
+      "notes": "Flexural modulus of eleven 0.035 in wires; three-point bending, 40 mm span, stiff segment beyond 60 cm from the floppy tip."
+    },
+    {
+      "id": "eurointervention-guidewires",
+      "title": "Guidewires for lower extremity artery angioplasty: a review (EuroIntervention)",
+      "url": "https://eurointervention.pcronline.com/article/guidewires-for-lower-extremity-artery-angioplasty-a-review",
+      "type": "journal",
+      "opened": true
+    },
+    {
+      "id": "niemczyk-coatings",
+      "title": "Friction behaviour of hydrophilic lubricious coatings for medical devices (Niemczyk et al.)",
+      "url": "https://eprints.whiterose.ac.uk/id/eprint/112506/7/Niemczyk_et_al__R2.pdf",
+      "type": "journal",
+      "opened": true,
+      "notes": "Uncoated polymer on PVA hydrogel near 0.2; coated values only in figures."
+    },
+    {
+      "id": "lsu-primer",
+      "title": "Wires, Catheters, and More: a primer for residents and fellows (LSU Health)",
+      "url": "https://www.medschool.lsuhsc.edu/radiology/docs/Interventional%20Radiology%20Powerpoint.pdf",
+      "type": "teaching",
+      "opened": true
+    },
+    {"id": "radiologykey-tools", "title": "Tools of the Trade (Radiology Key)", "url": "https://radiologykey.com/tools-of-the-trade/", "type": "textbook", "opened": true},
+    {
+      "id": "terumo-glidewire-brochure",
+      "title": "Terumo Glidewire portfolio brochure (Glidewire, Stiff Shaft, Advantage, Baby-J, GT)",
+      "url": "https://www.terumois.com/en-us/product/glidewire/documents/gw-portfolio-brochure.pdf",
+      "type": "manufacturer",
+      "opened": true
+    },
+    {
+      "id": "medicalecart-micropuncture",
+      "title": "Cook G47947 Micropuncture introducer set listing",
+      "url": "https://www.medicalecart.com/products/cook-medical-g47947-introducer-access-set-micropuncture-4-fr-x-10-cm-length-outer-catheter-21-gauge-x-4-cm-length-needle-for-0-18-inch-diameter-wire-guide-01-unit.html",
+      "type": "listing",
+      "opened": true
+    },
+    {
+      "id": "bsc-microcatheter-brochure",
+      "title": "Boston Scientific microcatheters and guidewires brochure (Direxion, Renegade, TruSelect, Fathom, Transend)",
+      "url": "https://www.bostonscientific.com/content/dam/bostonscientific/pi/portfolio-group/embolization/truselect/microcatheter-guidewire-brochure.pdf",
+      "type": "manufacturer",
+      "opened": true
+    },
+    {
+      "id": "bsc-deadspace",
+      "title": "Boston Scientific microcatheter dead-space comparison table",
+      "url": "https://www.bostonscientific.com/content/dam/bsc/us/pi/ir/ioe/obsidio/downloads/obsidio-embolic-microcatheter-dead-space.pdf",
+      "type": "manufacturer",
+      "opened": true
+    },
+    {"id": "terumo-progreat-brochure", "title": "Terumo Progreat family brochure", "url": "https://www.terumois.com/en-us/product-assets/progreat/Progreat-Family-Brochure.pdf", "type": "manufacturer", "opened": true},
+    {"id": "cook-cantata", "title": "Cook Cantata microcatheter product page", "url": "https://www.cookmedical.com/products/di_mcs_webds/", "type": "manufacturer", "opened": true},
+    {"id": "merit-maestro", "title": "Merit Maestro microcatheter brochure", "url": "https://www.merit.com/wp-content/uploads/2018/10/Merit-Maestro-Microcatheter-Brochure.pdf", "type": "manufacturer", "opened": true},
+    {"id": "penumbra-platform-2023", "title": "Penumbra's Embolization Platform (Endovascular Today insert, 2023)", "url": "https://assets.bmctoday.net/evtoday/pdfs/et0423_FT_Penumbra.pdf", "type": "manufacturer", "opened": true},
+    {
+      "id": "dir-catheters-2023",
+      "title": "Catheters in vascular interventional radiology: an illustrated review (Diagn Interv Radiol 2023)",
+      "url": "https://dirjournal.org/articles/catheters-in-vascular-interventional-radiology-an-illustrated-review/doi/dir.2022.21233",
+      "type": "journal",
+      "opened": true
+    },
+    {
+      "id": "angiodynamics-softvu",
+      "title": "AngioDynamics Soft-Vu angiographic catheters brochure",
+      "url": "https://pelegrinamedical.americommerce.com/Shared/Literaturas/Catalogs%20PMO/AngioDynamics/Literatura/soft-vu-brochure-compressed.pdf",
+      "type": "manufacturer",
+      "opened": true
+    },
+    {
+      "id": "evt-radial-2019",
+      "title": "The Rise of Transradial Access for Embolization (Endovascular Today, 2019)",
+      "url": "https://evtoday.com/articles/2019-nov/the-rise-of-transradial-access-for-embolization",
+      "type": "journal",
+      "opened": true
+    },
+    {"id": "cit-femoral-2008", "title": "Optimal Femoral Access Prevents Complications (Cardiac Interventions Today, 2008)", "url": "https://citoday.com/articles/2008-jan-feb/CIT0108_05-php", "type": "journal", "opened": true},
+    {"id": "cit-micropuncture-2012", "title": "Applying Micropuncture Access (Cardiac Interventions Today, 2012)", "url": "https://citoday.com/articles/2012-sept-oct/applying-micropuncture-access", "type": "journal", "opened": true},
+    {
+      "id": "acc-closure-chapter",
+      "title": "ACC Coronary Interventions Handbook, Chapter 14: Vascular Access Closure",
+      "url": "https://www.acc.org/-/media/Non-Clinical/Files-PDFs-Excel-MS-Word-etc/Membership/Coronary-Interventions-Handbook/Chapter-14_Vascular-Access-Closure.pdf",
+      "type": "textbook",
+      "opened": true
+    },
+    {"id": "cit-closure-guide", "title": "Closure Devices device guide (Cardiac Interventions Today)", "url": "https://citoday.com/device-guide/us/closure-devices-2", "type": "device-guide", "opened": true},
+    {"id": "ijgii-embolics", "title": "Review of embolic materials for gastrointestinal bleeding embolization (IJGII)", "url": "https://www.ijgii.org/journal/view.html?uid=517&vmd=Full", "type": "journal", "opened": true},
+    {
+      "id": "evt-pelvic-trauma-2014",
+      "title": "Transcatheter Embolization for Trauma of the Pelvis (Endovascular Today, 2014)",
+      "url": "https://evtoday.com/articles/2014-sept/transcatheter-embolization-for-trauma-of-the-pelvis",
+      "type": "journal",
+      "opened": true
+    },
+    {"id": "merit-embosphere", "title": "Embosphere microspheres brochure (Merit)", "url": "https://cloud.merit.com/catalog/Brochures/402263001-J.pdf", "type": "manufacturer", "opened": true},
+    {"id": "embozene-sheet", "title": "Embozene microspheres international sales sheet", "url": "https://www.mml-medical.nl/assets/files/embozeneinternationalsalessheeta4rad10789aenpdf-mml-medical.pdf", "type": "manufacturer", "opened": true},
+    {
+      "id": "doctorlib-deb",
+      "title": "Drug-Eluting Beads chapter (Embolization Therapy: Principles and Clinical Applications)",
+      "url": "https://doctorlib.org/therapy/embolization-therapy-principles-clinical-applications/8.html",
+      "type": "textbook",
+      "opened": true
+    },
+    {
+      "id": "nrc-y90",
+      "title": "Radioactive Microsphere Therapy of Hepatic Neoplasm (NRC presentation)",
+      "url": "https://www.nrc.gov/docs/ML1201/ML12010A181.pdf",
+      "type": "guideline",
+      "opened": true,
+      "notes": "The extracted table paired activity per sphere inversely to sphere counts; values here follow the sphere counts (fewer glass spheres, higher activity each)."
+    },
+    {"id": "cirse-coils-plugs-2024", "title": "CIRSE course: Embolization coils and plugs (2024)", "url": "https://cirsecongress.cirse.org/wp-content/uploads/sites/4/2024/07/EMT.CP_.pdf", "type": "course", "opened": true},
+    {
+      "id": "abbott-avp4",
+      "title": "Amplatzer Vascular Plug 4 product page (Abbott)",
+      "url": "https://www.cardiovascular.abbott/us/en/hcp/products/peripheral-intervention/amplatzer-family-vascular-plugs/avp-4.html",
+      "type": "manufacturer",
+      "opened": true
+    },
+    {"id": "evt-glue-2010", "title": "The Use of Glue in Peripheral Applications (Endovascular Today, 2010)", "url": "https://evtoday.com/articles/2010-apr/the-use-of-glue-in-peripheral-applications", "type": "journal", "opened": true},
+    {"id": "fda-onyx-ifu", "title": "Onyx Liquid Embolic System instructions for use (FDA P030004)", "url": "https://www.accessdata.fda.gov/cdrh_docs/pdf3/P030004c.pdf", "type": "ifu", "opened": true},
+    {"id": "radiologykey-evoh", "title": "EVOH/DMSO in Peripheral Application (Radiology Key)", "url": "https://radiologykey.com/evohdmso-in-peripheral-application/", "type": "textbook", "opened": true},
+    {"id": "articl-sts", "title": "Sotradecol (sodium tetradecyl sulfate) for embolization (Articl)", "url": "https://articl.net/interventional-radiology/sotradecol-sodium-tetradecyl-sulfate-for-embolization", "type": "web", "opened": true},
+    {"id": "evt-guide-pta", "title": "PTA balloons device guide (Endovascular Today)", "url": "https://evtoday.com/device-guide/us/pta-balloons", "type": "device-guide", "opened": true},
+    {"id": "evt-guide-filters", "title": "Vena cava filters device guide (Endovascular Today)", "url": "https://evtoday.com/device-guide/us/vena-cava-filters", "type": "device-guide", "opened": true},
+    {"id": "evt-guide-snares", "title": "Snares device guide (Endovascular Today)", "url": "https://evtoday.com/device-guide/us/snares", "type": "device-guide", "opened": true},
+    {
+      "id": "cit-pe-thrombectomy-2022",
+      "title": "Pulmonary Thrombectomy for Acute PE (Cardiac Interventions Today, 2022)",
+      "url": "https://citoday.com/articles/2022-july-aug/pulmonary-thrombectomy-for-acute-pe",
+      "type": "journal",
+      "opened": true
+    },
+    {"id": "thoracickey-filter-retrieval", "title": "Retrieval of Inferior Vena Cava Filters (Thoracic Key)", "url": "https://thoracickey.com/retrieval-of-inferior-vena-cava-filters/", "type": "textbook", "opened": true},
+    {"id": "articl-tips", "title": "TIPS technique summary (Articl)", "url": "https://articl.net/ask/tips-technique", "type": "web", "opened": true, "notes": "Secondary summary; verify against a society guideline before use."},
+    {"id": "philips-azurion-b12", "title": "Philips Azurion 7 B12/12 specifications", "url": "https://www.documents.philips.com/doclib/enc/18039676/Philips_Azurion_bi-plane_specifications_7B12-12.pdf", "type": "manufacturer", "opened": true},
+    {"id": "thoracickey-angiography", "title": "Diagnostic Catheter-Based Vascular Angiography (Thoracic Key), Table 3.1", "url": "https://thoracickey.com/diagnostic-catheter-based-vascular-angiography/", "type": "textbook", "opened": true},
+    {"id": "cvir-pae-guidance", "title": "Advanced image guidance for prostatic artery embolization (CVIR Endovascular)", "url": "https://link.springer.com/article/10.1186/s42155-021-00249-z", "type": "journal", "opened": true},
+    {
+      "id": "sir-dose-2009",
+      "title": "SIR Guidelines for Patient Radiation Dose Management (2009)",
+      "url": "https://www.cirse.org/wp-content/uploads/2018/07/SOP_SIR_2009_Patient-Radiation-Dose-Management.pdf",
+      "type": "guideline",
+      "opened": true
+    },
+    {"id": "wikipedia-cin", "title": "Contrast-induced nephropathy (Wikipedia)", "url": "https://en.wikipedia.org/wiki/Contrast-induced_nephropathy", "type": "web", "opened": true},
+    {"id": "wikipedia-iohexol", "title": "Iohexol (Wikipedia)", "url": "https://en.wikipedia.org/wiki/Iohexol", "type": "web", "opened": true},
+    {"id": "wikipedia-hypovolemic-shock", "title": "Hypovolemic shock (Wikipedia, ATLS classes)", "url": "https://en.wikipedia.org/wiki/Hypovolemic_shock", "type": "web", "opened": true},
+    {
+      "id": "uic-heparin",
+      "title": "Heparin dosing regimens for peripheral artery disease indications (UIC Drug Information Group)",
+      "url": "https://dig.pharmacy.uic.edu/faqs/2024-2/dec-2024-faqs/what-heparin-dosing-regimens-should-be-used-for-indications-related-to-peripheral-artery-disease/",
+      "type": "web",
+      "opened": true
+    },
+    {"id": "ipsis-oversedation", "title": "IPSIS emergency protocol: oversedation", "url": "https://cdn.ymaws.com/www.ipsismed.org/resource/resmgr/safety/ipsis_protocol_oversedation.pdf", "type": "guideline", "opened": true},
+    {
+      "id": "ucsf-contrast-reactions",
+      "title": "Management of Acute Reactions to Contrast Media in Adults (UCSF Radiology)",
+      "url": "https://radiology.ucsf.edu/patient-care/patient-safety/contrast/iodinated/reactions-adults",
+      "type": "guideline",
+      "opened": true
+    },
+    {
+      "id": "acr-table-copy",
+      "title": "ACR Table 3: Management of Acute Reactions to Contrast Media in Adults (copy hosted by Professional Radiology)",
+      "url": "https://www.professionalradiology.com/media/user/resources/Contrast%20Reaction%20Management.pdf",
+      "type": "guideline",
+      "opened": true,
+      "notes": "Verify against the current ACR Manual on Contrast Media."
+    },
+    {"id": "ymj-aorta", "title": "Reference Diameters of the Abdominal Aorta and Iliac Arteries in the Korean Population (Yonsei Med J 2013)", "url": "https://eymj.org/DOIx.php?id=10.3349%2Fymj.2013.54.1.48", "type": "journal", "opened": true},
+    {
+      "id": "jcdr-mesenteric",
+      "title": "Diameters and origins of the celiac trunk, SMA and IMA (JCDR 2022)",
+      "url": "https://www.jcdr.net/article_fulltext.asp?issn=0973-709x&year=2022&month=November&volume=16&issue=11&page=AC06&id=17062",
+      "type": "journal",
+      "opened": true
+    },
+    {"id": "ejr-open-le-cta", "title": "Reporting lower extremity CT angiography for treatment planning (EJR Open)", "url": "https://www.sciencedirect.com/science/article/pii/S2211568422001231", "type": "journal", "opened": true},
+    {"id": "deranged-hepatic-flow", "title": "Hepatic blood flow (Deranged Physiology)", "url": "https://derangedphysiology.com/main/cicm-primary-exam/cardiovascular-system/Chapter-475/hepatic-blood-flow", "type": "web", "opened": true},
+    {"id": "jocmr-hepatic-variants", "title": "The Main Anatomic Variations of the Hepatic Artery (J Clin Med Res review)", "url": "https://www.jocmr.org/index.php/JOCMR/article/view/2902/1742", "type": "journal", "opened": true},
+    {
+      "id": "polradiol-celiac",
+      "title": "Celiac artery variations by embryology-based classification, n = 1,050 (Pol J Radiol)",
+      "url": "https://www.polradiol.com/Newly-proposed-classification-of-celiac-artery-variations-based-on-embryology-and,146703,0,2.html",
+      "type": "journal",
+      "opened": true
+    },
+    {"id": "ijms-arch", "title": "Aortic arch branching variants review (Irish J Med Sci)", "url": "https://link.springer.com/article/10.1007/s11845-022-03196-3", "type": "journal", "opened": true},
+    {"id": "springerplus-renal", "title": "Renal arterial variations on CT, n = 302 (SpringerPlus)", "url": "https://link.springer.com/article/10.1186/2193-1801-2-443", "type": "journal", "opened": true},
+    {
+      "id": "folia-prostatic",
+      "title": "The complete anatomy of the prostatic artery: meta-analysis of 7,421 arteries (Folia Morphologica)",
+      "url": "https://journals.viamedica.pl/folia_morphologica/article/view/97797",
+      "type": "journal",
+      "opened": true
+    },
+    {
+      "id": "tjog-uterine",
+      "title": "Anatomic variations of the uterine artery: review (Turk J Obstet Gynecol)",
+      "url": "https://jucvm.com/pdf/c2f7718d-0796-4c18-a6d4-3c339e748b23/articles/tjod.galenos.2020.33427/TJOG-17-58-En.pdf",
+      "type": "journal",
+      "opened": true
+    },
+    {
+      "id": "cirse-curriculum-2023",
+      "title": "CIRSE European Curriculum and Syllabus for Interventional Radiology (2023)",
+      "url": "https://www.cirse.org/wp-content/uploads/2023/04/cirse_IRcurriculum_syllabus_2023_web.pdf",
+      "type": "guideline",
+      "opened": true
+    },
+    {"id": "vcsim3", "title": "VCSim3: a VR simulator for cardiovascular interventions", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5754385/", "type": "journal", "opened": true},
+    {"id": "korzeniowski-gpu-rods", "title": "Massively-Parallel Implementation of Inextensible Elastic Rods Using Inter-block GPU Synchronization", "url": "https://arxiv.org/abs/2509.04277", "type": "journal", "opened": true},
+    {"id": "pbd-library", "title": "PositionBasedDynamics library (MIT)", "url": "https://github.com/InteractiveComputerGraphics/PositionBasedDynamics", "type": "software", "opened": true},
+    {
+      "id": "kugelstadt-2016",
+      "title": "Position and Orientation Based Cosserat Rods (Kugelstadt and Schoemer, SCA 2016)",
+      "url": "https://animation.rwth-aachen.de/media/papers/2016-SCA-Cosserat-Rods.pdf",
+      "type": "journal",
+      "opened": false,
+      "notes": "Cited by the PositionBasedDynamics README; read before implementing."
+    },
+    {"id": "hsu-stable-cosserat-2025", "title": "Stable Cosserat Rods (Hsu et al., SIGGRAPH 2025)", "url": "https://jerryhsu.io/wp-content/uploads/2025/05/Sig25__Stable_Cosserat_Rods.pdf", "type": "journal", "opened": true},
+    {"id": "sofa-beamadapter", "title": "SOFA BeamAdapter plugin (LGPL-2.1)", "url": "https://github.com/sofa-framework/BeamAdapter", "type": "software", "opened": true},
+    {"id": "mdpi-needle-survey", "title": "Force Modeling, Identification, and Feedback Control of Robot-Assisted Needle Insertion: A Survey (Sensors 2018)", "url": "https://www.mdpi.com/1424-8220/18/2/561", "type": "journal", "opened": true},
+    {"id": "mdpi-angiography-sph", "title": "Angiography Simulation and Planning Using a Multi-Fluid Approach (Applied Sciences 2019)", "url": "https://www.mdpi.com/2076-3417/9/3/379", "type": "journal", "opened": true},
+    {"id": "webdev-webgpu", "title": "WebGPU is now supported in major browsers (web.dev, Nov 2025)", "url": "https://web.dev/blog/webgpu-supported-major-browsers", "type": "web", "opened": true},
+    {
+      "id": "ics-three-webgpu",
+      "title": "Getting started with Three.js on WebGPU (ICS MEDIA)",
+      "url": "https://ics.media/en/entry/250501/",
+      "type": "web",
+      "opened": true,
+      "notes": "WebGPURenderer falls back to WebGL 2 automatically; import from three/webgpu; await renderer.init(); custom shaders in TSL."
+    },
+    {"id": "mdn-gamepad", "title": "Using the Gamepad API (MDN)", "url": "https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API", "type": "web", "opened": true},
+    {"id": "mdn-haptic", "title": "GamepadHapticActuator.playEffect() (MDN)", "url": "https://developer.mozilla.org/en-US/docs/Web/API/GamepadHapticActuator/playEffect", "type": "web", "opened": true},
+    {"id": "mdn-sab", "title": "SharedArrayBuffer (MDN)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer", "type": "web", "opened": true},
+    {"id": "totalsegmentator", "title": "TotalSegmentator", "url": "https://github.com/wasserth/TotalSegmentator", "type": "software", "opened": true},
+    {"id": "avt-dataset", "title": "Aortic Vessel Tree (AVT) CTA datasets and segmentations", "url": "https://figshare.com/articles/dataset/Aortic_Vessel_Tree_AVT_CTA_Datasets_and_Segmentations/14806362", "type": "dataset", "opened": true},
+    {"id": "vmtk", "title": "Vascular Modeling Toolkit (VMTK)", "url": "https://github.com/vmtk/vmtk", "type": "software", "opened": true},
+    {"id": "gvxr", "title": "gVirtualXRay (BSD)", "url": "https://sourceforge.net/projects/gvirtualxray/", "type": "software", "opened": true},
+    {
+      "id": "macklin-small-steps-2019",
+      "title": "Small Steps in Physics Simulation (Macklin et al., SCA 2019)",
+      "url": "https://mmacklin.com/smallsteps.pdf",
+      "type": "journal",
+      "opened": false,
+      "notes": "Design reference for substepping with one XPBD iteration per substep; cite for method only."
+    },
+    {
+      "id": "deul-stiff-rods-2018",
+      "title": "Direct Position-Based Solver for Stiff Rods (Deul et al., Computer Graphics Forum 2018)",
+      "url": "https://www.animation.rwth-aachen.de/media/papers/2018-CGF-Rods.pdf",
+      "type": "journal",
+      "opened": false,
+      "notes": "Upgrade path for very stiff rods; implemented in the PositionBasedDynamics library."
+    }
+  ]
+}

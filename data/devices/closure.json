@@ -1,0 +1,177 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "closure",
+  "notes": "Closure is a short interactive procedure, not a button (questionnaire 3.11). Sizes come from the Cardiac Interventions Today device guide; steps and failure modes from the ACC Coronary Interventions Handbook chapter. Steps marked 'to source' need the instructions for use before the device gets an interactive sequence.",
+  "items": [
+    {
+      "id": "closure-angio-seal-vip",
+      "kind": "closure-device",
+      "brandName": "Angio-Seal VIP",
+      "manufacturer": "Terumo",
+      "genericName": "Anchor, collagen and suture closure device",
+      "mechanism": {"text": "Suture, collagen and anchor sandwich of the arteriotomy", "confidence": "sourced", "source": "cit-closure-guide"},
+      "sheathCompatibility": {"options": ["5/6F", "7/8F"], "confidence": "sourced", "source": "cit-closure-guide"},
+      "deviceSheath": {"options": [6, 8], "unit": "Fr", "confidence": "sourced", "source": "acc-closure-chapter", "note": "Dedicated sheath with an arteriotomy locator."},
+      "vessels": {"options": ["femoral artery"], "confidence": "sourced", "source": "cit-closure-guide"},
+      "steps": [
+        {"text": "Remove the procedure sheath and place the dedicated 6F or 8F sheath with arteriotomy locator.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Advance it 1 cm into the lumen beyond the point where blood stops flowing from the drip hole.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Deploy the anchor and pull it back against the arterial wall.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Seat the collagen plug just outside the arterial wall and tamp it with the tamping tube.", "confidence": "sourced", "source": "acc-closure-chapter"}
+      ],
+      "resorption": {"min": 60, "max": 90, "unit": "day", "confidence": "sourced", "source": "acc-closure-chapter"},
+      "reaccess": {"text": "Re-access at the same site before 90 days should be 1 cm proximal to the previous puncture.", "confidence": "sourced", "source": "acc-closure-chapter"},
+      "failureModes": [
+        {"text": "Incomplete anchor apposition against the lumen: hemostasis fails.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Collagen plug ends up intravascular: limb ischemia.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Ineffective after a posterior-wall puncture or in an irregular, diseased lumen.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Do not trim a plug that shows at the skin entry.", "confidence": "sourced", "source": "acc-closure-chapter"}
+      ]
+    },
+    {
+      "id": "closure-perclose-proglide",
+      "kind": "closure-device",
+      "brandName": "Perclose ProGlide",
+      "manufacturer": "Abbott",
+      "genericName": "Suture-mediated closure device",
+      "mechanism": {"text": "Suture (polypropylene monofilament)", "confidence": "sourced", "source": "cit-closure-guide"},
+      "arterySheath": {"min": 5, "max": 21, "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"},
+      "veinSheath": {"min": 5, "max": 24, "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"},
+      "steps": [
+        {"text": "Advance the device over the wire until blood return shows.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Pull lever 1 to deploy the anchor inside the lumen.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Depress plunger 2 to send two needles to the anchor, creating a suture loop.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Advance the pre-tied knot with the knot pusher, then cut the suture.", "confidence": "sourced", "source": "acc-closure-chapter"}
+      ],
+      "largeBore": [
+        {"text": "For sheaths 5 to 8F a single device is deployed at the end of the procedure.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "For sheaths above 8F, pre-close with two devices before upsizing: the first at 10 o'clock, the second at 2 o'clock, crossing the sutures over the arteriotomy.", "confidence": "sourced", "source": "acc-closure-chapter"}
+      ],
+      "failureModes": [
+        {"text": "Complications are more likely with peripheral arterial disease, in women and in vessels under 5 mm.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Calcification deflects the needles and the device fails.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "In obese patients the fascia can be mistaken for the vessel wall; a knot secured there bleeds.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "A bifurcation within reach of the anchor can tether the back wall and occlude the femoral artery.", "confidence": "sourced", "source": "acc-closure-chapter"}
+      ]
+    },
+    {
+      "id": "closure-prostar-xl",
+      "kind": "closure-device",
+      "brandName": "Prostar XL",
+      "manufacturer": "Abbott",
+      "genericName": "Braided-suture closure device",
+      "mechanism": {"text": "Suture (braided)", "confidence": "sourced", "source": "cit-closure-guide"},
+      "arterySheath": {"min": 8.5, "max": 10, "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"}
+    },
+    {
+      "id": "closure-starclose-se",
+      "kind": "closure-device",
+      "brandName": "StarClose SE",
+      "manufacturer": "Abbott",
+      "genericName": "Extravascular nitinol clip",
+      "mechanism": {"text": "Nitinol clip", "confidence": "sourced", "source": "cit-closure-guide"},
+      "arterySheath": {"min": 5, "max": 6, "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"},
+      "steps": [
+        {"text": "Deployment steps to source from the instructions for use.", "confidence": "placeholder"}
+      ]
+    },
+    {
+      "id": "closure-mynxcontrol",
+      "kind": "closure-device",
+      "brandName": "MynxControl",
+      "manufacturer": "Cordis",
+      "genericName": "Balloon-positioned extravascular sealant",
+      "mechanism": {"text": "Extravascular polyethylene glycol (PEG) sealant", "confidence": "sourced", "source": "cit-closure-guide"},
+      "arterySheath": {"options": [5, 6, 7], "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"},
+      "steps": [
+        {"text": "Fill the small semicompliant balloon with contrast, inflate it inside the artery and pull it back against the arteriotomy.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "Advance the shuttle to bring the PEG plug to the artery, then advance the plug toward the arteriotomy.", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {"text": "After 30 s, lay the device flat for another 90 s of curing.", "confidence": "sourced", "source": "acc-closure-chapter"}
+      ],
+      "cureTime": {"value": 120, "unit": "s", "confidence": "derived", "source": "acc-closure-chapter", "note": "30 s plus 90 s laid flat."},
+      "resorption": {"value": 60, "unit": "day", "confidence": "sourced", "source": "acc-closure-chapter"},
+      "failureModes": [
+        {"text": "Over-advancing the delivery system can push sealant into the lumen.", "confidence": "estimated", "note": "From the research notes; confirm against the instructions for use."}
+      ]
+    },
+    {
+      "id": "closure-mynxgrip",
+      "kind": "closure-device",
+      "brandName": "MynxGrip",
+      "manufacturer": "Cordis",
+      "genericName": "Balloon-positioned extravascular sealant",
+      "mechanism": {"text": "Extravascular polyethylene glycol (PEG) sealant", "confidence": "sourced", "source": "cit-closure-guide"},
+      "arterySheath": {"options": [5, 6, 7], "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"},
+      "veinSheath": {"options": [5, 6, 7], "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"}
+    },
+    {
+      "id": "closure-exoseal",
+      "kind": "closure-device",
+      "brandName": "ExoSeal",
+      "manufacturer": "Cordis",
+      "genericName": "Extravascular plug",
+      "mechanism": {"text": "Extravascular polyglycolic acid (PGA) plug", "confidence": "sourced", "source": "cit-closure-guide"},
+      "arterySheath": {"options": [5, 6, 7], "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"}
+    },
+    {
+      "id": "closure-vascade-vcs",
+      "kind": "closure-device",
+      "brandName": "Vascade VCS",
+      "manufacturer": "Haemonetics",
+      "genericName": "Extravascular bioabsorbable closure",
+      "mechanism": {"text": "Extravascular, bioabsorbable", "confidence": "sourced", "source": "cit-closure-guide"},
+      "arterySheath": {"options": [5, 6, 7], "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"},
+      "veinSheath": {"options": [5, 6, 7], "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide"}
+    },
+    {
+      "id": "closure-vascade-mvp",
+      "kind": "closure-device",
+      "brandName": "Vascade MVP",
+      "manufacturer": "Haemonetics",
+      "genericName": "Extravascular bioabsorbable venous closure",
+      "mechanism": {"text": "Extravascular, bioabsorbable", "confidence": "sourced", "source": "cit-closure-guide"},
+      "veinSheath": {"min": 6, "max": 12, "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide", "note": "Inner diameter; up to 15F outer diameter."}
+    },
+    {
+      "id": "closure-manta",
+      "kind": "closure-device",
+      "brandName": "Manta",
+      "manufacturer": "Teleflex",
+      "genericName": "Large-bore bioresorbable closure",
+      "mechanism": {"text": "Bioresorbable implant", "confidence": "sourced", "source": "cit-closure-guide"},
+      "deviceSize": {"min": 10, "max": 20, "unit": "Fr", "confidence": "sourced", "source": "cit-closure-guide", "note": "For 10 to 20F devices (12 to 25F outer diameter)."},
+      "uses": {"text": "Large-bore femoral arterial access such as EVAR", "confidence": "estimated", "note": "Follows from its 10-20F sizing; confirm with an IR reviewer."}
+    },
+    {
+      "id": "closure-radial-band",
+      "kind": "compression-band",
+      "brandName": "Radial compression band (e.g., TR Band, Zephyr)",
+      "genericName": "Radial compression band",
+      "mechanism": {"text": "External compression with an air-filled bladder", "confidence": "sourced", "source": "evt-radial-2019"},
+      "steps": [
+        {"text": "Inflate the band to about 18 mL.", "confidence": "sourced", "source": "evt-radial-2019"},
+        {"text": "Deflate until a small amount of bleeding shows, then re-inject about 2 mL of air (patent hemostasis).", "confidence": "sourced", "source": "evt-radial-2019"},
+        {"text": "Leave it inflated about 45 minutes, then deflate about 3 mL every 5 minutes.", "confidence": "sourced", "source": "evt-radial-2019"}
+      ],
+      "initialVolume": {"value": 18, "unit": "mL", "confidence": "sourced", "source": "evt-radial-2019"},
+      "holdTime": {"value": 45, "unit": "min", "confidence": "sourced", "source": "evt-radial-2019"}
+    },
+    {
+      "id": "closure-manual-compression",
+      "kind": "manual-compression",
+      "genericName": "Manual compression",
+      "mechanism": {"text": "Pressure over the arteriotomy against the femoral head", "confidence": "estimated", "note": "Standard technique; add a source."},
+      "duration": {"text": "Durations by sheath size and ACT still to source", "confidence": "placeholder"}
+    }
+  ],
+  "rules": [
+    {
+      "id": "closure-site",
+      "text": "Femoral closure devices assume an anterior common femoral puncture above the bifurcation; atheroma, dissection and significant calcification are relative contraindications.",
+      "confidence": "sourced",
+      "source": "acc-closure-chapter"
+    },
+    {"id": "closure-ambulation", "text": "After uneventful access and closure, patients may walk within 2 hours.", "confidence": "sourced", "source": "acc-closure-chapter"},
+    {"id": "closure-mynx-size", "text": "Mynx is used only for sheaths up to 7F.", "confidence": "sourced", "source": "acc-closure-chapter"}
+  ]
+}

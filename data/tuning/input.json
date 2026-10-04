@@ -1,0 +1,72 @@
+{
+  "schema": "ir-sim/tuning@1",
+  "category": "input",
+  "notes": "Controller, keyboard and mouse feel. All values are design choices exposed in Settings; C-arm motion limits and speeds come from data/imaging/imaging.json.",
+  "sticks": {
+    "deadZone": {"value": 0.12, "unit": "1", "confidence": "design", "note": "Radial dead zone on each stick."},
+    "responseExponent": {"value": 2.0, "unit": "1", "confidence": "design", "note": "Output = sign(x) * |x|^n after the dead zone; 1 = linear."},
+    "triggerThreshold": {"value": 0.2, "unit": "1", "confidence": "design", "note": "Digital threshold for trigger actions such as fluoro."}
+  },
+  "devices": {
+    "advanceSpeedMax": {"value": 30, "unit": "mm/s", "confidence": "design", "note": "Full-stick advance or retract speed for catheters and wires."},
+    "rotationSpeedMax": {"value": 360, "unit": "deg/s", "confidence": "design", "note": "Full-stick rotation speed (one turn per second)."},
+    "fineScale": {"value": 0.25, "unit": "1", "confidence": "design", "note": "Speed multiplier in fine mode (L3 or Shift)."},
+    "quarterTurnStep": {"value": 90, "unit": "deg", "confidence": "design", "note": "Rotation per tap in the optional torque-device mode."}
+  },
+  "mouse": {
+    "dragAdvancePerPixel": {"value": 0.2, "unit": "mm", "confidence": "design", "note": "Vertical drag advance per pixel."},
+    "dragRotatePerPixel": {"value": 1.0, "unit": "deg", "confidence": "design", "note": "Horizontal drag rotation per pixel."},
+    "wheelAdvancePerNotch": {"value": 0.5, "unit": "mm", "confidence": "design", "note": "Fine advance per wheel notch."},
+    "dragCarmPerPixel": {"value": 0.2, "unit": "deg", "confidence": "design", "note": "C-arm rotation or angulation per pixel of drag in Control mode."},
+    "dragTablePerPixel": {"value": 0.5, "unit": "mm", "confidence": "design", "note": "Table pan per pixel of right-drag in Control mode."}
+  },
+  "control": {
+    "tablePanSpeed": {"value": 50, "unit": "mm/s", "confidence": "design", "note": "Full-stick table pan speed."},
+    "tableHeightSpeed": {"value": 20, "unit": "mm/s", "confidence": "design"},
+    "detectorSpeed": {"value": 50, "unit": "mm/s", "confidence": "design", "note": "Source-to-image distance change speed."},
+    "collimationSpeed": {"value": 40, "unit": "mm/s", "confidence": "design"},
+    "collimationMin": {"value": 0.3, "unit": "1", "confidence": "design", "note": "Narrowest collimation as a fraction of the field of view."},
+    "collimationMax": {"value": 1.0, "unit": "1", "confidence": "design"},
+    "savedViews": {"value": 6, "unit": "count", "confidence": "design", "note": "Saved C-arm angles (A in Control mode)."}
+  },
+  "rumble": {
+    "updateRate": {"value": 10, "unit": "Hz", "confidence": "design", "note": "Maximum playEffect calls per second (each call overrides the last)."},
+    "contactDuration": {"value": 120, "unit": "ms", "confidence": "design"},
+    "contactFullScaleForce": {"value": 0.2, "unit": "N", "confidence": "design", "note": "Tip normal force that maps to full weak-motor rumble."},
+    "contactWeakMax": {"value": 0.6, "unit": "1", "confidence": "design"},
+    "events": [
+      {
+        "id": "hub-force-danger",
+        "pattern": "single",
+        "strong": {"value": 0.7, "unit": "1", "confidence": "design"},
+        "weak": {"value": 0.2, "unit": "1", "confidence": "design"},
+        "duration": {"value": 80, "unit": "ms", "confidence": "design"},
+        "note": "Fires when hub force crosses feedback.hubForceDanger."
+      },
+      {"id": "needle-pop", "pattern": "single", "strong": {"value": 0.8, "unit": "1", "confidence": "design"}, "weak": {"value": 0.3, "unit": "1", "confidence": "design"}, "duration": {"value": 60, "unit": "ms", "confidence": "design"}},
+      {
+        "id": "coil-release",
+        "pattern": "double",
+        "strong": {"value": 0.5, "unit": "1", "confidence": "design"},
+        "weak": {"value": 0.5, "unit": "1", "confidence": "design"},
+        "duration": {"value": 50, "unit": "ms", "confidence": "design"},
+        "gap": {"value": 80, "unit": "ms", "confidence": "design"}
+      },
+      {"id": "dissection", "pattern": "long", "strong": {"value": 1.0, "unit": "1", "confidence": "design"}, "weak": {"value": 0.6, "unit": "1", "confidence": "design"}, "duration": {"value": 600, "unit": "ms", "confidence": "design"}},
+      {
+        "id": "vital-alarm",
+        "pattern": "pulsed",
+        "strong": {"value": 0.0, "unit": "1", "confidence": "design"},
+        "weak": {"value": 0.4, "unit": "1", "confidence": "design"},
+        "duration": {"value": 200, "unit": "ms", "confidence": "design"},
+        "gap": {"value": 200, "unit": "ms", "confidence": "design"},
+        "repeats": {"value": 3, "unit": "count", "confidence": "design"}
+      }
+    ],
+    "strengthDefault": {"value": 1.0, "unit": "1", "confidence": "design", "note": "Default rumble strength multiplier in Settings."}
+  },
+  "autopilot": {
+    "takeoverThreshold": {"value": 0.25, "unit": "1", "confidence": "design", "note": "Any live stick deflection above this, or any button, hands control back from the autopilot."},
+    "settings": {"text": "The autopilot always maps through the default dead zone and response exponent in this file, with no inversion or mirroring, so demos and replays do not depend on the learner's settings.", "confidence": "design"}
+  }
+}

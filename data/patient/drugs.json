@@ -1,0 +1,286 @@
+{
+  "schema": "ir-sim/drugs@1",
+  "notes": "Drug cart defaults (spec 09) and the adult contrast-reaction protocol. Doses are the cart's defaults for an educational simulation; an IR or anesthesia reviewer should confirm them before release. Pharmacodynamics (onset, peak, duration, effect sizes) are not sourced yet and are placeholders the patient model must not present as fact.",
+  "drugs": [
+    {
+      "id": "heparin",
+      "name": "Heparin (unfractionated), systemic",
+      "class": "anticoagulant",
+      "route": "IV or intra-arterial",
+      "doses": [
+        {"label": "Fixed bolus (most common)", "value": 5000, "unit": "IU", "confidence": "sourced", "source": "uic-heparin", "note": "Mode across 21 trials; range 2,500-7,500 IU (Qureshi 2020)."},
+        {"label": "Weight-based bolus", "min": 70, "max": 100, "unit": "IU/kg", "confidence": "sourced", "source": "uic-heparin", "note": "100 IU/kg then ACT-guided doses (Roosendaal 2023); mean 70 IU/kg reached target ACT (Nissborg 2019)."}
+      ],
+      "targets": [
+        {"label": "ACT target", "min": 200, "max": 250, "unit": "s", "confidence": "sourced", "source": "uic-heparin", "note": "Roosendaal 2023."},
+        {"label": "ACT target (alternative)", "min": 200, "max": 350, "unit": "s", "confidence": "sourced", "source": "uic-heparin", "note": "Nissborg 2019."}
+      ]
+    },
+    {
+      "id": "radial-cocktail",
+      "name": "Radial cocktail",
+      "class": "spasmolytic and anticoagulant mixture",
+      "route": "intra-arterial via the radial sheath",
+      "components": [
+        {"label": "Heparin", "value": 3000, "unit": "IU", "confidence": "sourced", "source": "evt-radial-2019"},
+        {"label": "Nitroglycerin", "value": 200, "unit": "ug", "confidence": "sourced", "source": "evt-radial-2019"},
+        {"label": "Verapamil", "value": 2.5, "unit": "mg", "confidence": "sourced", "source": "evt-radial-2019"}
+      ],
+      "administration": {"text": "Dilute with about 10 mL of the patient's blood and instill slowly over 1 minute back into the sheath; re-administer if the procedure lasts longer than 1 hour.", "confidence": "sourced", "source": "evt-radial-2019"}
+    },
+    {
+      "id": "midazolam",
+      "name": "Midazolam",
+      "class": "benzodiazepine sedative",
+      "route": "IV push",
+      "doses": [
+        {"label": "Increment", "min": 0.5, "max": 1, "unit": "mg", "confidence": "sourced", "source": "ipsis-oversedation", "note": "Titrated to effect."}
+      ]
+    },
+    {
+      "id": "fentanyl",
+      "name": "Fentanyl",
+      "class": "opioid analgesic",
+      "route": "IV push",
+      "doses": [
+        {"label": "Increment", "min": 25, "max": 100, "unit": "ug", "confidence": "sourced", "source": "ipsis-oversedation", "note": "Lower initial dose in the elderly and others susceptible to opioid effects."}
+      ]
+    },
+    {
+      "id": "naloxone",
+      "name": "Naloxone",
+      "class": "opioid antagonist",
+      "route": "IV push (or intranasal 0.4 mg)",
+      "doses": [
+        {"label": "Initial", "value": 0.4, "unit": "mg", "confidence": "sourced", "source": "ipsis-oversedation"},
+        {"label": "Titration", "min": 0.04, "max": 0.08, "unit": "mg", "confidence": "sourced", "source": "ipsis-oversedation", "note": "Every 2 minutes."}
+      ],
+      "maxTotal": {"value": 2, "unit": "mg", "confidence": "sourced", "source": "ipsis-oversedation", "note": "Usually not necessary to exceed."}
+    },
+    {
+      "id": "flumazenil",
+      "name": "Flumazenil",
+      "class": "benzodiazepine antagonist",
+      "route": "IV push",
+      "doses": [
+        {"label": "Dose", "value": 0.2, "unit": "mg", "confidence": "sourced", "source": "ipsis-oversedation", "note": "Over 15 s; repeat 0.2 mg at 1-minute intervals."}
+      ],
+      "maxTotal": {"value": 5, "unit": "mg", "confidence": "sourced", "source": "ipsis-oversedation"},
+      "warnings": [
+        {"text": "Can precipitate seizures in patients on chronic benzodiazepines.", "confidence": "sourced", "source": "ipsis-oversedation"}
+      ]
+    },
+    {
+      "id": "protamine",
+      "name": "Protamine",
+      "class": "heparin reversal",
+      "route": "IV",
+      "doses": [
+        {"label": "Dose", "text": "Heparin reversal; dose to source", "confidence": "placeholder"}
+      ]
+    },
+    {
+      "id": "ia-vasodilators",
+      "name": "Intra-arterial vasodilators (nitroglycerin, verapamil)",
+      "class": "spasmolytic",
+      "route": "intra-arterial",
+      "doses": [
+        {"label": "Dose", "text": "For spasm beyond the radial cocktail; doses to source", "confidence": "placeholder"}
+      ]
+    },
+    {
+      "id": "alteplase",
+      "name": "Alteplase",
+      "class": "thrombolytic",
+      "route": "catheter-directed infusion",
+      "doses": [
+        {"label": "Dose", "text": "Infusion for limb ischemia, DVT and PE; dosing to source", "confidence": "placeholder"}
+      ]
+    },
+    {
+      "id": "diphenhydramine",
+      "name": "Diphenhydramine",
+      "class": "antihistamine",
+      "route": "PO, IM or slow IV",
+      "doses": [
+        {"label": "Dose", "min": 25, "max": 50, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "epinephrine",
+      "name": "Epinephrine",
+      "class": "vasopressor, bronchodilator",
+      "route": "IM or IV",
+      "doses": [
+        {"label": "IM, 1:1,000 (1 mg/mL)", "value": 0.3, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy", "note": "0.3 mL; repeat every 5-15 min up to 1 mg total."},
+        {"label": "IV, 1:10,000 (0.1 mg/mL)", "value": 0.1, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy", "note": "1 mL slowly; repeat every few minutes up to 1 mg total."}
+      ],
+      "maxTotal": {"value": 1, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy"}
+    },
+    {
+      "id": "albuterol",
+      "name": "Albuterol inhaler",
+      "class": "beta-agonist",
+      "route": "inhaled",
+      "doses": [
+        {"label": "2 puffs (90 ug per puff)", "value": 180, "unit": "ug", "confidence": "sourced", "source": "acr-table-copy", "note": "Can repeat up to 3 times."}
+      ]
+    },
+    {
+      "id": "atropine",
+      "name": "Atropine",
+      "class": "anticholinergic",
+      "route": "IV",
+      "doses": [
+        {"label": "Dose", "min": 0.6, "max": 1.0, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ],
+      "maxTotal": {"value": 3, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy"}
+    },
+    {
+      "id": "labetalol",
+      "name": "Labetalol",
+      "class": "beta-blocker",
+      "route": "IV",
+      "doses": [
+        {"label": "Dose", "value": 20, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy", "note": "Slowly over 2 min; can double the dose every 10 min."}
+      ]
+    },
+    {
+      "id": "nitroglycerin-sl",
+      "name": "Nitroglycerin, sublingual",
+      "class": "vasodilator",
+      "route": "sublingual",
+      "doses": [
+        {"label": "Tablet", "value": 0.4, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy", "note": "Can repeat every 5-10 min."}
+      ]
+    },
+    {
+      "id": "lorazepam",
+      "name": "Lorazepam",
+      "class": "benzodiazepine",
+      "route": "IV",
+      "doses": [
+        {"label": "Dose", "min": 2, "max": 4, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ],
+      "maxTotal": {"value": 4, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy"}
+    },
+    {
+      "id": "furosemide",
+      "name": "Furosemide",
+      "class": "loop diuretic",
+      "route": "IV",
+      "doses": [
+        {"label": "Dose", "min": 20, "max": 40, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy", "note": "Slowly over 2 min."}
+      ]
+    },
+    {
+      "id": "dextrose-50",
+      "name": "Dextrose 50% (D50W)",
+      "class": "glucose",
+      "route": "IV",
+      "doses": [
+        {"label": "1 ampule", "value": 25, "unit": "g", "confidence": "sourced", "source": "acr-table-copy", "note": "Over 2 min."}
+      ]
+    },
+    {
+      "id": "glucagon",
+      "name": "Glucagon",
+      "class": "hormone",
+      "route": "IM",
+      "doses": [
+        {"label": "Dose (no IV access)", "value": 1, "unit": "mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "fluids",
+      "name": "0.9% saline or lactated Ringer's",
+      "class": "crystalloid",
+      "route": "IV",
+      "doses": [
+        {"label": "Bolus", "value": 1000, "unit": "mL", "confidence": "sourced", "source": "acr-table-copy", "note": "Rapidly."}
+      ]
+    },
+    {
+      "id": "oxygen",
+      "name": "Oxygen",
+      "class": "gas",
+      "route": "mask",
+      "doses": [
+        {"label": "Flow", "min": 6, "max": 10, "unit": "L/min", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    }
+  ],
+  "contrastReactions": [
+    {
+      "id": "rx-hives",
+      "reaction": "Hives",
+      "steps": [
+        {"drug": "diphenhydramine", "text": "Diphenhydramine 25-50 mg PO, IM or slow IV", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-bronchospasm",
+      "reaction": "Bronchospasm",
+      "steps": [
+        {"drug": "oxygen", "text": "O2 6-10 L/min", "confidence": "sourced", "source": "acr-table-copy"},
+        {"drug": "albuterol", "text": "Albuterol 2 puffs (180 ug), up to 3 times", "confidence": "sourced", "source": "acr-table-copy"},
+        {"drug": "epinephrine", "text": "If severe: epinephrine 0.3 mg IM (1:1,000) or 0.1 mg IV (1:10,000), IV repeatable to 1 mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-laryngeal-edema",
+      "reaction": "Laryngeal edema",
+      "steps": [
+        {"drug": "oxygen", "text": "O2 6-10 L/min", "confidence": "sourced", "source": "acr-table-copy"},
+        {"drug": "epinephrine", "text": "Epinephrine 0.3 mg IM, repeatable every 5-15 min to 1 mg; or 0.1 mg IV slowly, repeatable to 1 mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-anaphylactoid-hypotension",
+      "reaction": "Hypotension with tachycardia (anaphylactoid)",
+      "steps": [
+        {"drug": "fluids", "text": "1 L saline or lactated Ringer's rapidly", "confidence": "sourced", "source": "acr-table-copy"},
+        {"drug": "epinephrine", "text": "Then epinephrine as above", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-vasovagal",
+      "reaction": "Hypotension with bradycardia (vasovagal)",
+      "steps": [
+        {"drug": "fluids", "text": "Legs up at least 60 deg; 1 L saline rapidly", "confidence": "sourced", "source": "acr-table-copy"},
+        {"drug": "atropine", "text": "Atropine 0.6-1.0 mg IV, repeatable to 3 mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-hypertensive-crisis",
+      "reaction": "Hypertensive crisis",
+      "steps": [
+        {"drug": "labetalol", "text": "Labetalol 20 mg IV over 2 min, doubling every 10 min", "confidence": "sourced", "source": "acr-table-copy"},
+        {"drug": "nitroglycerin-sl", "text": "Or nitroglycerin 0.4 mg sublingual, repeatable every 5-10 min", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-seizure",
+      "reaction": "Seizure",
+      "steps": [
+        {"drug": "lorazepam", "text": "Lorazepam 2-4 mg IV, maximum 4 mg", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-pulmonary-edema",
+      "reaction": "Pulmonary edema",
+      "steps": [
+        {"drug": "furosemide", "text": "Furosemide 20-40 mg IV over 2 min", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    },
+    {
+      "id": "rx-hypoglycemia",
+      "reaction": "Hypoglycemia",
+      "steps": [
+        {"drug": "dextrose-50", "text": "D50W 25 g IV over 2 min, or glucagon 1 mg IM without IV access", "confidence": "sourced", "source": "acr-table-copy"}
+      ]
+    }
+  ],
+  "reactionSourceNote": {"text": "Verify against the current ACR Manual on Contrast Media, which redirected during research; the copy used is hosted by Professional Radiology. UCSF Radiology's page matches the mild-reaction doses.", "confidence": "placeholder"},
+  "toAdd": {"text": "Antibiotic prophylaxis, antiemetics, analgesia after UFE and PAE, glucagon to stop bowel motion during mesenteric DSA", "confidence": "placeholder"}
+}

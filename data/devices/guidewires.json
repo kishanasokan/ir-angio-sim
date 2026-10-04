@@ -1,0 +1,417 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "guidewire",
+  "notes": "Body stiffness values from Harrison 2011 are the effective flexural modulus of the stiff segment (beyond 60 cm from the floppy tip) of 0.035 in wires. Tip stiffness, transition lengths and torsional values are not published for most wires; those are 'estimated' or 'placeholder' and must be tuned with faculty play-testing (spec 04).",
+  "items": [
+    {
+      "id": "gw-glidewire",
+      "kind": "guidewire",
+      "role": "maneuver",
+      "genericName": "Hydrophilic nitinol guidewire",
+      "brandName": "Glidewire",
+      "manufacturer": "Terumo",
+      "geometry": {
+        "diameter": {"options": [0.018, 0.025, 0.032, 0.035, 0.038], "unit": "in", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "length": {"min": 80, "max": 450, "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "flexibleTipLength": {"min": 1, "max": 8, "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "tipShapes": {"options": ["straight", "angled", "J 1.5 mm", "J 3.0 mm"], "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "angledTipAngle": {"value": 45, "unit": "deg", "confidence": "placeholder", "note": "Angle of the standard angled tip not stated in the brochure; confirm from the instructions for use."}
+      },
+      "mechanics": {
+        "core": {"text": "nitinol", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "coating": {"text": "hydrophilic", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "bodyFlexuralModulus": {"value": 8, "unit": "GPa", "confidence": "estimated", "note": "No published measurement found. Standard shaft assumed softer than rail wires; tune with faculty."}
+      },
+      "teaching": [
+        {"text": "Commonly used maneuver wire for selecting and crossing.", "confidence": "sourced", "source": "lsu-primer"},
+        {"text": "Hydrophilic coatings track and cross better but raise perforation and subintimal risk.", "confidence": "sourced", "source": "eurointervention-guidewires"}
+      ]
+    },
+    {
+      "id": "gw-glidewire-stiff",
+      "kind": "guidewire",
+      "role": "maneuver-or-rail",
+      "genericName": "Hydrophilic nitinol guidewire, stiff shaft",
+      "brandName": "Glidewire Stiff Shaft",
+      "manufacturer": "Terumo",
+      "geometry": {
+        "diameter": {"options": [0.035, 0.038], "unit": "in", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "length": {"min": 80, "max": 260, "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "flexibleTipLength": {"options": [3, 5], "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "tipShapes": {"options": ["straight", "angled"], "confidence": "sourced", "source": "terumo-glidewire-brochure"}
+      },
+      "mechanics": {
+        "core": {"text": "nitinol", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "coating": {"text": "hydrophilic", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "bodyFlexuralModulus": {"value": 9.5, "unit": "GPa", "confidence": "estimated", "note": "Described as 'as stiff as Amplatz' (LSU primer); set equal to the Bard Amplatz value from Harrison 2011 until measured."}
+      }
+    },
+    {
+      "id": "gw-glidewire-advantage",
+      "kind": "guidewire",
+      "role": "maneuver-and-support",
+      "genericName": "Hybrid guidewire, PTFE-coated body with hydrophilic tip",
+      "brandName": "Glidewire Advantage",
+      "manufacturer": "Terumo",
+      "geometry": {
+        "diameter": {"options": [0.014, 0.018, 0.035], "unit": "in", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "length": {"options": [180, 260, 300], "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "tipShapes": {"options": ["45 deg angle"], "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "flexibleTipLength": {"value": 5, "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure", "note": "0.035 in size; 1 cm for 0.014 and 0.018 in"}
+      },
+      "mechanics": {"core": {"text": "nitinol with spiral PTFE coating", "confidence": "sourced", "source": "terumo-glidewire-brochure"}, "bodyFlexuralModulus": {"value": 12, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-glidewire-baby-j",
+      "kind": "guidewire",
+      "role": "access-navigation",
+      "genericName": "Hydrophilic J-tip guidewire for radial access",
+      "brandName": "Glidewire Baby-J",
+      "manufacturer": "Terumo",
+      "geometry": {
+        "diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "length": {"min": 150, "max": 260, "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "tipShapes": {"options": ["J 1.5 mm", "J 3.0 mm"], "confidence": "sourced", "source": "terumo-glidewire-brochure"}
+      },
+      "mechanics": {"bodyFlexuralModulus": {"value": 8, "unit": "GPa", "confidence": "placeholder"}},
+      "teaching": [
+        {"text": "Designed to minimize complications while traversing the radial artery.", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        {"text": "Radial embolization workflows use a 0.035 in, 180 cm Glidewire with a 1.5 mm J tip.", "confidence": "sourced", "source": "evt-radial-2019"}
+      ]
+    },
+    {
+      "id": "gw-bentson",
+      "kind": "guidewire",
+      "role": "atraumatic-advance",
+      "genericName": "Non-hydrophilic guidewire with very floppy tip",
+      "brandName": "Bentson",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "lsu-primer"}},
+      "mechanics": {
+        "coating": {"text": "non-hydrophilic", "confidence": "sourced", "source": "lsu-primer"},
+        "bodyFlexuralModulus": {"value": 9, "unit": "GPa", "confidence": "placeholder", "note": "'Relatively stiff' body per LSU primer; not in Harrison 2011."}
+      },
+      "teaching": [
+        {"text": "Very floppy tip; relatively stiff body.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "gw-new-yorker",
+      "kind": "guidewire",
+      "role": "atraumatic-advance",
+      "genericName": "Non-hydrophilic guidewire, floppy tip stiffer than Bentson",
+      "brandName": "New Yorker",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "lsu-primer"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 9, "unit": "GPa", "confidence": "placeholder"}},
+      "teaching": [
+        {"text": "Floppy portion of the tip is stiffer than a Bentson.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "gw-roadrunner",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Hydrophilic rail wire, very stiff, floppy tip",
+      "brandName": "Roadrunner",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "lsu-primer"}},
+      "mechanics": {"coating": {"text": "hydrophilic", "confidence": "sourced", "source": "lsu-primer"}, "bodyFlexuralModulus": {"value": 17, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-amplatz-bard",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Stiff rail wire",
+      "brandName": "Amplatz",
+      "manufacturer": "C.R. Bard",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 9.5, "sd": 0.6, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}}
+    },
+    {
+      "id": "gw-fixed-core-hd-cook",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Fixed-core heavy-duty wire",
+      "brandName": "Fixed Core Heavy Duty",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 11.4, "sd": 0.3, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}}
+    },
+    {
+      "id": "gw-rosen-hd-cook",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Curved-tip heavy-duty rail wire",
+      "brandName": "Rosen Heavy Duty",
+      "manufacturer": "Cook",
+      "geometry": {
+        "diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"},
+        "tipShapes": {"options": ["curved (J)"], "confidence": "sourced", "source": "lsu-primer", "note": "J radius not stated; confirm from instructions for use."}
+      },
+      "mechanics": {"bodyFlexuralModulus": {"value": 12.3, "sd": 0.7, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}},
+      "teaching": [
+        {"text": "Stiff curved tip; rail wire for sheaths, balloons and stents.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "gw-rosen-hd-bsc",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Curved-tip heavy-duty rail wire",
+      "brandName": "Rosen Heavy Duty",
+      "manufacturer": "Boston Scientific",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 14.5, "sd": 0.6, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}}
+    },
+    {
+      "id": "gw-newton-hd-cook",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Heavy-duty wire",
+      "brandName": "Newton Heavy Duty",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 12.5, "sd": 0.7, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}}
+    },
+    {
+      "id": "gw-amplatz-stiff-cook",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Stiff rail wire",
+      "brandName": "Amplatz Stiff",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 17.0, "sd": 0.8, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}}
+    },
+    {
+      "id": "gw-amplatz-extra-stiff-cook",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Extra-stiff rail wire",
+      "brandName": "Amplatz Extra Stiff",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 29.2, "sd": 0.9, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}},
+      "teaching": [
+        {"text": "Two wires both called 'extra stiff' measured 29.2 and 158.4 GPa, a 5-fold gap: names do not predict stiffness.", "confidence": "sourced", "source": "harrison2011"}
+      ]
+    },
+    {
+      "id": "gw-amplatz-super-stiff-bsc",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "High-support rail wire, floppy tip",
+      "brandName": "Amplatz Super Stiff",
+      "manufacturer": "Boston Scientific",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 60.3, "sd": 0.9, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}},
+      "teaching": [
+        {"text": "Floppy tip, very stiff body; rail wire.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "gw-amplatz-ultra-stiff-cook",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Ultra-stiff rail wire",
+      "brandName": "Amplatz Ultra Stiff",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 65.4, "sd": 1.2, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}}
+    },
+    {
+      "id": "gw-backup-meier-bsc",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Large-bore rail wire, somewhat floppy tip",
+      "brandName": "Backup Meier",
+      "manufacturer": "Boston Scientific",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 139.6, "sd": 2.5, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}}
+    },
+    {
+      "id": "gw-lunderquist-cook",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "Extra-stiff stent-graft delivery wire",
+      "brandName": "Lunderquist Extra Stiff",
+      "manufacturer": "Cook",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "harrison2011"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 158.4, "sd": 1.5, "unit": "GPa", "confidence": "sourced", "source": "harrison2011"}},
+      "teaching": [
+        {"text": "Incredibly stiff rail wire.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "gw-supra-core",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "High-support position wire",
+      "brandName": "Supra Core",
+      "manufacturer": "Abbott",
+      "geometry": {"diameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "eurointervention-guidewires"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 30, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-v18",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "0.018 in rail wire, very stiff with floppy end",
+      "brandName": "V-18",
+      "manufacturer": "Boston Scientific",
+      "geometry": {"diameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "lsu-primer"}},
+      "mechanics": {"tipLoad": {"value": 8, "unit": "gf", "confidence": "sourced", "source": "eurointervention-guidewires", "note": "short-taper version"}, "bodyFlexuralModulus": {"value": 30, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-steelcore-018",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "0.018 in high-support position wire",
+      "brandName": "Steelcore",
+      "manufacturer": "Abbott",
+      "geometry": {"diameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "eurointervention-guidewires"}},
+      "mechanics": {"core": {"text": "stainless steel", "confidence": "estimated", "note": "Implied by the name; confirm from the instructions for use."}, "bodyFlexuralModulus": {"value": 30, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-platinum-plus-018",
+      "kind": "guidewire",
+      "role": "rail",
+      "genericName": "0.018 in high-support position wire",
+      "brandName": "Platinum Plus",
+      "manufacturer": "Boston Scientific",
+      "geometry": {"diameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "eurointervention-guidewires"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 30, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-command-es-014",
+      "kind": "guidewire",
+      "role": "crossing",
+      "genericName": "0.014 in flexible crossing wire",
+      "brandName": "Command ES",
+      "manufacturer": "Abbott",
+      "geometry": {"diameter": {"value": 0.014, "unit": "in", "confidence": "sourced", "source": "eurointervention-guidewires"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 20, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-v14-long-taper",
+      "kind": "guidewire",
+      "role": "crossing",
+      "genericName": "0.014 in flexible crossing wire, long taper",
+      "brandName": "V-14 Long Taper",
+      "manufacturer": "Boston Scientific",
+      "geometry": {"diameter": {"value": 0.014, "unit": "in", "confidence": "sourced", "source": "eurointervention-guidewires"}},
+      "mechanics": {"bodyFlexuralModulus": {"value": 20, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "gw-victory-14-30g",
+      "kind": "guidewire",
+      "role": "cto-crossing",
+      "genericName": "0.014 in high-tip-load CTO wire",
+      "brandName": "Victory 14 30 g",
+      "manufacturer": "Boston Scientific",
+      "geometry": {"diameter": {"value": 0.014, "unit": "in", "confidence": "sourced", "source": "eurointervention-guidewires"}},
+      "mechanics": {"tipLoad": {"value": 30, "unit": "gf", "confidence": "sourced", "source": "eurointervention-guidewires"}, "bodyFlexuralModulus": {"value": 30, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "mw-fathom-16",
+      "kind": "microwire",
+      "role": "microcatheter-navigation",
+      "genericName": "0.016 in nitinol microwire",
+      "brandName": "Fathom-16",
+      "manufacturer": "Boston Scientific",
+      "geometry": {
+        "diameter": {"value": 0.016, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "length": {"options": [140, 180, 200, 215], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "nitinolTipLength": {"value": 25, "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "floppyTipLength": {"options": [10, 20], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "tipShapes": {"options": ["straight", "angled"], "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "mechanics": {"bodyFlexuralModulus": {"value": 40, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "mw-fathom-14",
+      "kind": "microwire",
+      "role": "microcatheter-navigation",
+      "genericName": "0.014 in nitinol-tip microwire",
+      "brandName": "Fathom-14",
+      "manufacturer": "Boston Scientific",
+      "geometry": {
+        "diameter": {"value": 0.014, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "length": {"options": [200, 300], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "nitinolTipLength": {"value": 35, "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "floppyTipLength": {"value": 10, "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "tipShapes": {"options": ["straight", "angled"], "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "mechanics": {"bodyFlexuralModulus": {"value": 40, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "mw-transend-14",
+      "kind": "microwire",
+      "role": "microcatheter-navigation",
+      "genericName": "0.014 in microwire with shapeable tip",
+      "brandName": "Transend-14",
+      "manufacturer": "Boston Scientific",
+      "geometry": {
+        "diameter": {"value": 0.014, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "length": {"options": [135, 165, 190], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "shapeableTipLength": {"value": 2, "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "mechanics": {"bodyFlexuralModulus": {"value": 40, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "mw-transend-18",
+      "kind": "microwire",
+      "role": "microcatheter-navigation",
+      "genericName": "0.018 in microwire with shapeable tungsten tip",
+      "brandName": "Transend-18",
+      "manufacturer": "Boston Scientific",
+      "geometry": {
+        "diameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "length": {"options": [135, 165], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "shapeableTipLength": {"value": 2, "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "mechanics": {"bodyFlexuralModulus": {"value": 40, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "mw-glidewire-gt",
+      "kind": "microwire",
+      "role": "microcatheter-navigation",
+      "genericName": "Hydrophilic microwire for distal visceral vessels",
+      "brandName": "Glidewire GT",
+      "manufacturer": "Terumo",
+      "geometry": {
+        "diameter": {"options": [0.016, 0.018], "unit": "in", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "length": {"options": [180, 200], "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "tipShapes": {"options": ["45 deg angle", "90 deg angle", "double angle", "straight shapeable"], "confidence": "sourced", "source": "terumo-glidewire-brochure"},
+        "flexibleTipLength": {"value": 25, "unit": "cm", "confidence": "sourced", "source": "terumo-glidewire-brochure"}
+      },
+      "mechanics": {"coating": {"text": "hydrophilic", "confidence": "sourced", "source": "terumo-glidewire-brochure"}, "bodyFlexuralModulus": {"value": 40, "unit": "GPa", "confidence": "placeholder"}}
+    },
+    {
+      "id": "mw-glidewire-gt-progreat-preloaded",
+      "kind": "microwire",
+      "role": "microcatheter-navigation",
+      "genericName": "Hydrophilic microwire preloaded in a coaxial microcatheter set",
+      "brandName": "Glidewire GT (Progreat coaxial system)",
+      "manufacturer": "Terumo",
+      "geometry": {
+        "diameter": {"options": [0.018, 0.021], "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure", "note": "0.018 in with the 2.4F; 0.021 in with the 2.7F and 2.8F"},
+        "length": {"options": [120, 140, 160], "unit": "cm", "confidence": "sourced", "source": "terumo-progreat-brochure", "note": "varies with catheter length"}
+      },
+      "mechanics": {"bodyFlexuralModulus": {"value": 40, "unit": "GPa", "confidence": "placeholder"}}
+    }
+  ],
+  "behaviorRules": [
+    {"text": "Stainless cores give good torque, push and support but bend permanently; nitinol cores are kink resistant and re-shapeable with less torque and push.", "confidence": "sourced", "source": "eurointervention-guidewires"},
+    {
+      "text": "Core-to-tip designs steer better but perforate more; shaping-ribbon tips are gentler with less torque; tapered tips penetrate far more than untapered tips of equal tip load.",
+      "confidence": "sourced",
+      "source": "eurointervention-guidewires"
+    },
+    {"text": "Tip load is the force in grams that bends the last 10 mm of the tip 2 mm sideways.", "confidence": "sourced", "source": "eurointervention-guidewires"},
+    {"text": "Tip-shaping targets (45 deg bend length): 3-4 mm iliac, 2-3 mm SFA, 1-2 mm tibial.", "confidence": "sourced", "source": "eurointervention-guidewires"},
+    {"text": "A J tip keeps the wire in the main lumen; an angled tip diverts into side branches.", "confidence": "sourced", "source": "cit-micropuncture-2012"},
+    {"text": "Standard wire lengths 145-180 cm; exchange lengths 180-300 cm.", "confidence": "sourced", "source": "radiologykey-tools"}
+  ]
+}

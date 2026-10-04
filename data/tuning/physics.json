@@ -1,0 +1,165 @@
+{
+  "schema": "ir-sim/tuning@1",
+  "category": "physics",
+  "notes": "Solver settings and sandbox rod models. 'design' values are deliberate engineering choices, not claims about reality. 'placeholder' values claim to describe a real device but have no source yet; the device inspector shows them with a badge.",
+  "solver": {
+    "linearDamping": {"value": 2, "unit": "1/s", "confidence": "design", "note": "Stand-in for blood drag; tune by feel."},
+    "angularDamping": {"value": 2, "unit": "1/s", "confidence": "design", "note": "Stand-in for blood drag on twist; tune by feel."},
+    "gravity": {"value": 0, "unit": "m/s2", "confidence": "design", "note": "Omitted in M1: wires and catheters are thin and supported by blood and vessel walls, so their weight is small next to bending and contact forces. Revisit in spec 04."},
+    "lumenContactMargin": {"value": 0.02, "unit": "mm", "confidence": "design", "note": "Extra clearance kept between device surface and lumen wall to avoid jitter."},
+    "settleKineticEnergy": {"value": 1e-09, "unit": "J", "confidence": "design", "note": "Below this total kinetic energy a static test counts as settled."},
+    "lumenGridCell": {"value": 10, "unit": "mm", "confidence": "design", "note": "Cell size of the uniform grid over lumen capsules."},
+    "settleSteps": {"value": 100, "unit": "count", "confidence": "design", "note": "A static test counts as settled after this many consecutive steps below settleKineticEnergy."},
+    "maxStepsPerMessage": {"value": 64, "unit": "count", "confidence": "design", "note": "Most steps the worker runs per main-thread message; beyond this the sim runs in slow motion instead of skipping."},
+    "maxStepsPerMessageFast": {"value": 1000, "unit": "count", "confidence": "design", "note": "Used only with the ?fast=1 test flag so end-to-end tests are not limited by slow headless rendering."}
+  },
+  "tiers": [
+    {
+      "id": "high",
+      "renderer": "webgpu",
+      "model": "rod",
+      "stepRate": {"value": 1000, "unit": "Hz", "confidence": "design"},
+      "substeps": {"value": 2, "unit": "count", "confidence": "design"},
+      "segmentLength": {"value": 2, "unit": "mm", "confidence": "design"},
+      "autoSelect": {
+        "maxPhysicsPerFrame": {"value": 4, "unit": "ms", "confidence": "design", "note": "Startup benchmark: if 300 steps of phantom C cost more than this per 16.7 ms frame, use the standard tier."},
+        "benchmarkSteps": {"value": 300, "unit": "count", "confidence": "design", "note": "Steps of phantom C run at startup to choose the tier."}
+      }
+    },
+    {
+      "id": "standard",
+      "renderer": "webgpu-or-webgl2",
+      "model": "rod",
+      "stepRate": {"value": 500, "unit": "Hz", "confidence": "design"},
+      "substeps": {"value": 2, "unit": "count", "confidence": "design"},
+      "segmentLength": {"value": 4, "unit": "mm", "confidence": "design"}
+    },
+    {
+      "id": "fallback",
+      "renderer": "webgl2",
+      "model": "rail",
+      "stepRate": {"value": 250, "unit": "Hz", "confidence": "design"},
+      "substeps": {"value": 1, "unit": "count", "confidence": "design"},
+      "segmentLength": {"value": 5, "unit": "mm", "confidence": "design"},
+      "availableFrom": "M2"
+    }
+  ],
+  "feedback": {
+    "hubForceFullScale": {"value": 1.0, "unit": "N", "confidence": "design", "note": "Resistance meter full scale. A display scale, not an injury threshold."},
+    "hubForceWarning": {"value": 0.5, "unit": "N", "confidence": "design", "note": "Resistance meter turns amber. A display threshold, not an injury threshold."},
+    "hubForceDanger": {"value": 0.8, "unit": "N", "confidence": "design", "note": "Resistance meter turns red and rumble pulses. A display threshold, not an injury threshold."},
+    "wallStressThreshold": {"value": 0.1, "unit": "N", "confidence": "placeholder", "note": "Tip normal force above this accumulates wall stress, the hidden risk that drives dissection from M2 on. Not a validated injury threshold; tune with faculty."},
+    "tipForceNodes": {"value": 3, "unit": "count", "confidence": "design", "note": "Tip normal force sums the contact forces on this many most-distal nodes."}
+  },
+  "rodModels": [
+    {
+      "id": "rm-glidewire-035-angled-150",
+      "deviceId": "gw-glidewire",
+      "variant": {"diameter": {"value": 0.035, "unit": "in"}, "tipShapes": "angled", "length": {"value": 150, "unit": "cm"}},
+      "variantNote": "Diameter, tip shape and length are chosen from the item's sourced options.",
+      "sections": [
+        {
+          "name": "tip",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 30, "unit": "mm", "confidence": "placeholder", "note": "Within the sourced 1-8 cm flexible tip range (terumo-glidewire-brochure); 3 cm chosen."},
+          "youngsModulusRatio": {"value": 0.02, "unit": "1", "confidence": "placeholder", "note": "Tip stiffness relative to the body; the flexible tip is 1-8 cm long (terumo-glidewire-brochure), its stiffness is unpublished."}
+        },
+        {
+          "name": "transition",
+          "fromTip": {"value": 30, "unit": "mm"},
+          "toTip": {"value": 100, "unit": "mm", "confidence": "placeholder", "note": "Transition length unpublished."},
+          "youngsModulusRatio": {"min": 0.02, "max": 1.0, "unit": "1", "confidence": "placeholder", "note": "Linear ramp from tip to body."}
+        },
+        {"name": "body", "fromTip": {"value": 100, "unit": "mm"}, "toTip": {"value": 1500, "unit": "mm"}, "youngsModulusRatio": {"value": 1.0, "unit": "1", "confidence": "design"}}
+      ],
+      "bodyYoungsModulusFrom": "mechanics.bodyFlexuralModulus",
+      "restShape": [
+        {
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 3, "unit": "mm", "confidence": "placeholder", "note": "Factory angled-tip geometry is unpublished; 3 mm borrows the iliac tip-shaping length from eurointervention-guidewires."},
+          "bendAngle": {"value": 45, "unit": "deg", "confidence": "placeholder", "note": "Item angledTipAngle (placeholder)."},
+          "toward": "d1"
+        }
+      ],
+      "frictionId": "fr-hydrophilic-wet-wall",
+      "radiopacity": {"tipBoost": {"value": 1.5, "unit": "1", "confidence": "design", "note": "Tip drawn darker on fluoro so it can be found."}, "body": {"value": 1.0, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-nitinol"
+    },
+    {
+      "id": "rm-bentson-035-145",
+      "deviceId": "gw-bentson",
+      "variant": {"length": {"value": 145, "unit": "cm", "confidence": "placeholder", "note": "The item lists no lengths; 145 cm is within the standard 145-180 cm range (radiologykey-tools)."}},
+      "sections": [
+        {
+          "name": "tip",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 60, "unit": "mm", "confidence": "placeholder", "note": "Floppy-tip length unpublished."},
+          "youngsModulusRatio": {"value": 0.01, "unit": "1", "confidence": "placeholder", "note": "Very floppy tip (lsu-primer); length and stiffness unpublished."}
+        },
+        {"name": "transition", "fromTip": {"value": 60, "unit": "mm"}, "toTip": {"value": 120, "unit": "mm", "confidence": "placeholder"}, "youngsModulusRatio": {"min": 0.01, "max": 1.0, "unit": "1", "confidence": "placeholder"}},
+        {"name": "body", "fromTip": {"value": 120, "unit": "mm"}, "toTip": {"value": 1450, "unit": "mm"}, "youngsModulusRatio": {"value": 1.0, "unit": "1", "confidence": "design"}}
+      ],
+      "bodyYoungsModulusFrom": "mechanics.bodyFlexuralModulus",
+      "restShape": [],
+      "frictionId": "fr-nonhydrophilic-wire-wall",
+      "radiopacity": {"tipBoost": {"value": 1.5, "unit": "1", "confidence": "design"}, "body": {"value": 1.0, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-stainless",
+      "materialAssumption": {"text": "Stainless steel core assumed", "confidence": "placeholder", "note": "Core material not stated in the sources."}
+    },
+    {
+      "id": "rm-amplatz-bard-035-180",
+      "deviceId": "gw-amplatz-bard",
+      "variant": {"length": {"value": 180, "unit": "cm", "confidence": "placeholder", "note": "The item lists no lengths; 180 cm is within the 180-300 cm exchange range (radiologykey-tools)."}},
+      "sections": [
+        {
+          "name": "tip",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 60, "unit": "mm", "confidence": "placeholder", "note": "Floppy-tip length unpublished."},
+          "youngsModulusRatio": {"value": 0.02, "unit": "1", "confidence": "placeholder", "note": "Floppy-tip length and stiffness unpublished."}
+        },
+        {
+          "name": "transition",
+          "fromTip": {"value": 60, "unit": "mm"},
+          "toTip": {"value": 600, "unit": "mm", "confidence": "derived", "source": "harrison2011", "note": "Harrison measured the stiff segment 60 cm or more from the floppy tip, so the body modulus applies from there."},
+          "youngsModulusRatio": {"min": 0.02, "max": 1.0, "unit": "1", "confidence": "placeholder", "note": "Linear ramp from tip to the measured body."}
+        },
+        {"name": "body", "fromTip": {"value": 600, "unit": "mm"}, "toTip": {"value": 1800, "unit": "mm"}, "youngsModulusRatio": {"value": 1.0, "unit": "1", "confidence": "design"}}
+      ],
+      "bodyYoungsModulusFrom": "mechanics.bodyFlexuralModulus",
+      "restShape": [],
+      "frictionId": "fr-nonhydrophilic-wire-wall",
+      "radiopacity": {"tipBoost": {"value": 1.5, "unit": "1", "confidence": "design"}, "body": {"value": 1.0, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-stainless",
+      "materialAssumption": {"text": "Stainless steel core assumed", "confidence": "placeholder", "note": "Core material not stated in the sources."}
+    },
+    {
+      "id": "rm-berenstein-5f-65",
+      "deviceId": "cath-berenstein",
+      "variant": {"outerDiameter": {"value": 5, "unit": "Fr"}, "length": {"value": 65, "unit": "cm"}},
+      "variantNote": "Outer diameter and length chosen from the item's sourced options and range.",
+      "innerDiameter": {"value": 0.039, "unit": "in", "confidence": "placeholder", "note": "Must exceed the largest compatible wire (0.038 in, sourced); confirm from the instructions for use."},
+      "sections": [
+        {
+          "name": "tip",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 20, "unit": "mm", "confidence": "placeholder", "note": "Soft-tip length unpublished."},
+          "youngsModulus": {"value": 0.3, "unit": "GPa", "confidence": "placeholder", "note": "Soft tip; tune with play-testing."}
+        },
+        {"name": "body", "fromTip": {"value": 20, "unit": "mm"}, "toTip": {"value": 650, "unit": "mm"}, "youngsModulus": {"value": 1.0, "unit": "GPa", "confidence": "placeholder", "note": "Effective modulus of a braided 5F shaft; unpublished."}}
+      ],
+      "restShape": [
+        {
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 12, "unit": "mm", "confidence": "placeholder", "note": "Curve geometry unpublished; build from the manufacturer's drawing."},
+          "bendAngle": {"value": 45, "unit": "deg", "confidence": "placeholder", "note": "Simple angled tip (dir-catheters-2023: simple curve); build the true curve from the manufacturer's drawing."},
+          "toward": "d1"
+        }
+      ],
+      "frictionId": "fr-uncoated-polymer-wall",
+      "lumenFrictionId": "fr-device-in-device",
+      "radiopacity": {"tipBoost": {"value": 1.2, "unit": "1", "confidence": "design"}, "body": {"value": 0.8, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-catheter-polymer"
+    }
+  ],
+  "ruleParameters": {"handHoldMargin": {"value": 15, "unit": "cm", "confidence": "design", "note": "Wire length that must stay outside the catheter hub to hold it; used by the limit-wire-length rule."}}
+}

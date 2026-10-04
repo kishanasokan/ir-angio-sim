@@ -1,0 +1,50 @@
+{
+  "schema": "ir-sim/materials@1",
+  "notes": "Contact and material parameters for the rod model (spec 04). Friction coefficients feed Coulomb friction at wall and device-device contacts. Coated values are placeholders until extracted from the Niemczyk paper's figures.",
+  "friction": [
+    {
+      "id": "fr-uncoated-polymer-wall",
+      "pair": "uncoated polymer device on vessel wall",
+      "coefficient": {"value": 0.2, "unit": "1", "confidence": "sourced", "source": "niemczyk-coatings", "note": "Near 0.2 for an uncoated polymer on a vessel-like hydrogel."}
+    },
+    {
+      "id": "fr-nonhydrophilic-wire-wall",
+      "pair": "non-hydrophilic (for example PTFE-coated) wire on vessel wall",
+      "coefficient": {"value": 0.2, "unit": "1", "confidence": "placeholder", "note": "Assumed equal to the uncoated polymer value (niemczyk-coatings); PTFE-coated wires were not tested there."}
+    },
+    {
+      "id": "fr-hydrophilic-wet-wall",
+      "pair": "wet hydrophilic-coated device on vessel wall",
+      "coefficient": {"value": 0.05, "unit": "1", "confidence": "placeholder", "note": "Every hydrophilic coating tested was below the uncoated value (niemczyk-coatings); extract per-coating values from the paper's figures."}
+    },
+    {"id": "fr-device-in-device", "pair": "wire or microcatheter inside a catheter lumen", "coefficient": {"value": 0.1, "unit": "1", "confidence": "placeholder", "note": "No source yet; tune with play-testing and an IR reviewer."}}
+  ],
+  "derivations": [
+    {
+      "id": "tip-ei-from-tip-load",
+      "text": "Tip load is the force in grams that bends the last 10 mm of the tip 2 mm sideways. Treating that 10 mm as a cantilever gives an effective tip bending stiffness EI = F * L^3 / (3 * delta) with L = 10 mm and delta = 2 mm. It is a small-deflection estimate (delta/L = 0.2), good enough to rank tips.",
+      "confidence": "derived",
+      "source": "eurointervention-guidewires"
+    }
+  ],
+  "bulk": [
+    {
+      "id": "mat-nitinol",
+      "name": "Nitinol (superelastic NiTi) core",
+      "density": {"value": 6450, "unit": "kg/m3", "confidence": "estimated", "note": "Typical handbook value; add a source. Only affects dynamics, not static shape."},
+      "poissonRatio": {"value": 0.33, "unit": "1", "confidence": "estimated", "note": "Typical handbook value; sets torsional stiffness through G = E / (2 (1 + nu)). Add a source."}
+    },
+    {
+      "id": "mat-stainless",
+      "name": "Stainless steel core",
+      "density": {"value": 7900, "unit": "kg/m3", "confidence": "estimated", "note": "Typical handbook value; add a source."},
+      "poissonRatio": {"value": 0.3, "unit": "1", "confidence": "estimated", "note": "Typical handbook value; add a source."}
+    },
+    {
+      "id": "mat-catheter-polymer",
+      "name": "Braided polymer catheter shaft",
+      "density": {"value": 1200, "unit": "kg/m3", "confidence": "placeholder", "note": "Composite of polymer and braid; unpublished."},
+      "poissonRatio": {"value": 0.4, "unit": "1", "confidence": "placeholder", "note": "Unpublished; torsion of braided shafts is better tuned directly (spec 04)."}
+    }
+  ]
+}

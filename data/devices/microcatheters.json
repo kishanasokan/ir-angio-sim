@@ -1,0 +1,374 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "microcatheter",
+  "notes": "Dead space is the volume to fill before an agent reaches the tip (needed for glue, Onyx and drug dosing). Mechanics are placeholders until tuned. Parent catheter inner diameter must exceed the proximal outer diameter, not the tip outer diameter.",
+  "items": [
+    {
+      "id": "mc-progreat-2.0",
+      "kind": "microcatheter",
+      "brandName": "Progreat 2.0Fr (Alpha)",
+      "manufacturer": "Terumo",
+      "genericName": "2.0F microcatheter, 0.019 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.0, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "outerDiameterProximal": {"value": 2.7, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "innerDiameter": {"value": 0.019, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "usableLength": {"options": [110, 130, 150], "unit": "cm", "confidence": "sourced", "source": "terumo-progreat-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 750, "unit": "psi", "confidence": "sourced", "source": "terumo-progreat-brochure"}},
+      "compatibility": {
+        "coils": {"text": "Azur CX 0.018 in coils", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "maxParticleSize": {"value": 400, "unit": "um", "confidence": "sourced", "source": "terumo-progreat-brochure", "note": "HydroPearl 400 +/- 75 um"}
+      }
+    },
+    {
+      "id": "mc-progreat-2.4",
+      "kind": "microcatheter",
+      "brandName": "Progreat 2.4Fr",
+      "manufacturer": "Terumo",
+      "genericName": "2.4F microcatheter, 0.022 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.4, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "outerDiameterProximal": {"value": 2.9, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "innerDiameter": {"value": 0.022, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "usableLength": {"options": [110, 130, 150], "unit": "cm", "confidence": "sourced", "source": "terumo-progreat-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 750, "unit": "psi", "confidence": "sourced", "source": "terumo-progreat-brochure"}},
+      "compatibility": {
+        "maxCoilPlatform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "maxParticleSize": {"value": 600, "unit": "um", "confidence": "sourced", "source": "terumo-progreat-brochure", "note": "HydroPearl 600 +/- 75 um"},
+        "preloadedWire": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure", "note": "Glidewire GT in the coaxial system"}
+      }
+    },
+    {
+      "id": "mc-progreat-2.7",
+      "kind": "microcatheter",
+      "brandName": "Progreat 2.7Fr",
+      "manufacturer": "Terumo",
+      "genericName": "2.7F microcatheter, 0.025 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.7, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "outerDiameterProximal": {"value": 2.9, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "innerDiameter": {"value": 0.025, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "usableLength": {"options": [110, 130], "unit": "cm", "confidence": "sourced", "source": "terumo-progreat-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 750, "unit": "psi", "confidence": "sourced", "source": "terumo-progreat-brochure"}},
+      "compatibility": {
+        "maxCoilPlatform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "maxParticleSize": {"value": 800, "unit": "um", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "preloadedWire": {"value": 0.021, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"}
+      },
+      "deadSpace": [
+        {"usableLength": {"value": 110, "unit": "cm"}, "value": 0.461, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 130, "unit": "cm"}, "value": 0.531, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-progreat-2.8",
+      "kind": "microcatheter",
+      "brandName": "Progreat 2.8Fr",
+      "manufacturer": "Terumo",
+      "genericName": "2.8F microcatheter, 0.027 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "outerDiameterProximal": {"value": 3.0, "unit": "Fr", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "innerDiameter": {"value": 0.027, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "usableLength": {"options": [110, 130, 150], "unit": "cm", "confidence": "sourced", "source": "terumo-progreat-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 900, "unit": "psi", "confidence": "sourced", "source": "terumo-progreat-brochure"}},
+      "compatibility": {
+        "maxCoilPlatform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "maxParticleSize": {"value": 800, "unit": "um", "confidence": "sourced", "source": "terumo-progreat-brochure"},
+        "preloadedWire": {"value": 0.021, "unit": "in", "confidence": "sourced", "source": "terumo-progreat-brochure"}
+      },
+      "deadSpace": [
+        {"usableLength": {"value": 110, "unit": "cm"}, "value": 0.531, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 130, "unit": "cm"}, "value": 0.591, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 150, "unit": "cm"}, "value": 0.661, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-direxion",
+      "kind": "microcatheter",
+      "brandName": "Direxion",
+      "manufacturer": "Boston Scientific",
+      "genericName": "Torqueable 2.4F microcatheter, 0.021 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.4, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "outerDiameterProximal": {"value": 2.7, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "innerDiameter": {"value": 0.021, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "usableLength": {"options": [105, 130, 155], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "tipShapes": {"options": ["straight", "Bern", "J", "swan"], "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 1200, "unit": "psi", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}},
+      "compatibility": {"dmsoCompatible": {"value": true, "confidence": "sourced", "source": "bsc-microcatheter-brochure"}, "chemoAndAlcoholCompatible": {"value": true, "confidence": "sourced", "source": "bsc-microcatheter-brochure"}}
+    },
+    {
+      "id": "mc-direxion-hiflo",
+      "kind": "microcatheter",
+      "brandName": "Direxion HI-FLO",
+      "manufacturer": "Boston Scientific",
+      "genericName": "Torqueable 2.8F microcatheter, 0.027 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "outerDiameterProximal": {"value": 3.0, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "innerDiameter": {"value": 0.027, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "usableLength": {"options": [105, 130, 155], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "tipShapes": {"options": ["straight", "Bern", "J", "swan"], "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 1200, "unit": "psi", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}},
+      "deadSpace": [
+        {"usableLength": {"value": 105, "unit": "cm"}, "value": 0.554, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 130, "unit": "cm"}, "value": 0.644, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 155, "unit": "cm"}, "value": 0.734, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-renegade-stc-18",
+      "kind": "microcatheter",
+      "brandName": "Renegade STC 18",
+      "manufacturer": "Boston Scientific",
+      "genericName": "2.4F microcatheter for 0.018 in coils",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.4, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "outerDiameterProximal": {"value": 3.0, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "innerDiameter": {"value": 0.021, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "usableLength": {"options": [105, 130, 150], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "distalTipLength": {"options": [20, 30], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "tipShapes": {"options": ["straight", "angled"], "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 1000, "unit": "psi", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}},
+      "compatibility": {"maxCoilPlatform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}}
+    },
+    {
+      "id": "mc-renegade-fiber",
+      "kind": "microcatheter",
+      "brandName": "Renegade Fiber Braided",
+      "manufacturer": "Boston Scientific",
+      "genericName": "2.5F fiber-braided microcatheter",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.5, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "outerDiameterProximal": {"value": 3.0, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "innerDiameter": {"value": 0.021, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "usableLength": {"options": [130, 150], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "distalTipLength": {"options": [10, 20], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 300, "unit": "psi", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}},
+      "compatibility": {
+        "maxCoilPlatform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "maxParticleSize": {"value": 700, "unit": "um", "confidence": "sourced", "source": "bsc-microcatheter-brochure", "note": "spherical particles"}
+      }
+    },
+    {
+      "id": "mc-renegade-hiflo",
+      "kind": "microcatheter",
+      "brandName": "Renegade HI-FLO",
+      "manufacturer": "Boston Scientific",
+      "genericName": "2.8F high-flow microcatheter",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "outerDiameterProximal": {"value": 3.0, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "innerDiameter": {"value": 0.027, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "usableLength": {"min": 105, "max": 150, "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "distalTipLength": {"options": [10, 20], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "ratings": {"maxPressure": {"value": 900, "unit": "psi", "confidence": "placeholder", "note": "Not stated in the brochure page read; confirm from instructions for use."}},
+      "deadSpace": [
+        {"usableLength": {"value": 105, "unit": "cm"}, "value": 0.533, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 115, "unit": "cm"}, "value": 0.573, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 135, "unit": "cm"}, "value": 0.643, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 150, "unit": "cm"}, "value": 0.693, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-truselect-2.0",
+      "kind": "microcatheter",
+      "brandName": "TruSelect",
+      "manufacturer": "Boston Scientific",
+      "genericName": "2.0F tip microcatheter, 0.021 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.0, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "outerDiameterProximal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "innerDiameter": {"value": 0.021, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "usableLength": {"options": [105, 130, 155, 175], "unit": "cm", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "tipShapes": {"options": ["straight", "Bern"], "confidence": "sourced", "source": "bsc-microcatheter-brochure"}
+      },
+      "compatibility": {
+        "maxCoilPlatform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "bsc-microcatheter-brochure"},
+        "maxParticleSize": {"value": 700, "unit": "um", "confidence": "sourced", "source": "bsc-microcatheter-brochure", "note": "spherical embolics; also Y-90"}
+      },
+      "deadSpace": [
+        {"usableLength": {"value": 105, "unit": "cm"}, "value": 0.371, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 130, "unit": "cm"}, "value": 0.441, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 155, "unit": "cm"}, "value": 0.501, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 175, "unit": "cm"}, "value": 0.551, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-cantata-2.5",
+      "kind": "microcatheter",
+      "brandName": "Cantata 2.5",
+      "manufacturer": "Cook",
+      "genericName": "2.5F microcatheter, 0.021 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.5, "unit": "Fr", "confidence": "sourced", "source": "cook-cantata"},
+        "innerDiameter": {"value": 0.021, "unit": "in", "confidence": "sourced", "source": "cook-cantata"},
+        "usableLength": {"options": [100, 110, 135, 150], "unit": "cm", "confidence": "sourced", "source": "cook-cantata", "note": "lengths offered across most sizes"}
+      },
+      "compatibility": {"maxParticleSize": {"value": 500, "unit": "um", "confidence": "sourced", "source": "cook-cantata"}}
+    },
+    {
+      "id": "mc-cantata-2.8",
+      "kind": "microcatheter",
+      "brandName": "Cantata 2.8",
+      "manufacturer": "Cook",
+      "genericName": "2.8F microcatheter, 0.025 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "cook-cantata"},
+        "innerDiameter": {"value": 0.025, "unit": "in", "confidence": "sourced", "source": "cook-cantata"},
+        "usableLength": {"options": [100, 110, 135, 150], "unit": "cm", "confidence": "sourced", "source": "cook-cantata"}
+      },
+      "compatibility": {"maxParticleSize": {"value": 700, "unit": "um", "confidence": "sourced", "source": "cook-cantata"}},
+      "deadSpace": [
+        {"usableLength": {"value": 100, "unit": "cm"}, "value": 0.545, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 110, "unit": "cm"}, "value": 0.575, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 135, "unit": "cm"}, "value": 0.655, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 150, "unit": "cm"}, "value": 0.705, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-cantata-2.9",
+      "kind": "microcatheter",
+      "brandName": "Cantata 2.9 (high flow)",
+      "manufacturer": "Cook",
+      "genericName": "2.9F high-flow microcatheter, 0.027 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.9, "unit": "Fr", "confidence": "sourced", "source": "cook-cantata"},
+        "innerDiameter": {"value": 0.027, "unit": "in", "confidence": "sourced", "source": "cook-cantata"},
+        "usableLength": {"options": [110, 135, 150], "unit": "cm", "confidence": "sourced", "source": "bsc-deadspace"}
+      },
+      "compatibility": {"maxParticleSize": {"value": 1000, "unit": "um", "confidence": "sourced", "source": "cook-cantata"}},
+      "deadSpace": [
+        {"usableLength": {"value": 110, "unit": "cm"}, "value": 0.635, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 135, "unit": "cm"}, "value": 0.725, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 150, "unit": "cm"}, "value": 0.775, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-maestro-2.1",
+      "kind": "microcatheter",
+      "brandName": "Maestro 2.8F tapered to 2.1F",
+      "manufacturer": "Merit Medical",
+      "genericName": "2.1F tip microcatheter, 0.018 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.1, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "outerDiameterProximal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "innerDiameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "merit-maestro"},
+        "usableLength": {"options": [110, 130, 150], "unit": "cm", "confidence": "sourced", "source": "merit-maestro"},
+        "tipShapes": {"options": ["straight", "45 deg", "swan neck"], "confidence": "sourced", "source": "merit-maestro"}
+      },
+      "ratings": {"maxPressure": {"value": 800, "unit": "psi", "confidence": "sourced", "source": "merit-maestro"}},
+      "compatibility": {"maxCoilPlatform": {"value": 0.016, "unit": "in", "confidence": "sourced", "source": "merit-maestro"}, "maxParticleSize": {"value": 500, "unit": "um", "confidence": "sourced", "source": "merit-maestro"}}
+    },
+    {
+      "id": "mc-maestro-2.4",
+      "kind": "microcatheter",
+      "brandName": "Maestro 2.8F tapered to 2.4F",
+      "manufacturer": "Merit Medical",
+      "genericName": "2.4F tip microcatheter, 0.020 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.4, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "outerDiameterProximal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "innerDiameter": {"value": 0.02, "unit": "in", "confidence": "sourced", "source": "merit-maestro"},
+        "usableLength": {"options": [110, 130, 150], "unit": "cm", "confidence": "sourced", "source": "merit-maestro"},
+        "tipShapes": {"options": ["straight", "45 deg", "swan neck"], "confidence": "sourced", "source": "merit-maestro"}
+      },
+      "ratings": {"maxPressure": {"value": 800, "unit": "psi", "confidence": "sourced", "source": "merit-maestro"}},
+      "compatibility": {"maxCoilPlatform": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "merit-maestro"}, "maxParticleSize": {"value": 700, "unit": "um", "confidence": "sourced", "source": "merit-maestro"}}
+    },
+    {
+      "id": "mc-maestro-2.8",
+      "kind": "microcatheter",
+      "brandName": "Maestro 2.8F no taper",
+      "manufacturer": "Merit Medical",
+      "genericName": "2.8F microcatheter, 0.024 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "outerDiameterProximal": {"value": 2.8, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "innerDiameter": {"value": 0.024, "unit": "in", "confidence": "sourced", "source": "merit-maestro"},
+        "usableLength": {"options": [110, 130, 150], "unit": "cm", "confidence": "sourced", "source": "merit-maestro"},
+        "tipShapes": {"options": ["straight", "45 deg", "swan neck"], "confidence": "sourced", "source": "merit-maestro"}
+      },
+      "ratings": {"maxPressure": {"value": 800, "unit": "psi", "confidence": "sourced", "source": "merit-maestro"}},
+      "compatibility": {"maxParticleSize": {"value": 700, "unit": "um", "confidence": "sourced", "source": "merit-maestro"}},
+      "deadSpace": [
+        {"usableLength": {"value": 110, "unit": "cm"}, "value": 0.638, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace", "note": "BSC table lists 'Maestro 2.8F' without naming the variant"},
+        {"usableLength": {"value": 130, "unit": "cm"}, "value": 0.708, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 150, "unit": "cm"}, "value": 0.778, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-maestro-2.9",
+      "kind": "microcatheter",
+      "brandName": "Maestro 2.9F no taper",
+      "manufacturer": "Merit Medical",
+      "genericName": "2.9F microcatheter, 0.027 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.9, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "outerDiameterProximal": {"value": 2.9, "unit": "Fr", "confidence": "sourced", "source": "merit-maestro"},
+        "innerDiameter": {"value": 0.027, "unit": "in", "confidence": "sourced", "source": "merit-maestro"},
+        "usableLength": {"options": [110, 130, 150], "unit": "cm", "confidence": "sourced", "source": "merit-maestro"},
+        "tipShapes": {"options": ["straight", "45 deg", "swan neck"], "confidence": "sourced", "source": "merit-maestro"}
+      },
+      "ratings": {"maxPressure": {"value": 800, "unit": "psi", "confidence": "sourced", "source": "merit-maestro"}},
+      "compatibility": {"maxParticleSize": {"value": 900, "unit": "um", "confidence": "sourced", "source": "merit-maestro"}},
+      "deadSpace": [
+        {"usableLength": {"value": 110, "unit": "cm"}, "value": 0.698, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 130, "unit": "cm"}, "value": 0.778, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 150, "unit": "cm"}, "value": 0.858, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    },
+    {
+      "id": "mc-lantern",
+      "kind": "microcatheter",
+      "brandName": "Lantern",
+      "manufacturer": "Penumbra",
+      "genericName": "2.6F delivery microcatheter, 0.025 in lumen",
+      "geometry": {
+        "outerDiameterDistal": {"value": 2.6, "unit": "Fr", "confidence": "sourced", "source": "bsc-deadspace"},
+        "innerDiameter": {"value": 0.025, "unit": "in", "confidence": "sourced", "source": "penumbra-platform-2023"},
+        "usableLength": {"options": [115, 135, 150], "unit": "cm", "confidence": "sourced", "source": "bsc-deadspace"}
+      },
+      "compatibility": {"coils": {"text": "Ruby and POD coils", "confidence": "sourced", "source": "penumbra-platform-2023"}},
+      "deadSpace": [
+        {"usableLength": {"value": 115, "unit": "cm"}, "value": 0.539, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 135, "unit": "cm"}, "value": 0.599, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"},
+        {"usableLength": {"value": 150, "unit": "cm"}, "value": 0.649, "unit": "mL", "confidence": "sourced", "source": "bsc-deadspace"}
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "micro-parent-fit",
+      "text": "Parent catheter inner diameter must exceed the microcatheter's proximal outer diameter.",
+      "confidence": "derived",
+      "source": "terumo-progreat-brochure",
+      "note": "Proximal OD is larger than tip OD for tapered designs (e.g., Progreat 2.4F is 2.9F at the hub)."
+    },
+    {
+      "id": "micro-particle-limit",
+      "text": "Particles larger than the microcatheter's stated maximum raise injection resistance, then occlude the catheter.",
+      "confidence": "derived",
+      "source": "cook-cantata",
+      "note": "Follows from each catheter's stated maximum particle size."
+    },
+    {
+      "id": "micro-pressure-limit",
+      "text": "Power injection above the stated maximum pressure risks catheter rupture.",
+      "confidence": "derived",
+      "source": "bsc-microcatheter-brochure",
+      "note": "Follows from each catheter's stated maximum pressure rating."
+    },
+    {"id": "micro-dmso", "text": "DMSO-based agents (Onyx) only through DMSO-compatible microcatheters; others degrade.", "confidence": "sourced", "source": "fda-onyx-ifu"}
+  ]
+}

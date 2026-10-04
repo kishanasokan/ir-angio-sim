@@ -1,0 +1,236 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "access",
+  "notes": "Needles, micropuncture sets and sheaths, plus the access-site facts the access simulation (spec 06) needs. Sheath French size names the INNER diameter, unlike catheters, whose French size is the outer diameter. Needle outer diameters come from the standard gauge table and still need a citable source.",
+  "items": [
+    {
+      "id": "needle-single-wall-18g",
+      "kind": "access-needle",
+      "genericName": "18G single-wall access needle",
+      "design": {"text": "Single-wall: hollow core with no inner cutting needle filling the lumen", "confidence": "sourced", "source": "lsu-primer"},
+      "geometry": {
+        "gauge": {"value": 18, "unit": "G", "confidence": "sourced", "source": "lsu-primer"},
+        "outerDiameter": {"value": 1.27, "unit": "mm", "confidence": "estimated", "note": "Nominal 18G outer diameter from the standard needle gauge table (ISO 9626); add a citable source."}
+      },
+      "compatibility": {"maxWireDiameter": {"value": 0.035, "unit": "in", "confidence": "sourced", "source": "lsu-primer", "note": "An 18-gauge or larger needle is required for a 0.035 in wire."}},
+      "teaching": [
+        {"text": "21-, 19- and 18-gauge needles are often used for arterial and venous access; larger needles such as 18 gauge suit bigger, easily reached targets.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "needle-single-wall-19g",
+      "kind": "access-needle",
+      "genericName": "19G single-wall access needle",
+      "design": {"text": "Single-wall: hollow core with no inner cutting needle filling the lumen", "confidence": "sourced", "source": "lsu-primer"},
+      "geometry": {
+        "gauge": {"value": 19, "unit": "G", "confidence": "sourced", "source": "lsu-primer"},
+        "outerDiameter": {"value": 1.07, "unit": "mm", "confidence": "estimated", "note": "Nominal 19G outer diameter from the standard needle gauge table (ISO 9626); add a citable source."}
+      },
+      "compatibility": {
+        "maxWireDiameter": {
+          "value": 0.018,
+          "unit": "in",
+          "confidence": "derived",
+          "source": "lsu-primer",
+          "note": "The primer requires an 18-gauge or larger needle for 0.035 in and a 22-gauge or larger needle for 0.018 in, so a standard 19G needle takes 0.018 in. Thin-wall 19G needles may differ; check the instructions for use."
+        }
+      }
+    },
+    {
+      "id": "needle-single-wall-21g",
+      "kind": "access-needle",
+      "genericName": "21G single-wall access needle",
+      "design": {"text": "Single-wall: hollow core with no inner cutting needle filling the lumen", "confidence": "sourced", "source": "lsu-primer"},
+      "geometry": {
+        "gauge": {"value": 21, "unit": "G", "confidence": "sourced", "source": "lsu-primer"},
+        "outerDiameter": {"value": 0.82, "unit": "mm", "confidence": "estimated", "note": "Nominal 21G outer diameter from the standard needle gauge table (ISO 9626); add a citable source."}
+      },
+      "compatibility": {"maxWireDiameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "lsu-primer", "note": "A 22-gauge or larger needle is required for a 0.018 in wire."}}
+    },
+    {
+      "id": "needle-single-wall-22g",
+      "kind": "access-needle",
+      "genericName": "22G single-wall needle",
+      "design": {"text": "Single-wall: hollow core with no inner cutting needle filling the lumen", "confidence": "sourced", "source": "lsu-primer"},
+      "geometry": {
+        "gauge": {"value": 22, "unit": "G", "confidence": "sourced", "source": "lsu-primer"},
+        "outerDiameter": {"value": 0.72, "unit": "mm", "confidence": "estimated", "note": "Nominal 22G outer diameter from the standard needle gauge table (ISO 9626); add a citable source."}
+      },
+      "compatibility": {"maxWireDiameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "lsu-primer"}},
+      "teaching": [
+        {"text": "22- and 21-gauge needles can be used for small targets such as small vessels.", "confidence": "sourced", "source": "lsu-primer"}
+      ]
+    },
+    {
+      "id": "needle-trocar",
+      "kind": "access-needle",
+      "genericName": "Two-part trocar needle",
+      "design": {"text": "Two-part needle: outer bevelled or non-bevelled cannula with a removable inner sharp three-sided trocar", "confidence": "sourced", "source": "lsu-primer"},
+      "geometry": {"gauge": {"options": [18, 21], "unit": "G", "confidence": "sourced", "source": "lsu-primer"}, "length": {"options": [10, 15, 20], "unit": "cm", "confidence": "sourced", "source": "lsu-primer"}}
+    },
+    {
+      "id": "needle-chiba",
+      "kind": "access-needle",
+      "genericName": "Chiba needle",
+      "brandName": "Chiba",
+      "design": {"text": "Two-part high-gauge needle with a bevelled edge that allows steering", "confidence": "sourced", "source": "lsu-primer"},
+      "geometry": {"gauge": {"options": [20, 22], "unit": "G", "confidence": "sourced", "source": "lsu-primer"}, "length": {"options": [15, 20], "unit": "cm", "confidence": "sourced", "source": "lsu-primer"}},
+      "targets": {"options": ["biliary access", "renal access"], "confidence": "sourced", "source": "lsu-primer", "note": "The sim also uses it for direct punctures (transhepatic portal, translumbar, nodal); confirm with an IR reviewer."}
+    },
+    {
+      "id": "set-micropuncture-4f",
+      "kind": "micropuncture-set",
+      "genericName": "Micropuncture introducer set, 4F",
+      "brandName": "Micropuncture (G47947)",
+      "manufacturer": "Cook",
+      "components": {
+        "needle": {"text": "21G echogenic needle, 4 cm", "confidence": "sourced", "source": "medicalecart-micropuncture"},
+        "wire": {"text": "0.018 in nitinol wire with platinum tip", "confidence": "sourced", "source": "medicalecart-micropuncture"},
+        "introducer": {"text": "4F coaxial introducer, 10 cm outer catheter, transitionless tip", "confidence": "sourced", "source": "medicalecart-micropuncture"}
+      },
+      "geometry": {
+        "needleGauge": {"value": 21, "unit": "G", "confidence": "sourced", "source": "medicalecart-micropuncture"},
+        "needleLength": {"value": 4, "unit": "cm", "confidence": "sourced", "source": "medicalecart-micropuncture", "note": "As listed for this set; other sets use longer needles and stainless wires (confirm from Cook's catalog)."},
+        "wireDiameter": {"value": 0.018, "unit": "in", "confidence": "sourced", "source": "medicalecart-micropuncture"},
+        "introducerOuterDiameter": {"value": 4, "unit": "Fr", "confidence": "sourced", "source": "medicalecart-micropuncture"},
+        "introducerLength": {"value": 10, "unit": "cm", "confidence": "sourced", "source": "medicalecart-micropuncture"}
+      },
+      "teaching": [
+        {"text": "Blood return through a 21G needle is slower than through an 18G needle.", "confidence": "sourced", "source": "cit-micropuncture-2012"},
+        {
+          "text": "Advance the micropuncture wire only under fluoroscopy: its angled tip can enter small branches. One series saw retroperitoneal bleeding in 0.7% with micropuncture versus 0.18% with a standard needle, attributed to that tip.",
+          "confidence": "sourced",
+          "source": "cit-micropuncture-2012"
+        }
+      ]
+    },
+    {
+      "id": "sheath-introducer",
+      "kind": "sheath",
+      "genericName": "Introducer sheath",
+      "geometry": {
+        "innerDiameter": {"options": [4, 5, 6, 7, 8, 9, 10, 11, 12], "unit": "Fr", "confidence": "estimated", "note": "French size names the sheath's inner diameter (sourced, radiologykey-tools); the size list is the sim's catalog choice."},
+        "outerDiameterOverInner": {"min": 1.5, "max": 2, "unit": "Fr", "confidence": "sourced", "source": "radiologykey-tools", "note": "Outer diameter runs 1.5 to 2F larger than the labeled size."},
+        "length": {"value": 11, "unit": "cm", "confidence": "placeholder", "note": "Common short-sheath length; confirm from a catalog."}
+      },
+      "hubColors": [
+        {"label": "4F", "color": "red", "confidence": "sourced", "source": "lsu-primer"},
+        {"label": "5F", "color": "gray", "confidence": "sourced", "source": "lsu-primer"},
+        {"label": "6F", "color": "green", "confidence": "sourced", "source": "lsu-primer"},
+        {"label": "7F", "color": "orange", "confidence": "sourced", "source": "lsu-primer"},
+        {"label": "8F", "color": "blue", "confidence": "sourced", "source": "lsu-primer"},
+        {"label": "9F and larger", "color": "black", "confidence": "sourced", "source": "lsu-primer"}
+      ],
+      "teaching": [
+        {"text": "Sheath French size measures its inner diameter and decides which catheter fits; a 5F catheter fits a 5F sheath.", "confidence": "sourced", "source": "radiologykey-tools"}
+      ]
+    },
+    {
+      "id": "sheath-guiding-radial-6f",
+      "kind": "guiding-sheath",
+      "genericName": "6F long guiding sheath for radial-to-peripheral work",
+      "brandName": "R2P Destination Slender",
+      "manufacturer": "Terumo",
+      "geometry": {"innerDiameter": {"value": 6, "unit": "Fr", "confidence": "sourced", "source": "evt-radial-2019"}, "length": {"options": [119, 149], "unit": "cm", "confidence": "sourced", "source": "evt-radial-2019"}}
+    },
+    {
+      "id": "sheath-long-crossover",
+      "kind": "guiding-sheath",
+      "genericName": "Long or crossover sheath",
+      "uses": {"text": "Support through tortuous iliac arteries and up-and-over crossover work", "confidence": "estimated", "note": "Standard practice; add a source and named products in spec 05."}
+    }
+  ],
+  "sites": [
+    {
+      "id": "site-cfa-retrograde",
+      "name": "Common femoral artery, retrograde",
+      "sheathSizes": {"text": "4 to 8F short sheaths; 10 to 24F large bore", "confidence": "estimated", "note": "Typical ranges from the research notes; confirm with an IR reviewer."},
+      "target": {
+        "text": "Anterior wall of the common femoral artery below the femoral head centerline and relatively high within the lower inner quadrant of the femoral head (the artery is almost always medial); above the bifurcation and below the inferior epigastric artery",
+        "confidence": "sourced",
+        "source": "cit-femoral-2008"
+      },
+      "facts": [
+        {"text": "Punctures above the inferior epigastric artery carry odds ratios for retroperitoneal hemorrhage as high as 17:1.", "confidence": "sourced", "source": "cit-femoral-2008"},
+        {"text": "High punctures correlate with retroperitoneal hemorrhage; low punctures with pseudoaneurysm, hematoma and arteriovenous fistula.", "confidence": "sourced", "source": "cit-femoral-2008"},
+        {"text": "The inguinal crease is the single most common landmark (40% of operators) but does not reliably overlie the femoral head.", "confidence": "sourced", "source": "cit-femoral-2008"},
+        {"text": "Run a femoral angiogram through the sheath before anticoagulation to confirm the arteriotomy level.", "confidence": "sourced", "source": "cit-femoral-2008"}
+      ],
+      "frequencies": [
+        {"label": "Bifurcation above the bottom of the femoral head (type 2)", "value": 25, "unit": "%", "confidence": "sourced", "source": "cit-femoral-2008", "note": "approximately"},
+        {"label": "Bifurcation below the middle third of the femoral head", "value": 95, "unit": "%", "confidence": "sourced", "source": "acc-closure-chapter"},
+        {
+          "label": "Puncture over the middle third of the femoral head lies at or above the inferior epigastric artery",
+          "value": 11,
+          "unit": "%",
+          "confidence": "sourced",
+          "source": "acc-closure-chapter",
+          "note": "More common in obese patients. This is the inferior epigastric artery's position, not the bifurcation's."
+        }
+      ],
+      "sequence": [
+        {
+          "text": "Micropuncture: puncture over the femoral head, expect slower return through the 21G needle, advance the 0.018 in wire under fluoroscopy, place the 4F introducer, run a sheath angiogram in an oblique projection, exchange to a 0.035 in wire, upsize.",
+          "confidence": "sourced",
+          "source": "cit-micropuncture-2012"
+        }
+      ]
+    },
+    {
+      "id": "site-cfa-antegrade",
+      "name": "Common femoral artery, antegrade",
+      "sheathSizes": {"text": "4 to 6F", "confidence": "estimated", "note": "Typical range; confirm with an IR reviewer."},
+      "uses": {"text": "Ipsilateral superficial femoral and below-knee work", "confidence": "estimated", "note": "From the research notes; confirm with an IR reviewer."},
+      "facts": [
+        {"text": "Skin entry is higher than for retrograde access, so the risk of a high stick rises.", "confidence": "estimated", "note": "Teaching point from the research notes; add a source."}
+      ]
+    },
+    {
+      "id": "site-radial-left",
+      "name": "Left radial artery",
+      "sheathSizes": {"options": [5, 6], "unit": "Fr", "confidence": "sourced", "source": "evt-radial-2019"},
+      "uses": {"text": "Visceral, hepatic, uterine and renal embolization", "confidence": "sourced", "source": "evt-radial-2019"},
+      "facts": [
+        {"text": "Left radial access is preferred because it minimizes crossing the great vessels of the aortic arch.", "confidence": "sourced", "source": "evt-radial-2019"},
+        {"text": "A radial artery diameter under 2 mm is a relative contraindication.", "confidence": "sourced", "source": "evt-radial-2019"},
+        {"text": "Pelvic work from the radial artery needs 125 cm catheters and 150 cm microcatheters.", "confidence": "sourced", "source": "evt-radial-2019"},
+        {"text": "Ultrasound-guided single-wall puncture, then the radial cocktail through the sheath.", "confidence": "sourced", "source": "evt-radial-2019"}
+      ],
+      "frequencies": [
+        {"label": "Radial artery spasm", "max": 20, "unit": "%", "confidence": "sourced", "source": "evt-radial-2019", "note": "Occurs in 20% of cases or fewer."},
+        {"label": "Radial artery occlusion", "value": 1, "unit": "%", "confidence": "sourced", "source": "evt-radial-2019", "note": "approximately"}
+      ]
+    },
+    {
+      "id": "site-small-artery",
+      "name": "Brachial, popliteal and tibiopedal arteries",
+      "uses": {"text": "Bailout or retrograde peripheral arterial work", "confidence": "estimated", "note": "From the research notes; confirm with an IR reviewer."},
+      "details": {"text": "Sheath sizes, technique and complications to source in phase 2", "confidence": "placeholder"}
+    },
+    {
+      "id": "site-vein",
+      "name": "Common femoral vein and internal jugular vein",
+      "sheathSizes": {"min": 5, "max": 24, "unit": "Fr", "confidence": "estimated", "note": "Range spans filter introducers to large-bore thrombectomy sheaths (therapeutic.json)."},
+      "uses": {"text": "IVC filters, TIPS (right internal jugular), venous and pulmonary embolism thrombectomy", "confidence": "estimated", "note": "From the research notes; confirm with an IR reviewer."},
+      "facts": [
+        {"text": "Veins compress under the ultrasound probe and return dark, non-pulsatile blood.", "confidence": "estimated", "note": "Standard ultrasound teaching; add a source."}
+      ]
+    },
+    {
+      "id": "site-direct-puncture",
+      "name": "Direct puncture (transhepatic, translumbar, nodal)",
+      "sheathSizes": {"text": "Needle only, or 4 to 6F", "confidence": "estimated", "note": "From the research notes; confirm with an IR reviewer."},
+      "uses": {"text": "Portal venous work, type II endoleak, lymphatic embolization", "confidence": "estimated", "note": "From the research notes; confirm with an IR reviewer."}
+    }
+  ],
+  "rules": [
+    {"id": "access-needle-wire", "text": "A 0.035 in wire needs an 18-gauge or larger needle; a 0.018 in wire needs a 22-gauge or larger needle.", "confidence": "sourced", "source": "lsu-primer"},
+    {"id": "access-catheter-over-wire", "text": "Catheters advance in the vessel only over a wire.", "confidence": "sourced", "source": "radiologykey-tools"},
+    {
+      "id": "access-no-hydrophilic-through-needle",
+      "text": "Do not withdraw a hydrophilic wire back through a bevelled needle: the bevel can shear the coating. The sim blocks this and explains why.",
+      "confidence": "estimated",
+      "note": "Standard teaching; confirm with an IR reviewer and add a source."
+    }
+  ]
+}

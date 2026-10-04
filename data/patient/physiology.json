@@ -1,0 +1,49 @@
+{
+  "schema": "ir-sim/physiology@1",
+  "notes": "Patient model reference (spec 09): hemorrhage classes, sedation and reversal behavior, complications the patient model must express, and the monitor channels. Doses live in drugs.json.",
+  "hemorrhageClasses": [
+    {
+      "class": "I",
+      "bloodLoss": {"max": 15, "unit": "%", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock", "note": "Up to about 750 mL in a 70 kg adult."},
+      "signs": {"text": "Heart rate normal or slightly raised; blood pressure unchanged", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock"}
+    },
+    {
+      "class": "II",
+      "bloodLoss": {"min": 15, "max": 30, "unit": "%", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock", "note": "750-1,500 mL in a 70 kg adult."},
+      "signs": {"text": "Heart rate 100-120, respiratory rate 20-24, narrowing pulse pressure", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock"}
+    },
+    {
+      "class": "III",
+      "bloodLoss": {"min": 30, "max": 40, "unit": "%", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock", "note": "1,500-2,000 mL in a 70 kg adult."},
+      "signs": {"text": "Marked hypotension, heart rate over 120, confusion, falling urine output", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock"}
+    },
+    {
+      "class": "IV",
+      "bloodLoss": {"min": 40, "unit": "%", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock"},
+      "signs": {"text": "Pulse pressure under 25 mmHg, heart rate over 120, minimal urine output", "confidence": "sourced", "source": "wikipedia-hypovolemic-shock"}
+    }
+  ],
+  "hemorrhageModel": [
+    {
+      "text": "Bleeding rate follows the injury and falls as embolization takes effect; fluids, blood and REBOA move pressure.",
+      "confidence": "estimated",
+      "note": "Model rule from the research notes; commercial simulators model trauma this way."
+    },
+    {"text": "A full bleed-out or cardiovascular crash ends the case; guided mode can pause first so the learner can work out the fix (questionnaire 1.15).", "confidence": "design"}
+  ],
+  "sedation": [
+    {
+      "text": "Oversedation shows as unresponsiveness, hypoventilation and apnea; the monitor shows falling saturation and rising end-tidal CO2.",
+      "confidence": "sourced",
+      "source": "ipsis-oversedation",
+      "note": "Unresponsiveness, hypoventilation and apnea are from the protocol; the monitor signs are the model's expression of them."
+    },
+    {"text": "After reversal, monitor 45-60 minutes, because sedatives can outlast the reversal agents.", "confidence": "sourced", "source": "ipsis-oversedation"}
+  ],
+  "vasovagal": {"presentation": {"text": "Hypotension with bradycardia", "confidence": "sourced", "source": "acr-table-copy"}, "triggers": {"text": "Pain, anxiety, groin compression", "confidence": "estimated", "note": "Common triggers; add a source."}},
+  "contrastReactionPolicy": {"text": "Contrast reactions are set by the case (allergy history) and never fire at random unless the case calls for it (questionnaire 2.9).", "confidence": "design"},
+  "monitorChannels": {
+    "options": ["heart rate and ECG rhythm", "arterial pressure from the sheath side-arm", "SpO2", "respiratory rate", "end-tidal CO2", "sedation score", "ACT", "running contrast and dose totals", "case labs: hemoglobin, platelets, INR, creatinine or eGFR, lactate"],
+    "confidence": "design"
+  }
+}

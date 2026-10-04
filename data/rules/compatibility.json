@@ -1,0 +1,179 @@
+{
+  "schema": "ir-sim/rules@1",
+  "category": "compatibility",
+  "notes": "Rules the compatibility engine (spec 05) enforces. Each rule has a machine-readable 'check' (types defined in spec 02, section 8) so code never hard-codes the logic, and a 'failure' the learner sees when a pairing is blocked or degrades. Paths point at resolved device instances (the size the learner picked). Questionnaire 3.4 and 3.12: anything not allowed is blocked, with its reason. Roles in 'pair' map to device kinds through 'roles'. When a path resolves to an options list, comparisons use the selected value unless the check names an aggregate ('leftAgg' or 'rightAgg': 'max' or 'min'), which capability lists such as wireCompatibility use.",
+  "rules": [
+    {
+      "id": "fit-needle-wire",
+      "text": "A 0.035 in wire needs an 18-gauge or larger needle; a 0.018 in wire needs a 22-gauge or larger needle.",
+      "pair": ["needle", "wire"],
+      "check": {"type": "lte", "left": "wire.geometry.diameter", "right": "needle.compatibility.maxWireDiameter"},
+      "failure": {"mode": "block", "message": "This wire will not pass through this needle."},
+      "confidence": "sourced",
+      "source": "lsu-primer"
+    },
+    {
+      "id": "fit-wire-catheter",
+      "text": "A catheter's lumen must be rated for the wire (most diagnostic catheters take 0.035 or 0.038 in).",
+      "pair": ["catheter", "wire"],
+      "check": {"type": "lte", "left": "wire.geometry.diameter", "right": "catheter.geometry.wireCompatibility", "rightAgg": "max"},
+      "failure": {"mode": "block", "message": "This wire is too large for this catheter's lumen."},
+      "confidence": "derived",
+      "source": "angiodynamics-softvu",
+      "note": "Catheter labels state the largest compatible wire."
+    },
+    {
+      "id": "fit-wire-microcatheter",
+      "text": "A microcatheter's inner diameter must exceed the microwire's diameter.",
+      "pair": ["microcatheter", "wire"],
+      "check": {"type": "lt", "left": "wire.geometry.diameter", "right": "microcatheter.geometry.innerDiameter"},
+      "failure": {"mode": "block", "message": "This wire is too large for the microcatheter."},
+      "confidence": "derived",
+      "source": "terumo-progreat-brochure",
+      "note": "Inner diameters per model in microcatheters.json."
+    },
+    {
+      "id": "fit-catheter-sheath",
+      "text": "Sheath French size is its inner diameter and catheter French size is its outer diameter, so a 5F catheter fits a 5F sheath.",
+      "pair": ["sheath", "catheter"],
+      "check": {"type": "lte", "left": "catheter.geometry.outerDiameter", "right": "sheath.geometry.innerDiameter"},
+      "failure": {"mode": "block", "message": "This catheter will not enter the sheath valve."},
+      "confidence": "sourced",
+      "source": "radiologykey-tools"
+    },
+    {
+      "id": "fit-micro-parent",
+      "text": "The parent catheter's inner diameter must exceed the microcatheter's proximal outer diameter.",
+      "pair": ["parent", "microcatheter"],
+      "check": {"type": "lt", "left": "microcatheter.geometry.outerDiameterProximal", "right": "parent.geometry.innerDiameter"},
+      "failure": {"mode": "block", "message": "The microcatheter will not fit through this catheter."},
+      "confidence": "derived",
+      "source": "terumo-progreat-brochure",
+      "note": "Tapered microcatheters are larger at the hub than at the tip. A near-equal fit should raise friction (spec 04)."
+    },
+    {
+      "id": "fit-coil-microcatheter",
+      "text": "The coil's delivery platform (0.016, 0.018, 0.020 in for Ruby, or 0.035 in) must be within the catheter's coil limit.",
+      "pair": ["microcatheter", "coil"],
+      "check": {"type": "lte", "left": "coil.platform", "right": "microcatheter.compatibility.maxCoilPlatform"},
+      "failure": {"mode": "jam", "message": "The coil jams; the catheter must be replaced."},
+      "confidence": "derived",
+      "source": "penumbra-platform-2023",
+      "note": "Ruby is a 0.020 in coil platform that needs a high-flow 0.025 in lumen such as Lantern (penumbra-platform-2023); Maestro coil limits from merit-maestro."
+    },
+    {
+      "id": "fit-particle-microcatheter",
+      "text": "Particle size must be within the catheter's stated maximum (400 to 1,000 um by model).",
+      "pair": ["microcatheter", "particle"],
+      "check": {"type": "lte", "left": "particle.size.max", "right": "microcatheter.compatibility.maxParticleSize"},
+      "failure": {"mode": "degrade", "message": "Injection resistance rises, then the catheter clogs."},
+      "confidence": "derived",
+      "source": "cook-cantata"
+    },
+    {
+      "id": "fit-plug-catheter",
+      "text": "AVP 4 goes through a 0.038 in-compatible diagnostic catheter; MVP-3Q and 5Q through a microcatheter.",
+      "pair": ["catheter", "plug"],
+      "check": {"type": "device-specific", "field": "plug.deliveryCatheter"},
+      "failure": {"mode": "block", "message": "This plug will not deliver through this catheter."},
+      "confidence": "sourced",
+      "source": "abbott-avp4",
+      "note": "MVP delivery from cirse-coils-plugs-2024."
+    },
+    {
+      "id": "fit-dmso-catheter",
+      "text": "DMSO-based agents (Onyx) go only through DMSO-compatible catheters.",
+      "pair": ["microcatheter", "agent"],
+      "check": {"type": "flag-required", "flag": "microcatheter.compatibility.dmsoCompatible", "when": {"path": "agent.solvent", "equals": "DMSO"}},
+      "failure": {"mode": "block", "message": "DMSO would degrade this catheter."},
+      "confidence": "sourced",
+      "source": "fda-onyx-ifu"
+    },
+    {
+      "id": "order-glue-dextrose",
+      "text": "Flush the catheter with dextrose before glue; saline or blood in the lumen sets it.",
+      "pair": ["microcatheter", "agent"],
+      "check": {"type": "state", "condition": "catheter-flushed-with-dextrose"},
+      "failure": {"mode": "block", "message": "Flush with dextrose first, or the glue will set in the lumen."},
+      "confidence": "sourced",
+      "source": "evt-glue-2010"
+    },
+    {
+      "id": "limit-injection-pressure",
+      "text": "Power-injector pressure must stay at or below the catheter's rating (microcatheters 300 to 1,200 psi).",
+      "pair": ["injector", "catheter"],
+      "check": {"type": "lte", "left": "injector.pressureLimit", "right": "catheter.ratings.maxPressure"},
+      "failure": {"mode": "rupture", "message": "Catheter rupture."},
+      "confidence": "derived",
+      "source": "bsc-microcatheter-brochure"
+    },
+    {
+      "id": "limit-wire-length",
+      "text": "Wire length must exceed the catheter's length plus the distance to the target plus a hand-hold margin; exchanges need 180 to 300 cm wires.",
+      "pair": ["wire", "catheter"],
+      "check": {"type": "sum-lte", "terms": ["catheter.geometry.length", "case.targetDistance", "tuning.handHoldMargin"], "limit": "wire.geometry.length"},
+      "failure": {"mode": "warn", "message": "The wire is too short: you will lose wire position during the exchange."},
+      "confidence": "sourced",
+      "source": "radiologykey-tools"
+    },
+    {
+      "id": "limit-radial-reach",
+      "text": "Pelvic work from the radial artery needs 125 cm catheters and 150 cm microcatheters.",
+      "pair": ["catheter", "access-site"],
+      "check": {"type": "device-specific", "field": "catheter.geometry.length"},
+      "failure": {"mode": "block", "message": "This catheter is too short to reach the pelvis from the wrist."},
+      "confidence": "sourced",
+      "source": "evt-radial-2019"
+    },
+    {
+      "id": "fit-balloon-stent-platform",
+      "text": "A balloon or stent needs its labeled wire platform and sheath (for example 0.018 in balloons through 4 to 5F).",
+      "pair": ["device", "wire"],
+      "check": {
+        "type": "all",
+        "of": [
+          {"type": "lte", "left": "wire.geometry.diameter", "right": "device.platform"},
+          {"type": "lte", "left": "device.sheath", "right": "sheath.geometry.innerDiameter"}
+        ]
+      },
+      "failure": {"mode": "block", "message": "The device will not track on this wire or will not enter the sheath."},
+      "confidence": "sourced",
+      "source": "evt-guide-pta"
+    },
+    {
+      "id": "fit-closure-sheath",
+      "text": "Angio-Seal uses a 6 or 8F device sheath; Mynx is for sheaths up to 7F; above 8F, pre-close with two Perclose devices.",
+      "pair": ["closure", "sheath"],
+      "check": {"type": "device-specific", "field": "closure.arterySheath"},
+      "failure": {"mode": "fail-closure", "message": "Bleeding: this device does not close a sheath this size."},
+      "confidence": "sourced",
+      "source": "acc-closure-chapter"
+    },
+    {
+      "id": "order-catheter-over-wire",
+      "text": "Catheters advance in the vessel only over a wire.",
+      "pair": ["catheter", "wire"],
+      "check": {"type": "state", "condition": "wire-leads-catheter"},
+      "failure": {"mode": "block", "message": "Lead with the wire before advancing the catheter."},
+      "confidence": "sourced",
+      "source": "radiologykey-tools"
+    }
+  ],
+  "roles": {
+    "needle": ["access-needle"],
+    "wire": ["guidewire", "microwire"],
+    "catheter": ["selective-catheter", "flush-catheter", "guide-catheter", "infusion-catheter"],
+    "parent": ["selective-catheter", "flush-catheter", "guide-catheter"],
+    "microcatheter": ["microcatheter"],
+    "sheath": ["sheath", "guiding-sheath"],
+    "coil": ["detachable-coil", "coil-class"],
+    "particle": ["particle", "drug-eluting-bead", "radioembolic"],
+    "plug": ["plug"],
+    "agent": ["liquid-embolic", "sclerosant"],
+    "balloon": ["pta-balloon"],
+    "closure": ["closure-device", "compression-band"],
+    "injector": ["power-injector"],
+    "access-site": ["access-site"],
+    "device": ["pta-balloon", "stent-class"]
+  }
+}

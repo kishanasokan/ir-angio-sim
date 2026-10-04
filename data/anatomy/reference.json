@@ -1,0 +1,191 @@
+{
+  "schema": "ir-sim/anatomy-reference@1",
+  "notes": "Reference calibers, flows and variant frequencies that the anatomy generator (spec 03) and flow model (spec 07) sample from. Frequencies differ by population and by how studies count, so they are default sampling weights, not truths. Aortoiliac diameters come from a Korean CT cohort; add a Western reference before relying on absolute sizes.",
+  "calibers": [
+    {"id": "aorta-suprarenal", "vessel": "Suprarenal aorta", "male": {"value": 22.0, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"}, "female": {"value": 21.1, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"}},
+    {"id": "aorta-renal", "vessel": "Aorta at the renal arteries", "male": {"value": 20.4, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"}, "female": {"value": 19.0, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"}},
+    {
+      "id": "aorta-infrarenal",
+      "vessel": "Infrarenal aorta",
+      "male": {"value": 19.0, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"},
+      "female": {"value": 17.9, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"},
+      "age50s": {"value": 17.5, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"},
+      "age70s": {"value": 19.4, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"}
+    },
+    {"id": "cia-right", "vessel": "Right common iliac artery", "male": {"value": 12.2, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"}, "female": {"value": 11.7, "unit": "mm", "confidence": "sourced", "source": "ymj-aorta"}},
+    {
+      "id": "celiac-origin",
+      "vessel": "Celiac trunk at origin",
+      "diameter": {"value": 5.91, "sd": 0.48, "unit": "mm", "confidence": "sourced", "source": "jcdr-mesenteric"},
+      "level": {"text": "Most often T12 (44%)", "confidence": "sourced", "source": "jcdr-mesenteric"}
+    },
+    {
+      "id": "sma-origin",
+      "vessel": "Superior mesenteric artery at origin",
+      "diameter": {"value": 5.86, "sd": 0.4, "unit": "mm", "confidence": "sourced", "source": "jcdr-mesenteric"},
+      "level": {"text": "Most often L1 (64%)", "confidence": "sourced", "source": "jcdr-mesenteric"}
+    },
+    {
+      "id": "ima-origin",
+      "vessel": "Inferior mesenteric artery at origin",
+      "diameter": {"value": 3.13, "sd": 0.44, "unit": "mm", "confidence": "sourced", "source": "jcdr-mesenteric"},
+      "level": {"text": "Most often L3 (69%)", "confidence": "sourced", "source": "jcdr-mesenteric"}
+    },
+    {"id": "cfa", "vessel": "Common femoral artery", "diameter": {"min": 7.9, "max": 8.5, "unit": "mm", "confidence": "sourced", "source": "ejr-open-le-cta"}},
+    {"id": "sfa", "vessel": "Superficial femoral artery", "diameter": {"min": 6.0, "max": 6.3, "unit": "mm", "confidence": "sourced", "source": "ejr-open-le-cta"}},
+    {"id": "popliteal", "vessel": "Popliteal artery", "diameter": {"min": 5.9, "max": 6.2, "unit": "mm", "confidence": "sourced", "source": "ejr-open-le-cta"}},
+    {"id": "posterior-tibial", "vessel": "Posterior tibial artery", "diameter": {"min": 2.0, "max": 2.2, "unit": "mm", "confidence": "sourced", "source": "ejr-open-le-cta"}},
+    {"id": "dorsalis-pedis", "vessel": "Dorsalis pedis artery", "diameter": {"min": 1.9, "max": 2.0, "unit": "mm", "confidence": "sourced", "source": "ejr-open-le-cta"}},
+    {"id": "prostatic", "vessel": "Prostatic artery", "diameter": {"value": 1.52, "unit": "mm", "confidence": "sourced", "source": "folia-prostatic", "note": "Mean"}},
+    {"id": "radial", "vessel": "Radial artery", "accessThreshold": {"value": 2, "unit": "mm", "confidence": "sourced", "source": "evt-radial-2019", "note": "Below this diameter radial access is relatively contraindicated."}},
+    {
+      "id": "ivc",
+      "vessel": "Inferior vena cava",
+      "generatorNote": {"text": "Most retrievable filters are rated to 28-32 mm, so the generator must sometimes produce a larger cava to teach filter sizing.", "confidence": "derived", "source": "evt-guide-filters"}
+    }
+  ],
+  "caliberGaps": {"text": "Still to source: renal artery, hepatic branches, GDA, splenic, uterine (normal and fibroid-enlarged), bronchial (normal and hemoptysis-enlarged), internal iliac branches, venous calibers.", "confidence": "placeholder"},
+  "flows": [
+    {
+      "id": "liver-total",
+      "bed": "Liver, total inflow",
+      "flow": {"min": 1200, "max": 1800, "unit": "mL/min", "confidence": "sourced", "source": "deranged-hepatic-flow"},
+      "fractionOfCardiacOutput": {"min": 20, "max": 25, "unit": "%", "confidence": "sourced", "source": "deranged-hepatic-flow"}
+    },
+    {
+      "id": "hepatic-artery",
+      "bed": "Hepatic artery",
+      "fractionOfLiverInflow": {"min": 30, "max": 40, "unit": "%", "confidence": "sourced", "source": "deranged-hepatic-flow"},
+      "flow": {"value": 550, "unit": "mL/min", "confidence": "sourced", "source": "deranged-hepatic-flow", "note": "About 550 mL/min in one human study."}
+    },
+    {
+      "id": "portal-vein",
+      "bed": "Portal vein",
+      "fractionOfLiverInflow": {"value": 70, "unit": "%", "confidence": "sourced", "source": "deranged-hepatic-flow", "note": "approximately"},
+      "flow": {"value": 864, "unit": "mL/min", "confidence": "sourced", "source": "deranged-hepatic-flow", "note": "Supine"}
+    },
+    {
+      "id": "hepatic-buffer",
+      "bed": "Hepatic arterial buffer response",
+      "arterialRise": {"value": 30, "unit": "%", "confidence": "sourced", "source": "deranged-hepatic-flow", "note": "Arterial flow rises about 30% almost immediately when portal flow falls."}
+    }
+  ],
+  "flowGaps": {"text": "Still to source: renal, mesenteric (fasting and fed) and limb flows. In the flow model these set outlet resistances, which decide where flow-directed embolics go and how fast contrast washes out.", "confidence": "placeholder"},
+  "variants": [
+    {
+      "territory": "hepatic",
+      "classification": "Michels",
+      "entries": [
+        {"id": "hepatic-michels-1", "label": "Type I, standard anatomy", "value": 81, "unit": "%", "confidence": "sourced", "source": "jocmr-hepatic-variants", "note": "In one review."},
+        {
+          "id": "hepatic-rrha-sma",
+          "label": "Replaced right hepatic artery from the SMA",
+          "min": 11,
+          "max": 21,
+          "unit": "%",
+          "confidence": "sourced",
+          "source": "jocmr-hepatic-variants",
+          "note": "Across the literature; 3.7% as isolated type III in that review."
+        },
+        {"id": "hepatic-rlha-lga", "label": "Replaced left hepatic artery from the left gastric", "min": 3.8, "max": 10, "unit": "%", "confidence": "sourced", "source": "jocmr-hepatic-variants", "note": "Across the literature."},
+        {"id": "hepatic-alha", "label": "Accessory left hepatic artery", "value": 3.2, "unit": "%", "confidence": "sourced", "source": "jocmr-hepatic-variants"},
+        {"id": "hepatic-arha", "label": "Accessory right hepatic artery", "value": 1.6, "unit": "%", "confidence": "sourced", "source": "jocmr-hepatic-variants"},
+        {"id": "hepatic-replaced-both", "label": "Replaced right and left hepatic arteries", "value": 0.8, "unit": "%", "confidence": "sourced", "source": "jocmr-hepatic-variants"},
+        {"id": "hepatic-cha-sma", "label": "Common hepatic artery from the SMA (type IX)", "value": 1.2, "unit": "%", "confidence": "sourced", "source": "jocmr-hepatic-variants"}
+      ]
+    },
+    {
+      "territory": "celiac",
+      "classification": "Embryology-based, n = 1,050",
+      "entries": [
+        {"id": "celiac-trifurcation", "label": "Standard trifurcation", "value": 38.85, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac", "note": "Low because inferior phrenic patterns were counted separately."},
+        {"id": "celiac-ipa", "label": "Inferior phrenic arteries from the celiac (all patterns)", "value": 51.61, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"},
+        {"id": "celiac-right-hepatomesenteric", "label": "Right hepatomesenteric trunk", "value": 6.09, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"},
+        {"id": "celiac-gastrosplenic", "label": "Gastrosplenic trunk", "value": 3.43, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"},
+        {"id": "celiac-hepatosplenic", "label": "Hepatosplenic trunk", "value": 2.66, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"},
+        {"id": "celiac-hepatomesenteric", "label": "Hepatomesenteric trunk", "value": 0.95, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"},
+        {"id": "celiac-hepatosplenomesenteric", "label": "Hepatosplenomesenteric trunk", "value": 0.38, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"},
+        {"id": "celiac-celiomesenteric", "label": "Celiomesenteric trunk", "value": 0.19, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"},
+        {"id": "celiac-absent", "label": "Absent celiac trunk", "value": 0.57, "unit": "%", "confidence": "sourced", "source": "polradiol-celiac"}
+      ]
+    },
+    {
+      "territory": "aortic-arch",
+      "classification": "Review across populations",
+      "entries": [
+        {"id": "arch-standard", "label": "Standard three-vessel arch", "value": 78.8, "unit": "%", "confidence": "sourced", "source": "ijms-arch", "note": "Average; 61.2-92.6% by population."},
+        {"id": "arch-bovine-1", "label": "Bovine arch, type 1", "value": 12.9, "unit": "%", "confidence": "sourced", "source": "ijms-arch", "note": "Average"},
+        {"id": "arch-bovine-2", "label": "Bovine arch, type 2", "value": 8.7, "unit": "%", "confidence": "sourced", "source": "ijms-arch", "note": "Average"},
+        {"id": "arch-left-vertebral", "label": "Left vertebral artery from the arch", "value": 6.2, "unit": "%", "confidence": "sourced", "source": "ijms-arch", "note": "Average; 0.17-15.3%."},
+        {"id": "arch-aberrant-right-subclavian", "label": "Aberrant right subclavian artery", "min": 0.08, "max": 3.33, "unit": "%", "confidence": "sourced", "source": "ijms-arch"}
+      ]
+    },
+    {
+      "territory": "renal",
+      "classification": "CT study, n = 302",
+      "entries": [
+        {"id": "renal-accessory", "label": "Accessory renal artery (per patient)", "value": 36.1, "unit": "%", "confidence": "sourced", "source": "springerplus-renal", "note": "Left 23.5%, right 17.9%; 99% arise from the aorta."}
+      ]
+    },
+    {
+      "territory": "prostatic",
+      "classification": "Meta-analysis of 7,421 arteries",
+      "entries": [
+        {"id": "pa-internal-pudendal", "label": "Prostatic artery from the internal pudendal", "value": 28.8, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"},
+        {"id": "pa-obturator", "label": "From the obturator", "value": 14.4, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"},
+        {"id": "pa-inferior-vesical", "label": "From the inferior vesical", "value": 12.3, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"},
+        {"id": "pa-anterior-division", "label": "From the anterior division of the internal iliac", "value": 10.8, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"},
+        {"id": "pa-gluteal-pudendal", "label": "From the gluteal-pudendal trunk", "value": 5.0, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"},
+        {"id": "pa-superior-vesical", "label": "From the superior vesical", "value": 2.0, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"},
+        {
+          "id": "pa-other",
+          "label": "Other origins",
+          "value": 3.3,
+          "unit": "%",
+          "confidence": "sourced",
+          "source": "folia-prostatic",
+          "note": "The listed origins sum to 76.6%; the generator normalizes weights until the remaining categories are added."
+        },
+        {"id": "pa-double", "label": "Two prostatic arteries on one side", "value": 23.2, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"},
+        {"id": "pa-anastomoses", "label": "Anastomoses with neighboring arteries", "value": 45.2, "unit": "%", "confidence": "sourced", "source": "folia-prostatic"}
+      ]
+    },
+    {
+      "territory": "uterine",
+      "classification": "Gomez-Jorge 2003, as summarized by the TJOG review",
+      "entries": [
+        {"id": "ua-inferior-gluteal", "label": "Uterine artery from the inferior gluteal artery", "value": 51, "unit": "%", "confidence": "sourced", "source": "tjog-uterine"},
+        {"id": "ua-internal-iliac", "label": "From the internal iliac artery", "value": 43, "unit": "%", "confidence": "sourced", "source": "tjog-uterine"},
+        {
+          "id": "ua-trifurcation",
+          "label": "Trifurcation with the inferior and superior gluteal arteries",
+          "value": 6,
+          "unit": "%",
+          "confidence": "sourced",
+          "source": "tjog-uterine",
+          "note": "Check against the original classification before relying on it."
+        }
+      ]
+    },
+    {
+      "territory": "common-femoral",
+      "classification": "Access landmarks",
+      "entries": [
+        {"id": "cfa-bifurcation-high", "label": "Bifurcation above the bottom of the femoral head (type 2)", "value": 25, "unit": "%", "confidence": "sourced", "source": "cit-femoral-2008", "note": "approximately"},
+        {
+          "id": "cfa-iea-low",
+          "label": "Inferior epigastric artery at or below the middle of the femoral head, so a mid-head puncture is high",
+          "value": 11,
+          "unit": "%",
+          "confidence": "sourced",
+          "source": "acc-closure-chapter",
+          "note": "More common in obesity. The same source puts the bifurcation below the middle third of the femoral head in 95%."
+        }
+      ]
+    }
+  ],
+  "variantGaps": {
+    "text": "Also to source: hepatic falciform and cystic artery origins, bronchial artery patterns, the artery of Adamkiewicz, ovarian supply to fibroids, inferior epigastric and circumflex iliac collaterals, venous variants (duplicated IVC, left-sided IVC, retroaortic left renal vein). Disease modifiers (tortuosity, calcification, stenosis, occlusion, aneurysm) are separate generator parameters.",
+    "confidence": "placeholder"
+  }
+}

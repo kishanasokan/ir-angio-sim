@@ -1,0 +1,18 @@
+{
+  "schema": "ir-sim/tuning@1",
+  "category": "render",
+  "notes": "Display defaults for the fluoro view. Pulse-rate options come from data/imaging/imaging.json; these pick defaults and the look.",
+  "fluoro": {
+    "defaultPulseRate": {"value": 7.5, "unit": "Hz", "confidence": "design", "note": "Chosen from the sourced options 3.75, 7.5, 15 and 30."},
+    "noiseSigma": {"value": 0.04, "unit": "1", "confidence": "design", "note": "Quantum-noise standard deviation at the default dose per pulse."},
+    "blurRadius": {"value": 0.6, "unit": "px", "confidence": "design"},
+    "vignetteStrength": {"value": 0.35, "unit": "1", "confidence": "design"},
+    "lastImageHold": {"value": true, "confidence": "design"},
+    "background": {"value": 0.62, "unit": "1", "confidence": "design", "note": "Gray level of unattenuated field before window/level."},
+    "contrastPuffMaxOpacity": {"value": 0.7, "unit": "1", "confidence": "design", "note": "M1 stand-in for contrast: the lumen opacifies while RT is held; replaced by the flow model in M2."},
+    "contrastPuffFade": {"value": 1.0, "unit": "s", "confidence": "design", "note": "Fade after RT is released."},
+    "roadmapOutlineOpacity": {"value": 0.35, "unit": "1", "confidence": "design", "note": "M1 stand-in for roadmap: vessel outline overlay toggled by X or R."}
+  },
+  "threeD": {"vesselOpacity": {"value": 0.25, "unit": "1", "confidence": "design"}, "deviceColorWire": {"text": "#d9e2ec", "confidence": "design"}, "deviceColorCatheter": {"text": "#4fb3bf", "confidence": "design"}},
+  "hud": {"uiRefreshRate": {"value": 15, "unit": "Hz", "confidence": "design", "note": "React HUD reads the latest snapshot at this rate; the canvas renders every frame."}}
+}

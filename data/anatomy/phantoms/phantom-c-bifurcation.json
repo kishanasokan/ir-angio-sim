@@ -1,0 +1,86 @@
+{
+  "schema": "ir-sim/anatomy-graph@1",
+  "id": "phantom-c-bifurcation",
+  "name": "Phantom C: symmetric bifurcation",
+  "units": "mm",
+  "frame": "LPS",
+  "frameNote": "x = patient left, y = posterior, z = superior; phantoms run along +z from the access inlet.",
+  "provenance": {"text": "8 mm parent, 150 mm long, splitting into two 5 mm daughters at +30 and -30 degrees in the x-z plane, each 100 mm and capped (used for branch selection by tip rotation).", "confidence": "design"},
+  "nodes": [
+    {"id": "inlet", "position": [0, 0, 0], "kind": "inlet"},
+    {"id": "carina", "position": [0, 0, 150], "kind": "junction"},
+    {"id": "end-left", "position": [50.0, 0.0, 236.6025], "kind": "cap"},
+    {"id": "end-right", "position": [-50.0, 0.0, 236.6025], "kind": "cap"}
+  ],
+  "segments": [
+    {
+      "id": "c-parent",
+      "from": "inlet",
+      "to": "carina",
+      "centerline": [
+        [0.0, 0.0, 0.0],
+        [0.0, 0.0, 10.0],
+        [0.0, 0.0, 20.0],
+        [0.0, 0.0, 30.0],
+        [0.0, 0.0, 40.0],
+        [0.0, 0.0, 50.0],
+        [0.0, 0.0, 60.0],
+        [0.0, 0.0, 70.0],
+        [0.0, 0.0, 80.0],
+        [0.0, 0.0, 90.0],
+        [0.0, 0.0, 100.0],
+        [0.0, 0.0, 110.0],
+        [0.0, 0.0, 120.0],
+        [0.0, 0.0, 130.0],
+        [0.0, 0.0, 140.0],
+        [0.0, 0.0, 150.0]
+      ],
+      "radii": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0],
+      "tags": {"name": "parent", "territory": "phantom"}
+    },
+    {
+      "id": "c-left",
+      "from": "carina",
+      "to": "end-left",
+      "centerline": [
+        [0.0, 0.0, 150.0],
+        [5.0, 0.0, 158.6602],
+        [10.0, 0.0, 167.3205],
+        [15.0, 0.0, 175.9808],
+        [20.0, 0.0, 184.641],
+        [25.0, 0.0, 193.3012],
+        [30.0, 0.0, 201.9615],
+        [35.0, 0.0, 210.6217],
+        [40.0, 0.0, 219.282],
+        [45.0, 0.0, 227.9423],
+        [50.0, 0.0, 236.6025]
+      ],
+      "radii": [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5],
+      "tags": {"name": "left daughter", "territory": "phantom", "side": "+x"}
+    },
+    {
+      "id": "c-right",
+      "from": "carina",
+      "to": "end-right",
+      "centerline": [
+        [0.0, 0.0, 150.0],
+        [-5.0, 0.0, 158.6602],
+        [-10.0, 0.0, 167.3205],
+        [-15.0, 0.0, 175.9808],
+        [-20.0, 0.0, 184.641],
+        [-25.0, 0.0, 193.3012],
+        [-30.0, 0.0, 201.9615],
+        [-35.0, 0.0, 210.6217],
+        [-40.0, 0.0, 219.282],
+        [-45.0, 0.0, 227.9423],
+        [-50.0, 0.0, 236.6025]
+      ],
+      "radii": [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5],
+      "tags": {"name": "right daughter", "territory": "phantom", "side": "-x"}
+    }
+  ],
+  "access": [
+    {"id": "inlet-sheath", "node": "inlet", "kind": "sheath", "direction": [0, 0, 1]}
+  ],
+  "landmarks": []
+}
