@@ -8,6 +8,13 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Pinned on purpose (docs/M1-plan.md, phase A deviation 1): typescript-eslint supports TypeScript below 6.1,
+      # and TypeScript 7 ships without the compiler API linters use. @types/node follows the Node 24 runtime.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major, version-update:semver-minor]
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:
