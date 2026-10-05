@@ -1,0 +1,21 @@
+{
+  "schema": "ir-sim/sources@1",
+  "description": "Fixture registry: one opened source and one never opened.",
+  "accessed": "2026-10-05",
+  "sources": [
+    {
+      "id": "fixture-open",
+      "title": "An opened fixture source",
+      "url": "https://example.org/opened",
+      "type": "web",
+      "opened": true
+    },
+    {
+      "id": "fixture-closed",
+      "title": "An unopened fixture source",
+      "url": "https://example.org/unopened",
+      "type": "web",
+      "opened": false
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "guidewires",
+  "notes": "Fixture: the item the rod model selects from.",
+  "items": [
+    {
+      "id": "gw-fixture",
+      "kind": "guidewire",
+      "genericName": "Fixture guidewire",
+      "geometry": {
+        "diameter": {
+          "options": [
+            0.018,
+            0.035
+          ],
+          "unit": "in",
+          "confidence": "sourced",
+          "source": "fixture-open"
+        }
+      }
+    }
+  ]
+}

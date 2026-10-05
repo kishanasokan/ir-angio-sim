@@ -1,0 +1,31 @@
+{
+  "schema": "ir-sim/rules@1",
+  "category": "compatibility",
+  "notes": "Fixture: a rule pairs a role the roles table does not define.",
+  "rules": [
+    {
+      "id": "fit-fixture",
+      "text": "A fixture rule.",
+      "pair": [
+        "wire",
+        "spaceship"
+      ],
+      "check": {
+        "type": "lte",
+        "left": "wire.geometry.diameter",
+        "right": "wire.geometry.diameter"
+      },
+      "failure": {
+        "mode": "block",
+        "message": "Fixture block."
+      },
+      "confidence": "sourced",
+      "source": "fixture-open"
+    }
+  ],
+  "roles": {
+    "wire": [
+      "guidewire"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+/* UI chrome lives in this theme; colors that depict the simulation come from data/tuning/render.json
+   (docs/M1-plan.md D5). System fonts only: no runtime network calls (CLAUDE.md rule 12). */
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --color-suite-950: #07090c;
+  --color-suite-900: #0c1117;
+  --color-suite-800: #121a23;
+  --color-suite-700: #1b2631;
+  --color-suite-600: #2a3846;
+  --color-ink-100: #e6edf3;
+  --color-ink-300: #a9b6c3;
+  --color-ink-500: #6b7b8c;
+  --color-accent-400: #4fb3bf;
+  --color-caution-400: #f2b84b;
+  --color-danger-400: #f06a5f;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-suite-950 font-sans text-ink-100 antialiased;
+}

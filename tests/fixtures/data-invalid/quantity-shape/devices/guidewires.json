@@ -1,0 +1,24 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "guidewires",
+  "notes": "Fixture: a quantity with both a value and options.",
+  "items": [
+    {
+      "id": "gw-fixture",
+      "kind": "guidewire",
+      "genericName": "Fixture guidewire",
+      "geometry": {
+        "diameter": {
+          "options": [
+            0.018,
+            0.035
+          ],
+          "unit": "in",
+          "confidence": "sourced",
+          "source": "fixture-open",
+          "value": 0.035
+        }
+      }
+    }
+  ]
+}

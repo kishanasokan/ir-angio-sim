@@ -1,0 +1,130 @@
+{
+  "schema": "ir-sim/tuning@1",
+  "category": "physics",
+  "notes": "Fixture: a rod model selects a diameter the item does not offer.",
+  "solver": {
+    "linearDamping": {
+      "value": 2,
+      "unit": "1/s"
+    },
+    "angularDamping": {
+      "value": 2,
+      "unit": "1/s"
+    },
+    "gravity": {
+      "value": 0,
+      "unit": "m/s2"
+    },
+    "lumenContactMargin": {
+      "value": 0.02,
+      "unit": "mm"
+    },
+    "settleKineticEnergy": {
+      "value": 1e-09,
+      "unit": "J"
+    },
+    "lumenGridCell": {
+      "value": 10,
+      "unit": "mm"
+    },
+    "settleSteps": {
+      "value": 100,
+      "unit": "count"
+    },
+    "maxStepsPerMessage": {
+      "value": 64,
+      "unit": "count"
+    },
+    "maxStepsPerMessageFast": {
+      "value": 1000,
+      "unit": "count"
+    }
+  },
+  "tiers": [
+    {
+      "id": "high",
+      "renderer": "webgpu",
+      "model": "rod",
+      "stepRate": {
+        "value": 1000,
+        "unit": "Hz"
+      },
+      "substeps": {
+        "value": 2,
+        "unit": "count"
+      },
+      "segmentLength": {
+        "value": 2,
+        "unit": "mm"
+      }
+    }
+  ],
+  "feedback": {
+    "hubForceFullScale": {
+      "value": 1,
+      "unit": "N"
+    },
+    "hubForceWarning": {
+      "value": 0.5,
+      "unit": "N"
+    },
+    "hubForceDanger": {
+      "value": 0.8,
+      "unit": "N"
+    },
+    "wallStressThreshold": {
+      "value": 0.1,
+      "unit": "N"
+    },
+    "tipForceNodes": {
+      "value": 3,
+      "unit": "count"
+    }
+  },
+  "rodModels": [
+    {
+      "id": "rm-fixture",
+      "deviceId": "gw-fixture",
+      "variant": {
+        "diameter": {
+          "value": 0.036,
+          "unit": "in"
+        }
+      },
+      "sections": [
+        {
+          "name": "body",
+          "fromTip": {
+            "value": 0,
+            "unit": "mm"
+          },
+          "toTip": {
+            "value": 100,
+            "unit": "mm"
+          },
+          "youngsModulus": {
+            "value": 8,
+            "unit": "GPa",
+            "confidence": "design"
+          }
+        }
+      ],
+      "restShape": [],
+      "frictionId": "fr-fixture",
+      "materialId": "mat-fixture",
+      "radiopacity": {
+        "tipBoost": {
+          "value": 1,
+          "unit": "1",
+          "confidence": "design"
+        },
+        "body": {
+          "value": 1,
+          "unit": "1",
+          "confidence": "design"
+        }
+      }
+    }
+  ],
+  "ruleParameters": {}
+}

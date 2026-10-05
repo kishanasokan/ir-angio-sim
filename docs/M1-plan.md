@@ -10,33 +10,33 @@ Checked at planning time: Apple M2 laptop (8 GB), macOS 26.4, Node 24.12, npm 11
 
 Build order:
 
-- [ ] `package.json`: latest stable versions pinned exactly. Scripts: `dev`, `build` (validate-data, then `tsc --noEmit`, then `vite build`), `preview`, `test`, `test:e2e`, `validate-data`, `bench`, `lint`, `format`. Confirm each direct dependency is MIT, BSD, Apache-2.0 or similar.
-- [ ] `tsconfig.json`, plus a config for scripts and tooling: `strict`, `noUncheckedIndexedAccess`, `noImplicitReturns`, `noFallthroughCasesInSwitch`
-- [ ] `vite.config.ts` (React, Tailwind, `base` from `BASE_PATH`, ES-module workers), `index.html`
-- [ ] `eslint.config.js`: typescript-eslint and react-hooks.
+- [x] `package.json`: latest stable versions pinned exactly. Scripts: `dev`, `build` (validate-data, then `tsc --noEmit`, then `vite build`), `preview`, `test`, `test:e2e`, `validate-data`, `bench`, `lint`, `format`. Confirm each direct dependency is MIT, BSD, Apache-2.0 or similar.
+- [x] `tsconfig.json`, plus a config for scripts and tooling: `strict`, `noUncheckedIndexedAccess`, `noImplicitReturns`, `noFallthroughCasesInSwitch`
+- [x] `vite.config.ts` (React, Tailwind, `base` from `BASE_PATH`, ES-module workers), `index.html`
+- [x] `eslint.config.js`: typescript-eslint and react-hooks.
   - In `src/sim/`, `src/input/mapping/` and `src/worker/session.ts`: ban `Math.random`, `Date.now`, `performance.now` and `crypto` with `no-restricted-globals` and `no-restricted-properties`, plus the trig and power functions (D27).
   - `no-magic-numbers` in `src/sim/`, ignoring −1, 0, 0.5, 1, 2 and array indexes, with the `src/sim/math/` and `src/sim/core/` override.
   - Prettier config.
-- [ ] `vitest.config.ts` (unit and golden folders), `playwright.config.ts` skeleton
-- [ ] `src/app/main.tsx`, `App.tsx`, `src/app/disclaimer.ts` (D26), `src/ui/StartScreen.tsx` (minimal), Tailwind entry CSS
-- [ ] `src/data/units.ts` → unit test 1
-- [ ] `src/data/schemas/`: fact, sources, devices, rules, materials, anatomy graph, anatomy reference, imaging, physiology, drugs, tuning with rod models, case v0, and the schema-id map (D24)
-- [ ] `src/data/quantity.ts`: value, options with a selection, range with a selection, single bounds → unit test 2
-- [ ] `src/data/validate.ts`: the spec 02 §14 checks in order, the 14 error codes and the report. `scripts/validate-data.ts`: the CLI, exit 1 on any error.
-- [ ] `tests/fixtures/data-invalid/<code>/`: one small self-contained data folder per error code → unit test 3
-- [ ] `src/data/provenance.ts`: how computed values inherit confidence (D13)
-- [ ] `src/data/restShape.ts`: per-joint angle distribution → unit test 9
-- [ ] `src/data/catalog.ts`: device instances from rod models for a tier (D21). Per-segment radii, E, I, EI, J, G, mass per length, friction and rest-shape joint angles, each with provenance. Also generic item instances with selections for the sheath, needles and anything else a rule reads. → unit test 8
-- [ ] `src/data/loaders.ts`: anatomy graphs and the sandbox case, for Node (fs) and the browser (Vite imports)
-- [ ] Extra unit test: the disclaimer string equals spec 00 §2 and the README
+- [x] `vitest.config.ts` (unit and golden folders), `playwright.config.ts` skeleton
+- [x] `src/app/main.tsx`, `App.tsx`, `src/app/disclaimer.ts` (D26), `src/ui/StartScreen.tsx` (minimal), Tailwind entry CSS
+- [x] `src/data/units.ts` → unit test 1
+- [x] `src/data/schemas/`: fact, sources, devices, rules, materials, anatomy graph, anatomy reference, imaging, physiology, drugs, tuning with rod models, case v0, and the schema-id map (D24)
+- [x] `src/data/quantity.ts`: value, options with a selection, range with a selection, single bounds → unit test 2
+- [x] `src/data/validate.ts`: the spec 02 §14 checks in order, the 14 error codes and the report. `scripts/validate-data.ts`: the CLI, exit 1 on any error.
+- [x] `tests/fixtures/data-invalid/<code>/`: one small self-contained data folder per error code → unit test 3
+- [x] `src/data/provenance.ts`: how computed values inherit confidence (D13)
+- [x] `src/data/restShape.ts`: per-joint angle distribution → unit test 9
+- [x] `src/data/catalog.ts`: device instances from rod models for a tier (D21). Per-segment radii, E, I, EI, J, G, mass per length, friction and rest-shape joint angles, each with provenance. Also generic item instances with selections for the sheath, needles and anything else a rule reads. → unit test 8
+- [x] `src/data/loaders.ts`: anatomy graphs and the sandbox case, for Node (fs) and the browser (Vite imports)
+- [x] Extra unit test: the disclaimer string equals spec 00 §2 and the README
 
 Done when (paste the output of each):
 
-- [ ] `npm run validate-data` passes on the repository data and reports the counts above
-- [ ] every invalid fixture fails with its expected code
-- [ ] unit tests 1, 2, 3, 8 and 9 pass
-- [ ] `npm run lint` and `tsc --noEmit` pass
-- [ ] `npm run dev` serves the start screen with the exact disclaimer
+- [x] `npm run validate-data` passes on the repository data and reports the counts above
+- [x] every invalid fixture fails with its expected code
+- [x] unit tests 1, 2, 3, 8 and 9 pass
+- [x] `npm run lint` and `tsc --noEmit` pass
+- [x] `npm run dev` serves the start screen with the exact disclaimer
 
 Riskiest part: schemas that accept all 21 files unchanged yet still catch every fixture. To de-risk it, build the generic fact walker first: provenance, units, quantity shape and orphan quantities. Run it on all files and reproduce the counts above with zero errors before writing per-file schemas. Then add one fixture per code and confirm each fails for the right reason.
 
@@ -242,4 +242,53 @@ Riskiest part: two rendering backends in headless CI, and the rule of no console
 
 ## Progress log
 
-_No entries yet._
+### 2026-10-05 · Phase A (session 2): scaffold and data layer
+
+**Built**
+
+- Scaffold: Vite 8, React 19, Tailwind 4, TypeScript 6.0 (strict), ESLint 10 with type-aware typescript-eslint and react-hooks, Prettier, Vitest 5, Playwright 1.63 (config only; the tests arrive in Phase D) and tsx.
+  - Every npm script from the prompt is in place, plus `typecheck`.
+  - Every direct dependency is MIT or Apache-2.0, and `npm install` reports 0 vulnerabilities.
+- Purity lint:
+  - `src/sim/`, `src/input/mapping/` and `src/worker/session.ts` ban DOM, wall-time, randomness, storage and network globals.
+  - `src/sim/` and `session.ts` also ban the Math functions that are not correctly rounded, and the `**` operator.
+  - `src/sim/` may not import three.js, React or Zustand, the app layers, `src/input` or `src/worker` (D6). From `src/data` it may import only types.
+  - `no-magic-numbers` covers `src/sim/` outside `math/` and `core/`.
+  - Throwaway probe files confirmed all of this: 13 deliberate violations were caught, while the `core/` constants and `Math.pow` in mapping were allowed.
+- Start screen showing the exact disclaimer. The text lives in `src/app/disclaimer.ts`, and a test keeps it identical to spec 00 §2 and the README. Production builds get the strict CSP meta tag (D23).
+- Data layer in `src/data/`:
+  - units, facts, quantity resolution and provenance (D13)
+  - Zod schemas for all 11 schema ids (D24)
+  - the validator with its 14 error codes and its report, plus the CLI in `scripts/validate-data.ts`
+  - rest-shape distribution
+  - the catalog: rod instances per tier, with per-segment properties and provenance, plus item instances and path resolution for the rules
+  - loaders for the repository and for anatomy graphs and cases in SI
+  - the bundled copy of `/data` for the browser
+- Tests: 64 in 9 files, covering unit tests 1, 2, 3, 8 and 9 plus the disclaimer, provenance, loaders and CLI. There are 14 invalid-data fixtures, one per error code; each fails with only its own code.
+
+**Deviations, and why**
+
+1. TypeScript is pinned at 6.0.3, not the latest 7.0.2. The stack requires typescript-eslint 8.71, which supports only TypeScript below 6.1, and TypeScript 7, the native compiler, ships without the compiler API that linters use. `@types/node` is pinned at 24.19.1 to match the Node 24 LTS runtime instead of the 26.x line.
+2. A device item needs a `genericName` or a `brandName`. Spec 02 §7.1 makes `genericName` required, but nine coil and plug items in `embolics.json` have only a brand name: emb-concerto, emb-interlock, emb-prestige, emb-azur, emb-ruby, emb-pod, emb-packing-coil, emb-avp4 and emb-mvp.
+3. Ids may contain dots between letters or digits, because twelve microcatheter ids carry decimal sizes, such as `mc-progreat-2.0`. Spec 02 says ids are kebab-case.
+4. The quantity-shape and unit checks apply to every object that holds a value, options or a range, not only to facts. The repository data passes.
+5. Lint goes slightly beyond the prompt in `src/sim/`:
+   - It also bans numbers in variable declarations, because `no-magic-numbers` lets `const SPEED = 30` through, and it bans the `**` operator.
+   - D27's Math bans cover `src/sim/` and `src/worker/session.ts`. `src/input/mapping/` keeps `Math.pow` for the response curve sign(x)·|x|^n.
+6. Two readings where the spec is silent:
+   - A rest-shape joint sits at the node the two segments share: joint j at node j+1.
+   - A `{min, max}` modulus ratio ramps from min at `fromTip` to max at `toTip`.
+7. Added `.claude/launch.json` so the in-app browser can start the dev server.
+
+**Values added to `/data`:** none. **Placeholders added:** none.
+
+**For the planning chat:** deviations 2 and 3, where the seed data and spec 02 disagree.
+
+**Checks** (output pasted in session 2):
+
+- `npm run validate-data`: exit 0 with no errors; counts 818 / 17 / 42 / 66 / 117.
+- Each of the 14 fixtures exits 1 with only its own code.
+- 64 of 64 tests pass.
+- `npm run typecheck` and `npm run lint` (ESLint and Prettier): exit 0.
+- `npm run dev` serves the start screen with the exact disclaimer and no console errors.
+- `npm run build` also succeeds, and the CSP tag appears only in production.

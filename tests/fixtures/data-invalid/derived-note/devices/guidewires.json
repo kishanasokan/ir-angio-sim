@@ -1,0 +1,23 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "guidewires",
+  "notes": "Fixture: a derived fact without a note.",
+  "items": [
+    {
+      "id": "gw-fixture",
+      "kind": "guidewire",
+      "genericName": "Fixture guidewire",
+      "geometry": {
+        "diameter": {
+          "options": [
+            0.018,
+            0.035
+          ],
+          "unit": "in",
+          "confidence": "derived",
+          "source": "fixture-open"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "ir-sim/anatomy-graph@1",
+  "id": "phantom-fixture",
+  "name": "Fixture: a segment with fewer radii than centerline points",
+  "units": "mm",
+  "frame": "LPS",
+  "provenance": {
+    "text": "Fixture tube.",
+    "confidence": "design"
+  },
+  "nodes": [
+    {
+      "id": "inlet",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "kind": "inlet"
+    },
+    {
+      "id": "end",
+      "position": [
+        0,
+        0,
+        20
+      ],
+      "kind": "cap"
+    }
+  ],
+  "segments": [
+    {
+      "id": "fixture-main",
+      "from": "inlet",
+      "to": "end",
+      "centerline": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          10
+        ],
+        [
+          0,
+          0,
+          20
+        ]
+      ],
+      "radii": [
+        4,
+        4
+      ],
+      "tags": {
+        "name": "fixture tube",
+        "territory": "phantom"
+      }
+    }
+  ],
+  "access": [
+    {
+      "id": "inlet-sheath",
+      "node": "inlet",
+      "kind": "sheath",
+      "direction": [
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "landmarks": []
+}

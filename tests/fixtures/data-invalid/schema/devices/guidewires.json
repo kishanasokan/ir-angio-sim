@@ -1,0 +1,22 @@
+{
+  "schema": "ir-sim/devices@1",
+  "category": "guidewires",
+  "notes": "Fixture: the item has no kind, which the devices schema requires.",
+  "items": [
+    {
+      "id": "gw-fixture",
+      "genericName": "Fixture guidewire",
+      "geometry": {
+        "diameter": {
+          "options": [
+            0.018,
+            0.035
+          ],
+          "unit": "in",
+          "confidence": "sourced",
+          "source": "fixture-open"
+        }
+      }
+    }
+  ]
+}

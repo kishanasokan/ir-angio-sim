@@ -1,0 +1,20 @@
+# Authored by hand and owned by the spec process: never reformat.
+data/
+spec/
+prompts/
+docs/
+CLAUDE.md
+README.md
+LICENSE
+
+# Validator fixtures are deliberately broken data.
+tests/fixtures/
+
+# Generated or local.
+package-lock.json
+dist/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.claude/

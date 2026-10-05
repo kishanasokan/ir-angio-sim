@@ -1,0 +1,31 @@
+{
+  "schema": "ir-sim/materials@1",
+  "notes": "Fixture materials.",
+  "friction": [
+    {
+      "id": "fr-fixture",
+      "pair": "fixture pair",
+      "coefficient": {
+        "value": 0.1,
+        "unit": "1",
+        "confidence": "design"
+      }
+    }
+  ],
+  "bulk": [
+    {
+      "id": "mat-fixture",
+      "name": "Fixture material",
+      "density": {
+        "value": 7900,
+        "unit": "kg/m3",
+        "confidence": "design"
+      },
+      "poissonRatio": {
+        "value": 0.3,
+        "unit": "1",
+        "confidence": "design"
+      }
+    }
+  ]
+}
