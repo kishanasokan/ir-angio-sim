@@ -27,7 +27,7 @@ const tierSchema = z.looseObject({
   stepRate: value,
   substeps: value,
   segmentLength: value,
-  autoSelect: z.looseObject({ maxPhysicsPerFrame: value, benchmarkSteps: value }).optional(),
+  autoSelect: z.looseObject({ maxPhysicsPerFrame: value, benchmarkSteps: value, benchmarkDepth: value }).optional(),
   availableFrom: z.string().optional(),
 });
 
@@ -84,6 +84,7 @@ export const physicsTuningSchema = z.looseObject({
     maxStepsPerMessageFast: value,
     contactActivationDistance: value,
     contactSolvePasses: value,
+    rotationalInertiaScale: value,
     frictionSlipSpeed: value,
     frictionSlipSpin: value,
     loadRelaxSteps: value,
@@ -145,7 +146,7 @@ export const inputTuningSchema = z.looseObject({
     events: z.array(rumbleEventSchema),
     strengthDefault: value,
   }),
-  autopilot: z.looseObject({ takeoverThreshold: value, settings: textFactSchema }),
+  autopilot: z.looseObject({ takeoverThreshold: value, advanceSpeed: value, rotateSpeed: value, settings: textFactSchema }),
 });
 
 export const renderTuningSchema = z.looseObject({
@@ -168,6 +169,7 @@ export const renderTuningSchema = z.looseObject({
     deviceColorCatheter: textFactSchema,
   }),
   hud: z.looseObject({ uiRefreshRate: value }),
+  targetFrameRate: value,
   carm: z.looseObject({
     defaultSourceToImageDistance: value,
     defaultZoomField: value,

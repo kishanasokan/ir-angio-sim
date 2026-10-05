@@ -43,6 +43,7 @@ export function engineSettings(repository: Repository): Pick<SimConfig, 'physics
       lumenGridCell: si(solver.lumenGridCell),
       contactActivation: si(solver.contactActivationDistance),
       contactPasses: solver.contactSolvePasses.value,
+      rotationalInertiaScale: solver.rotationalInertiaScale.value,
       slipSpeed: si(solver.frictionSlipSpeed),
       slipSpin: si(solver.frictionSlipSpin),
       loadRelaxSteps: solver.loadRelaxSteps.value,
@@ -142,6 +143,8 @@ export interface SandboxOptions {
   readonly anatomyId?: string;
   readonly seed?: number;
   readonly frictionOverride?: number | null;
+  /** Start the innermost device's tip this far past the sheath tip (m), the others keeping their distance behind it. */
+  readonly startDepth?: number;
 }
 
 /** The sandbox's engine configuration: the case's stack and start, every phantom and both rod tiers. */
@@ -156,11 +159,15 @@ export function sandboxConfig(repository: Repository, options: SandboxOptions = 
     throw new Error(`Case ${caseId} has no anatomy "${anatomyId}".`);
   }
   const sheath = sheathLength(repository, caseId);
-  const stack: StackEntry[] = sandbox.initialStack.map((rodModelId) => {
+  const starts = sandbox.initialStack.map(
+    (rodModelId) => sandbox.insertion.find((entry) => entry.rodModelId === rodModelId)?.tipBeyondAccess.value ?? 0,
+  );
+  const shift = options.startDepth === undefined ? 0 : options.startDepth - (starts.at(-1) ?? 0);
+  const stack: StackEntry[] = sandbox.initialStack.map((rodModelId, i) => {
     const start = sandbox.insertion.find((entry) => entry.rodModelId === rodModelId);
     return {
       rodModelId,
-      inserted: sheath + (start?.tipBeyondAccess.value ?? 0),
+      inserted: sheath + (starts[i] ?? 0) + shift,
       rotation: start?.hubRotation.value ?? 0,
     };
   });

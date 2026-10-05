@@ -14,6 +14,7 @@
     "maxStepsPerMessageFast": {"value": 1000, "unit": "count", "confidence": "design", "note": "Used only with the ?fast=1 test flag so end-to-end tests are not limited by slow headless rendering."},
     "contactActivationDistance": {"value": 0.005, "unit": "mm", "confidence": "design", "note": "A node within this distance inside its allowed lumen surface keeps its contact active, so resting contact does not flicker on and off. Added in M1 phase B (docs/M1-plan.md D29)."},
     "contactSolvePasses": {"value": 4, "unit": "count", "confidence": "design", "note": "Most solves per substep while lumen contacts are added (a node ended beyond the wall) or released (the contact would pull the node onto the wall), so contact only pushes. Added in M1 phase B (docs/M1-plan.md D29)."},
+    "rotationalInertiaScale": {"value": 1000, "unit": "1", "confidence": "design", "note": "Multiplies each rod segment's rotational inertia. A 2 mm segment of a thin wire would otherwise spin on a microsecond time scale, too fast to follow with one linearization per substep: when a buckled wire snaps through or is pushed hard against a cap (sandbox-a-buckle) the solve diverges. In that test 300 still diverged and 500 held; 1000 leaves a factor of two. Static shapes are unchanged; it slows only short bending and twisting waves (below a few centimetres), and twist still crosses a device within a few milliseconds. Added in M1 phase C."},
     "frictionSlipSpeed": {"value": 1, "unit": "mm/s", "confidence": "design", "note": "Below this sliding speed Coulomb friction is regularized (proportional to speed) so sticking does not chatter. Added in M1 phase B (docs/M1-plan.md D29)."},
     "frictionSlipSpin": {"value": 10, "unit": "deg/s", "confidence": "design", "note": "The same regularization for torsional friction against the wall. Added in M1 phase B (docs/M1-plan.md D29)."},
     "loadRelaxSteps": {"value": 500, "unit": "count", "confidence": "design", "note": "At load the devices relax into their rest shapes for this many steps before step 0, so a pre-shaped tip that starts straight does not snap in the first frame. Added in M1 phase B."}
@@ -28,7 +29,8 @@
       "segmentLength": {"value": 2, "unit": "mm", "confidence": "design"},
       "autoSelect": {
         "maxPhysicsPerFrame": {"value": 4, "unit": "ms", "confidence": "design", "note": "Startup benchmark: if 300 steps of phantom C cost more than this per 16.7 ms frame, use the standard tier."},
-        "benchmarkSteps": {"value": 300, "unit": "count", "confidence": "design", "note": "Steps of phantom C run at startup to choose the tier."}
+        "benchmarkSteps": {"value": 300, "unit": "count", "confidence": "design", "note": "Steps of phantom C run at startup to choose the tier."},
+        "benchmarkDepth": {"value": 140, "unit": "mm", "confidence": "design", "note": "During the startup benchmark the wire tip sits this far past the sheath tip in phantom C's straight parent, with the catheter at its starting distance behind it, so the benchmark costs what a demo at depth costs (about 70 free nodes) rather than the cheap starting pose. Added in M1 phase C (docs/M1-plan.md D17)."}
       }
     },
     {

@@ -80,21 +80,21 @@ The riskiest part is solver accuracy with one Gauss–Seidel iteration per subst
 
 Build order:
 
-- [ ] `src/input/mapping/`: `curves.ts`, `settings.ts` (defaults from `tuning/input`), `mapPad.ts`, `mapKeyboard.ts`, `mapPointer.ts`. Pure functions, with the previous raw state passed in so press edges are detected. → unit test 10
-- [ ] `src/sim/autopilot/`: `types.ts`, `sandboxCLeft.ts`, `sandboxBBend.ts`, `sandboxABuckle.ts`. Each is a pure `(step, stateView, params, memo) → (virtual pad, memo)` (D1, D6, D7).
-- [ ] `src/worker/session.ts`: the pure session runner, which the worker and the golden tests both use (D6, D8). It handles the step-stamped frame queue, applies commands at their step, routes the autopilot through `mapPad` with the default settings and records the input log.
-- [ ] `src/data/dataHash.ts` and `src/input/log.ts`: record changed frames and commands, round-trip through JSON, refuse a log with a different `dataHash` → unit test 15
-- [ ] `src/worker/protocol.ts` and `physics.worker.ts`: at most `maxStepsPerMessage` steps per message, `?fast=1`, snapshots as transferred buffers, perf messages, and the startup tier benchmark (D17)
-- [ ] `src/worker/client.ts`: wall time to target step, pause, frames stamped with their first step (D19)
-- [ ] `src/input/sources/`: `gamepad.ts`, `keyboard.ts`, `pointer.ts`, `replay.ts`, and `arbiter.ts`, which merges live sources and sends `stop-autopilot` on takeover
-- [ ] `src/input/rumble.ts`: pure scheduler plus a thin adapter → unit test 12
-- [ ] Golden scenes 4, 11 and 12, and the sandbox-c-left part of scene 10
+- [x] `src/input/mapping/`: `curves.ts`, `settings.ts` (defaults from `tuning/input`), `mapPad.ts`, `mapKeyboard.ts`, `mapPointer.ts`. Pure functions, with the previous raw state passed in so press edges are detected. → unit test 10
+- [x] `src/sim/autopilot/`: `types.ts`, `sandboxCLeft.ts`, `sandboxBBend.ts`, `sandboxABuckle.ts`. Each is a pure `(step, stateView, params, memo) → (virtual pad, memo)` (D1, D6, D7).
+- [x] `src/worker/session.ts`: the pure session runner, which the worker and the golden tests both use (D6, D8). It handles the step-stamped frame queue, applies commands at their step, routes the autopilot through `mapPad` with the default settings and records the input log.
+- [x] `src/data/dataHash.ts` and `src/input/log.ts`: record changed frames and commands, round-trip through JSON, refuse a log with a different `dataHash` → unit test 15
+- [x] `src/worker/protocol.ts` and `physics.worker.ts`: at most `maxStepsPerMessage` steps per message, `?fast=1`, snapshots as transferred buffers, perf messages, and the startup tier benchmark (D17)
+- [x] `src/worker/client.ts`: wall time to target step, pause, frames stamped with their first step (D19)
+- [x] `src/input/sources/`: `gamepad.ts`, `keyboard.ts`, `pointer.ts`, `replay.ts`, and `arbiter.ts`, which merges live sources and sends `stop-autopilot` on takeover
+- [x] `src/input/rumble.ts`: pure scheduler plus a thin adapter → unit test 12
+- [x] Golden scenes 4, 11 and 12, and the sandbox-c-left part of scene 10
 
 Done when:
 
-- [ ] unit tests 10, 12 and 15 pass
-- [ ] golden scenes 4, 10 (both parts), 11 and 12 pass
-- [ ] every earlier test and lint still pass
+- [x] unit tests 10, 12 and 15 pass
+- [x] golden scenes 4, 10 (both parts), 11 and 12 pass
+- [x] every earlier test and lint still pass
 
 Riskiest part: replays must stay deterministic across the worker boundary, and the closed-loop autopilots must always finish.
 
@@ -230,6 +230,13 @@ Riskiest part: two rendering backends in headless CI, and the rule of no console
 - Coulomb friction, sliding and twisting, uses the last substep's contact force. It is applied as implicit (backward-Euler) damping, so it resists sliding with μ·N but can never reverse it, even on a wire's 8 mg nodes.
 - A wire inside a catheter is one composite rod: the stiffnesses add, so the stiffer member sets the shared curve (scene 9's 31.9°). Beyond the catheter tip the wire continues as its own rod, attached at the tip.
 - Every test, tolerance, step rate and substep count stays as specified.
+
+### The owner's call during session 4 (agreed 2026-10-05)
+
+**D30 · The buckling demo pushes 50 mm past the stall.** With a stable solve, the Glidewire's 30 mm floppy tip (placeholder) folds back into a J at the cap at about 0.4 N. Within the 20 mm the prompt names, the hub force therefore never reaches `feedback.hubForceDanger`. Pushing on, the body buckles and passes 0.8 N at about 33 mm.
+
+- The case's `sandbox-a-buckle.extraPush` is now 50 mm (it was 20).
+- Golden scene 12 measures over the demo's extra push instead of a fixed 20 mm. Its other checks are unchanged: tip advance below 2 mm (D2), hub force above danger, a danger event, and segments within 0.5%.
 
 ### Expected data additions (design values, `data/tuning/` only; final names logged when added)
 
@@ -391,3 +398,89 @@ The tuning schema requires them, and the selection-mismatch fixture gained the f
 - `npm run lint` (ESLint, including `no-magic-numbers` and the purity rules in `src/sim/`, and Prettier) and `npm run typecheck`: exit 0.
 - `npm run validate-data`: OK.
 - `src/sim/` imports nothing from outside `src/sim/`; ESLint enforces the purity and layering rules.
+
+### 2026-10-05 · Phase C (session 4): worker, input, autopilot and replay
+
+**Built**
+
+- `src/input/mapping/`: radial dead zone and response curve with their inverse, `InputConfig` and settings, and `mapPad`, `mapKeyboard` and `mapPointer` to the prompt's tables.
+  - All three mappers share one mapper state (mode and fine), so Y and C toggle the same mode.
+  - `virtualPadToRaw` turns an autopilot's requested rates into raw stick deflections that `mapPad` maps back exactly. It lives here because it needs `Math.pow`, which is banned in `src/sim`.
+- `src/sim/autopilot/`: the three closed-loop scripts.
+  - sandbox-c-left follows D1, turns the short way, and backs off and turns again if the tip enters the right daughter.
+  - sandbox-b-bend leads with the wire, locks the pair (R3), advances both, unlocks and pulls the wire back.
+  - sandbox-a-buckle stalls on the tip's advance along the centerline, then pushes the extra length.
+  - The engine gives scripts a read-only view: L, φ, tip position and velocity, tip tangent, the bend direction of a pre-shaped tip, the tip segment and the hub force.
+- `src/worker/session.ts`: the session runner the worker and golden tests share (D6, D8).
+  - Frames hold from their step to the next one, and their buttons act on the first step only.
+  - Commands are logged and applied at their step. The starting tier is logged as a step-0 `set-tier` command, so a replay runs on the same tier on any machine.
+  - Autopilot frames go through `mapPad` with the default settings. When a script finishes, the runner emits `autopilot-done` and logs a `stop-autopilot`.
+  - A replay feeds a log's frames and commands, with the autopilot off.
+- `src/input/log.ts` and `src/data/dataHash.ts`: changed-frame logging, a JSON round trip, and refusal of a log that is malformed or was made with different data (FNV-1a over `/data`, with line endings normalized).
+- `src/worker/`:
+  - `protocol.ts`, and `physics.worker.ts`, a thin shell around the session. It runs at most `maxStepsPerMessage` steps per message (`maxStepsPerMessageFast` with `?fast=1`), transfers snapshot buffers, and posts events and perf.
+  - `benchmark.ts`, the D17 startup benchmark with an injected clock.
+  - `timing.ts`, a pure wall-time-to-step clock with pause.
+  - `client.ts`, which stamps each frame with the first step not yet requested (D19).
+- `src/input/sources/`: the gamepad (glyph sets, non-standard notice), keyboard, pointer and replay sources, and the arbiter. The arbiter takes the largest request per axis, keeps every button and detects takeover. `inputLoop.ts` wires one animation frame and sends `stop-autopilot` on takeover. The UI mounts it in phase D.
+- `src/input/rumble.ts`: the pure scheduler (patterns, contact buzz, strength, clamping, the update-rate cap) and the `dual-rumble` adapter.
+- Tests: 173 in 37 files. These include unit tests 10, 12 and 15, and golden scenes 4, 10 (both parts), 11 and 12. There are also new tests for the sources, the arbiter, the timing, the benchmark and the session runner.
+
+**Physics fixes found by the new scenes** (no tolerance or expected value changed except D30):
+
+1. **Stall detection.** At the rounded cap the tip keeps sliding sideways at 1 to 40 mm/s, so its speed never stays below `stallSpeed`. The script instead counts a stall when the tip advances along the centerline less than `stallSpeed·stallTime` over a window of `stallTime`.
+2. **Rotational inertia.** When the buckled wire snapped through, its floppy tip's segments spun up to about 1000 rad/s. At that rate one linearization per substep diverged: 356% stretch and a 450 N hub force. A new design value, `rotationalInertiaScale` = 1000, multiplies every segment's rotational inertia.
+   - In the hard-push test, 300 still diverged and 500 held, so 1000 leaves a factor of two.
+   - Static shapes are unchanged. The scale slows only short bending and twisting waves.
+   - Measured effects: scene 1 moved from 1.4300 to 1.4325 mm, and scene 7's lag at μ = 0 from 0.13° to 1.27°, which stays strictly increasing with μ.
+   - Linear damping, more contact passes and no friction did not help.
+3. **The joint where a chain starts.** Each time a node crossed the sheath tip or the catheter tip, the clamp joint's stiffness doubled and its pivot jumped 2 mm. That kicked the catheter tip about 0.8 mm and stretched the junction segment by up to 1.5%.
+   - The first two joints of a chain now share the bend at the clamp. The first segment's node sits `b` behind the clamp; the clamp joint has length (l − b)/2 and the next joint l − b/2. Stiffness and bend position are therefore continuous across a crossing. A node exactly at the clamp keeps D10's l/2, so scene 1 still sits on whole segments.
+   - Bend rows are solved in the equivalent angle form (C = joint angle, compliance l̄/EI), so a joint of zero length is rigid rather than ill-conditioned.
+   - Nodes carried inside a catheter now sit on the line the junction anchor uses, its tip segment's own axis.
+   - Release spikes fell from 1.5% to 0.26%.
+4. **Long pushes are now stable.** At 100 mm past the stall the hub force reaches 3.1 N with stretch at 0.05% and no solve failures.
+
+**Deviations, and why**
+
+1. **Script memory lives in the session runner and is not hashed.** D7 asked for an engine-owned, hashed memo. D8 replays run with the autopilot off, so a hashed memo would make every replay's hash differ from the live run, and scene 11 could never pass. The memo only shapes frames, and those are logged. It is cleared when a demo starts or the session resets.
+2. **Autopilot speeds.** Scripts ask for rates (`advanceSpeed` and `rotateSpeed` from tuning/input, `pushSpeed` from the case), not raw deflections, and the runner inverts the response curve.
+3. **The tier benchmark runs at depth.** At the starting pose the high tier looks cheap: 4 ms per frame, against 8 to 14 ms at depth. The benchmark therefore places the devices `benchmarkDepth` past the sheath tip. On this M2 it measures 8 to 14 ms for the high tier and picks the standard tier, which costs 0.7 to 2.6 ms per frame through the sandbox.
+
+**Performance** (headless, this M2, physics per 16.7 ms frame):
+
+| Tier | Starting pose | Deep (75 free nodes) |
+| --- | --- | --- |
+| High | 4.0 ms | 9.3 to 11 ms |
+| Standard | 0.7 ms | 2.2 to 2.6 ms |
+
+The demos finish in 36.9 s (c-left), 24.6 s (b-bend) and 16.2 s (buckle) of simulated time.
+
+**Values added to or changed in `/data`:**
+
+- Design values added (D4):
+  - `input.json → autopilot.advanceSpeed` 10 mm/s and `autopilot.rotateSpeed` 90 deg/s
+  - `render.json → targetFrameRate` 60 Hz (D17)
+  - `physics.json → solver.rotationalInertiaScale` 1000
+  - `physics.json → tiers[high].autoSelect.benchmarkDepth` 140 mm
+  - The schemas require them, and the selection-mismatch fixture gained `rotationalInertiaScale`.
+- Changed with the owner's approval (D30): `cases/sandbox.json → sandbox-a-buckle.extraPush`, from 20 to 50 mm, with a note.
+
+**Placeholders added:** none.
+
+**For the planning chat:**
+
+- D30, and the Glidewire's floppy-tip placeholders (30 mm at 2%), which decide where the fold happens.
+- The rotational inertia scale.
+- The high tier is over budget at depth on this machine; standard is chosen.
+
+**Checks** (output pasted in session 4):
+
+- `npx vitest run`: 173 of 173 pass in 37 files.
+- Golden values:
+  - scene 4: worst excursion past the allowed surface 0.000, 0.000 and 0.010 mm, against a 0.05 mm limit
+  - scene 10 (c-left part): largest wire offset 3.9e-5 mm, against 0.1008 mm
+  - scene 11: identical hashes, `9e0d3d89` after 10 s; the replay matches; a frame changed by 1% gives a different hash
+  - scene 12: hub 49.98 mm, tip −36.96 mm (the tip folds back), largest hub force 2.09 N, 2 danger events, largest stretch 0.26%
+- Scenes 1 to 3 and 5 to 9 still pass: 1.4325 mm, 360.0°, 6e-13%, 10.0000 mm, hub forces 0.128 / 0.177 / 0.228 N, lags 1.27° / 1.68° / 2.12°, branch selection both ways, and 31.92° then 60.00°.
+- `npm run lint`, `npm run typecheck`, `npm run validate-data` and `npm run build`: exit 0.

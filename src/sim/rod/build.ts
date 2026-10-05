@@ -7,8 +7,12 @@ import type { RodState } from './state';
 /**
  * Builds a rod from a device instance: node masses (half of each adjacent segment), segment inertias, joint
  * stiffness and the rest shape. Positions and orientations start at the identity; insertion.ts places the rod.
+ *
+ * Segment inertias are multiplied by `inertiaScale` (solver.rotationalInertiaScale). A 2 mm segment of a thin wire
+ * spins on a microsecond time scale, too fast to follow with one linearization per substep when a buckled wire snaps
+ * through; scaling its rotational inertia slows only those spin modes and leaves static shapes unchanged.
  */
-export function buildRod(spec: SimDeviceSpec): RodState {
+export function buildRod(spec: SimDeviceSpec, inertiaScale = 1): RodState {
   const n = spec.segments.count;
   const l = spec.segments.length;
   const nodes = n + 1;
@@ -45,8 +49,8 @@ export function buildRod(spec: SimDeviceSpec): RodState {
     rod.mass[j] = (rod.mass[j] ?? 0) + 0.5 * segmentMass;
     rod.mass[j + 1] = (rod.mass[j + 1] ?? 0) + 0.5 * segmentMass;
     const inertia = cylinderInertia(segmentMass, rod.outerRadius[j] ?? 0, rod.innerRadius[j] ?? 0, l);
-    rod.inertiaPerpendicular[j] = inertia.perpendicular;
-    rod.inertiaAxial[j] = inertia.axial;
+    rod.inertiaPerpendicular[j] = inertia.perpendicular * inertiaScale;
+    rod.inertiaAxial[j] = inertia.axial * inertiaScale;
     rod.q[QUAT * j + W] = 1;
     rod.qPrev[QUAT * j + W] = 1;
   }

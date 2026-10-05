@@ -1,10 +1,11 @@
 import type { SimAnatomy } from './anatomy/graph';
 import { buildLumen, createLumenHit, queryLumen, type Lumen, type LumenHit } from './anatomy/lumen';
+import type { AutopilotView, Vec3 } from './autopilot/types';
 import type { SimEvent } from './core/events';
 import { createHasher, hashHex, hashNumber, hashTypedArray } from './core/hash';
 import { NEUTRAL_AXES, type Command, type InputFrame } from './core/records';
 import { createRng, type Rng } from './core/rng';
-import { VEC3, Y, Z } from './core/types';
+import { QUAT, VEC3, X, Y, Z } from './core/types';
 import type { SimDeviceSpec } from './devices/instance';
 import { createStack, deviceInputs, moveActivePair, toggleLock, type StackState } from './devices/stack';
 import {
@@ -16,6 +17,7 @@ import {
   type CarmParams,
   type CarmState,
 } from './imaging/carm';
+import { quatAxis } from './math/quat';
 import { buildRod, rodKineticEnergy } from './rod/build';
 import { createAccessFrame, placeKinematic, placeStraight, type AccessFrame } from './rod/insertion';
 import {
@@ -72,6 +74,8 @@ export interface SimConfig {
     readonly lumenGridCell: number;
     readonly contactActivation: number;
     readonly contactPasses: number;
+    /** Multiplies every segment's rotational inertia (build.ts). */
+    readonly rotationalInertiaScale: number;
     readonly slipSpeed: number;
     readonly slipSpin: number;
     /** Steps the devices relax into their rest shapes at load, before step 0. */
@@ -101,6 +105,11 @@ export interface SimConfig {
 interface DeviceRecord {
   physics: PhysicsDevice;
   readonly spec: SimDeviceSpec;
+  /** The most proximal joint of a pre-shaped tip (−1 for a straight device) and the unit direction, in that joint's
+   * proximal (d1, d2) frame, that the tip bends toward. */
+  readonly bendJoint: number;
+  readonly bendD1: number;
+  readonly bendD2: number;
   hubForce: number;
   tipForce: number;
   wallStress: number;
@@ -308,9 +317,55 @@ export class SimEngine {
   }
 
   /** Emitted by the session runner when an autopilot script finishes (Phase C). */
+  /** Emits autopilot-done; the session runner then stops the demo with a logged stop-autopilot command. */
   notifyAutopilotDone(script: string): void {
     this.events.push({ type: 'autopilot-done', step: this.stepCount, script });
-    this.autopilot = null;
+  }
+
+  /** The read-only view autopilot scripts react to (docs/M1-plan.md D6). */
+  autopilotView(): AutopilotView {
+    const tier = this.requireTier();
+    const frame = this.requireFrame();
+    const axisOf = (q: Float64Array, segment: number, axis: number): Vec3 => {
+      const out = new Float64Array(VEC3);
+      quatAxis(q, QUAT * segment, axis, out, 0);
+      return [out[X] ?? 0, out[Y] ?? 0, out[Z] ?? 0];
+    };
+    return {
+      step: this.stepCount,
+      stepRate: tier.stepRate,
+      sheathLength: frame.sheathLength,
+      anatomy: this.currentAnatomy,
+      devices: this.records.map((record) => {
+        const { rod } = record.physics;
+        const tip = VEC3 * rod.segmentCount;
+        const tipTangent = axisOf(rod.q, rod.segmentCount - 1, Z);
+        let bendDirection: Vec3 | null = null;
+        let bodyTangent = tipTangent;
+        if (record.bendJoint >= 0) {
+          const d1 = axisOf(rod.q, record.bendJoint, X);
+          const d2 = axisOf(rod.q, record.bendJoint, Y);
+          bendDirection = [
+            record.bendD1 * d1[X] + record.bendD2 * d2[X],
+            record.bendD1 * d1[Y] + record.bendD2 * d2[Y],
+            record.bendD1 * d1[Z] + record.bendD2 * d2[Z],
+          ];
+          bodyTangent = axisOf(rod.q, record.bendJoint, Z);
+        }
+        return {
+          rodModelId: rod.rodModelId,
+          inserted: record.physics.inserted,
+          rotation: record.physics.rotation,
+          tip: [rod.x[tip] ?? 0, rod.x[tip + Y] ?? 0, rod.x[tip + Z] ?? 0],
+          tipVelocity: [rod.v[tip] ?? 0, rod.v[tip + Y] ?? 0, rod.v[tip + Z] ?? 0],
+          tipTangent,
+          bendDirection,
+          bodyTangent,
+          tipSegmentId: record.tipSegment >= 0 ? (this.lumen?.segmentIds[record.tipSegment] ?? null) : null,
+          hubForce: record.hubForce,
+        };
+      }),
+    };
   }
 
   snapshot(): Snapshot {
@@ -425,7 +480,7 @@ export class SimEngine {
 
   private makeRecord(spec: SimDeviceSpec, inserted: number, rotation: number): DeviceRecord {
     const frame = this.requireFrame();
-    const rod = buildRod(spec);
+    const rod = buildRod(spec, this.requireConfig().physics.rotationalInertiaScale);
     const physics = createPhysicsDevice(
       rod,
       this.friction(spec.wallFriction.value),
@@ -437,9 +492,30 @@ export class SimEngine {
     physics.currentRotation = rotation;
     placeStraight(rod, frame, inserted, rotation);
     physics.firstDynamic = placeKinematic(rod, frame, inserted, rotation, 0, 0);
+    // The pre-shaped tip: rest chords near the tip. A chord (cx, cy) turns d3 toward cy·d1 − cx·d2 (D9).
+    let bendJoint = -1;
+    let bendD1 = 0;
+    let bendD2 = 0;
+    for (let j = rod.segmentCount - 2; j >= 0; j -= 1) {
+      const cx = rod.restChord[VEC3 * j] ?? 0;
+      const cy = rod.restChord[VEC3 * j + Y] ?? 0;
+      if (cx === 0 && cy === 0) {
+        if (bendJoint >= 0) {
+          break;
+        }
+        continue;
+      }
+      bendJoint = j;
+      bendD1 += cy;
+      bendD2 -= cx;
+    }
+    const bendNorm = Math.sqrt(bendD1 * bendD1 + bendD2 * bendD2);
     return {
       physics,
       spec,
+      bendJoint,
+      bendD1: bendNorm > 0 ? bendD1 / bendNorm : 0,
+      bendD2: bendNorm > 0 ? bendD2 / bendNorm : 0,
       hubForce: 0,
       tipForce: 0,
       wallStress: 0,

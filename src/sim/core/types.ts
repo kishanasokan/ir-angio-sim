@@ -57,3 +57,6 @@ export const MIN_DEVICES_TO_MOVE_PAIR = 3;
 
 /** Values that describe a device's kinematic placement: L, φ and their two rates. */
 export const PLACEMENT_VALUES = 4;
+
+/** Memo slots an autopilot script may use: its phase and three values (docs/M1-plan.md D7). */
+export const AUTOPILOT_MEMO_SLOTS = 4;

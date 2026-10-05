@@ -31,7 +31,8 @@ import type { RodState } from './state';
  * - stretch-shear per segment: (x[j+1] − x[j]) / l − d3(q[j]) = 0 with zero compliance (inextensible,
  *   shear-stiff);
  * - bend-twist per joint: Ω − Ω₀ = 0 with Ω = 2·Im(conj(q[j])·q[j+1]) / l̄ on the shortest arc, compliance
- *   1/(EI·l̄) for the two bending rows and 1/(GJ·l̄) for twist (spec 01 §6);
+ *   1/(EI·l̄) for the two bending rows and 1/(GJ·l̄) for twist (spec 01 §6), solved in the equivalent angle form
+ *   (see bendTwist);
  * - lumen contact rows for nodes at or beyond the lumen surface, solved together with the rod so a stiff rod cannot
  *   spring back through the wall.
  *
@@ -260,9 +261,12 @@ export function addEntry(
 }
 
 /**
- * The bend-twist constraint between a proximal orientation qp and segment orientation qk. Writes C (three values in
- * qp's frame) into the unit and the Jacobian with respect to a world rotation of qk, (1/l̄)·G·Rpᵀ with
- * G = r_w·I − [r_v]×, into `jacobian`; the Jacobian with respect to qp is its negative.
+ * The bend-twist constraint between a proximal orientation qp and segment orientation qk, as the joint's angle:
+ * C = 2·Im(conj(qp)·qk) − chord₀ (three values in qp's frame), whose compliance is l̄/EI (bending) and l̄/GJ (twist).
+ * This is the energy of Ω = C/l̄ with compliance 1/(EI·l̄) (spec 01 §6), written so that a joint of length l̄ → 0
+ * becomes a rigid one instead of an ill-conditioned one. Writes C into the unit and the Jacobian with respect to a
+ * world rotation of qk, G·Rpᵀ with G = r_w·I − [r_v]×, into `jacobian`; the Jacobian with respect to qp is its
+ * negative.
  */
 export function bendTwist(
   solver: Solver,
@@ -273,7 +277,6 @@ export function bendTwist(
   ko: number,
   restChord: ArrayLike<number>,
   restOffset: number,
-  voronoiLength: number,
   jacobian: Float64Array,
 ): void {
   const r = solver.scratch.relative;
@@ -284,12 +287,11 @@ export function bendTwist(
   const ry = sign * (r[Y] ?? 0);
   const rz = sign * (r[Z] ?? 0);
   const rw = sign * (r[W] ?? 1);
-  const inverseLength = 1 / voronoiLength;
   const c = solver.units.constraint;
   const co = UNIT_ROWS * u + (GROUP_ROW[0] ?? 0);
-  c[co] = (2 * rx - (restChord[restOffset] ?? 0)) * inverseLength;
-  c[co + Y] = (2 * ry - (restChord[restOffset + Y] ?? 0)) * inverseLength;
-  c[co + Z] = (2 * rz - (restChord[restOffset + Z] ?? 0)) * inverseLength;
+  c[co] = 2 * rx - (restChord[restOffset] ?? 0);
+  c[co + Y] = 2 * ry - (restChord[restOffset + Y] ?? 0);
+  c[co + Z] = 2 * rz - (restChord[restOffset + Z] ?? 0);
   // G = rw·I − [r_v]×, row-major.
   const g = solver.scratch.bendG;
   g[0] = rw;
@@ -303,14 +305,14 @@ export function bendTwist(
   g[8] = rw;
   const rotation = solver.scratch.rotation;
   quatToMatrix(qp, po, rotation, 0);
-  // J = (1/l̄)·G·Rpᵀ, where (G·Rᵀ)[a][b] = Σk G[a][k]·R[b][k].
+  // J = G·Rpᵀ, where (G·Rᵀ)[a][b] = Σk G[a][k]·R[b][k].
   for (let a = 0; a < VEC3; a += 1) {
     for (let b = 0; b < VEC3; b += 1) {
       let sum = 0;
       for (let k = 0; k < VEC3; k += 1) {
         sum += (g[VEC3 * a + k] ?? 0) * (rotation[VEC3 * b + k] ?? 0);
       }
-      jacobian[VEC3 * a + b] = sum * inverseLength;
+      jacobian[VEC3 * a + b] = sum;
     }
   }
 }

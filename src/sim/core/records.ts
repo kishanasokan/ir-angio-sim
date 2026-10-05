@@ -89,6 +89,28 @@ export interface InputLog {
   readonly commands: readonly Command[];
 }
 
+/** Standard-mapping indices (W3C Gamepad API): stick axes, and buttons with their analog values in 0..1. */
+export const PAD_AXES = { leftX: 0, leftY: 1, rightX: 2, rightY: 3 } as const;
+export const PAD_BUTTONS = {
+  a: 0,
+  b: 1,
+  x: 2,
+  y: 3,
+  lb: 4,
+  rb: 5,
+  lt: 6,
+  rt: 7,
+  view: 8,
+  menu: 9,
+  l3: 10,
+  r3: 11,
+  up: 12,
+  down: 13,
+  left: 14,
+  right: 15,
+  home: 16,
+} as const;
+
 /** Gamepad state in the standard mapping: four stick axes and seventeen button values in 0..1. */
 export interface RawPad {
   readonly axes: readonly number[];

@@ -17,7 +17,6 @@ import {
   Y,
   Z,
 } from '../core/types';
-import { cylinderInertia } from '../math/geometry';
 import { setIdentity3, setPerpendicularProjection3, setSkew3 } from '../math/mat3';
 import { quatApplyWorldRotation, quatCopy, quatFromAxisAngle, quatMultiply } from '../math/quat';
 import {
@@ -247,6 +246,32 @@ function slavedOrientation(
   quatMultiply(ownerDevice.rod.q, QUAT * ownerSegment, world.scratch.quat, 0, out, 0);
 }
 
+/**
+ * The point at `arc` on an owner's centerline. Along its tip segment, and past its tip, it follows that segment's own
+ * axis d3 from the tip node: the line the junction anchor uses, so carried nodes sit exactly where the junction holds
+ * the chain beyond the tip.
+ */
+function ownerPoint(
+  world: PhysicsWorld,
+  owner: PhysicsDevice,
+  arc: number,
+  out: Float64Array,
+  o: number,
+): void {
+  const rod = owner.rod;
+  const back = owner.currentInserted - arc;
+  if (back >= rod.segmentLength) {
+    centerlinePoint(rod, owner.currentInserted, arc, out, o);
+    return;
+  }
+  const tangent = world.scratch.vector;
+  segmentTangent(rod, rod.segmentCount - 1, tangent, 0);
+  const tip = VEC3 * rod.segmentCount;
+  out[o] = (rod.x[tip] ?? 0) - back * (tangent[0] ?? 0);
+  out[o + Y] = (rod.x[tip + Y] ?? 0) - back * (tangent[1] ?? 0);
+  out[o + Z] = (rod.x[tip + Z] ?? 0) - back * (tangent[2] ?? 0);
+}
+
 /** Moves inner nodes that sit inside an owner onto its centerline, and starts newly freed nodes from it. */
 function carryInnerDevices(world: PhysicsWorld, h: number): void {
   const { devices, frame, scratch } = world;
@@ -266,10 +291,10 @@ function carryInnerDevices(world: PhysicsWorld, h: number): void {
       const ownerDevice = devices[owner] as PhysicsDevice;
       const o = VEC3 * i;
       if (!owned) {
-        centerlinePoint(ownerDevice.rod, ownerDevice.currentInserted, arc, rod.x, o);
+        ownerPoint(world, ownerDevice, arc, rod.x, o);
       } else if (device.ownedBefore[i] !== 1) {
         // Just left the device around it: start on its centerline (extended past its tip), moving with it.
-        centerlinePoint(ownerDevice.rod, ownerDevice.currentInserted, arc, rod.x, o);
+        ownerPoint(world, ownerDevice, arc, rod.x, o);
         centerlineVelocity(ownerDevice.rod, ownerDevice.currentInserted, arc, rod.v, o);
         const tipSegment = ownerDevice.rod.segmentCount - 1;
         segmentTangent(ownerDevice.rod, tipSegment, scratch.tangent, 0);
@@ -310,12 +335,7 @@ function innerLoad(world: PhysicsWorld, owner: number, arc: number): { mass: num
     );
     const segmentMass = (inner.rod.massPerLength[segment] ?? 0) * inner.rod.segmentLength;
     mass += segmentMass;
-    inertia += cylinderInertia(
-      segmentMass,
-      inner.rod.outerRadius[segment] ?? 0,
-      inner.rod.innerRadius[segment] ?? 0,
-      inner.rod.segmentLength,
-    ).perpendicular;
+    inertia += inner.rod.inertiaPerpendicular[segment] ?? 0;
   }
   return { mass, inertia };
 }
@@ -398,6 +418,14 @@ function buildChains(world: PhysicsWorld, h: number, firstUnit: Int32Array, pivo
     const junctionOwner =
       proximalArc > frame.sheathLength + LENGTH_EPSILON ? ownerOfArc(world, d, proximalArc) : -1;
 
+    // The chain's first segment straddles its clamp point (the sheath tip or the outer device's tip): its first node is
+    // `behind` the clamp. Its two joints share the bend at the clamp so that the stiffness and the bend's position are
+    // continuous as nodes cross the clamp: the clamp joint has length (l − behind)/2 (D10's l/2 for a node exactly at
+    // the clamp, rigid when the segment is fully inside), the next one l − behind/2 (l/2 when it sits at the clamp).
+    const behind = Math.min(
+      l,
+      Math.max(0, device.ownedFrom - arcOfNode(rod, device.currentInserted, first - 1)),
+    );
     for (let k = first - 1; k < n; k += 1) {
       const u = beginUnit(solver, d, k);
       if (k === first - 1) {
@@ -412,9 +440,12 @@ function buildChains(world: PhysicsWorld, h: number, firstUnit: Int32Array, pivo
         let prevOffset = QUAT * (k - 1);
         let prevVariable = device.segmentVariable[k - 1] ?? -1;
         let voronoi = l;
+        if (k === first) {
+          voronoi = l - 0.5 * behind;
+        }
         if (k === first - 1) {
-          // The clamp at the sheath tip or the junction at an outer tip: only the free half of the joint bends (D10).
-          voronoi = 0.5 * l;
+          // The clamp at the sheath tip or the junction at an outer tip.
+          voronoi = 0.5 * (l - behind);
           if (junctionOwner >= 0) {
             const ownerDevice = devices[junctionOwner] as PhysicsDevice;
             const ownerTip = ownerDevice.rod.segmentCount - 1;
@@ -452,13 +483,14 @@ function buildChains(world: PhysicsWorld, h: number, firstUnit: Int32Array, pivo
         scratch.chord[0] = chordX * release;
         scratch.chord[1] = chordY * release;
         scratch.chord[2] = chordZ * release;
-        bendTwist(solver, u, prevQ, prevOffset, rod.q, QUAT * k, scratch.chord, 0, voronoi, jacobian);
+        bendTwist(solver, u, prevQ, prevOffset, rod.q, QUAT * k, scratch.chord, 0, jacobian);
         addEntry(solver, u, GROUP_BEND, device.segmentVariable[k] ?? -1, jacobian, 0, 1);
         addEntry(solver, u, GROUP_BEND, prevVariable, jacobian, 0, -1);
+        // Angle-form compliance l̄/EI and l̄/GJ (bendTwist).
         const c = solver.units.compliance;
-        c[VEC3 * u] = 1 / (bending * voronoi);
-        c[VEC3 * u + 1] = 1 / (bending * voronoi);
-        c[VEC3 * u + 2] = 1 / ((rod.jointTorsion[k - 1] ?? 0) * voronoi);
+        c[VEC3 * u] = voronoi / bending;
+        c[VEC3 * u + 1] = voronoi / bending;
+        c[VEC3 * u + 2] = voronoi / (rod.jointTorsion[k - 1] ?? 0);
       } else {
         // No joint before the handle segment: keep its rows decoupled.
         const c = solver.units.compliance;
@@ -813,7 +845,7 @@ export function physicsSubstep(world: PhysicsWorld, h: number, elapsed: number):
       const owner = ownerOfArc(world, d, arc);
       if (owner >= 0) {
         const ownerDevice = devices[owner] as PhysicsDevice;
-        centerlinePoint(ownerDevice.rod, ownerDevice.currentInserted, arc, rod.x, VEC3 * i);
+        ownerPoint(world, ownerDevice, arc, rod.x, VEC3 * i);
       }
     }
   }

@@ -61,7 +61,7 @@
       "anatomy": "phantom-a-straight",
       "description": "Deliberately bad: advance the wire to the cap, then keep pushing to show buckling, the red resistance meter and rumble.",
       "params": {
-        "extraPush": {"value": 20, "unit": "mm", "confidence": "design"},
+        "extraPush": {"value": 50, "unit": "mm", "confidence": "design", "note": "Push past the stall. The Glidewire's 30 mm floppy tip folds back into a J at the cap at about 0.4 N; the body then buckles and the hub force passes feedback.hubForceDanger at about 33 mm, so 50 mm shows the red meter and rumble. Raised from 20 mm in M1 phase C with the owner's approval."},
         "pushSpeed": {"value": 20, "unit": "mm/s", "confidence": "design"},
         "stallSpeed": {"value": 1, "unit": "mm/s", "confidence": "design", "note": "The tip counts as stopped at the cap below this speed."},
         "stallTime": {"value": 0.1, "unit": "s", "confidence": "design"}

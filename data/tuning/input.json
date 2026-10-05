@@ -67,6 +67,8 @@
   },
   "autopilot": {
     "takeoverThreshold": {"value": 0.25, "unit": "1", "confidence": "design", "note": "Any live stick deflection above this, or any button, hands control back from the autopilot."},
+    "advanceSpeed": {"value": 10, "unit": "mm/s", "confidence": "design", "note": "Insertion speed of the sandbox-c-left and sandbox-b-bend demos, the speed of the golden scenes; sandbox-a-buckle uses its own pushSpeed. Added in M1 phase C (docs/M1-plan.md D4)."},
+    "rotateSpeed": {"value": 90, "unit": "deg/s", "confidence": "design", "note": "Hub rotation speed of the demos while they turn a tip toward a branch. Added in M1 phase C (docs/M1-plan.md D4)."},
     "settings": {"text": "The autopilot always maps through the default dead zone and response exponent in this file, with no inversion or mirroring, so demos and replays do not depend on the learner's settings.", "confidence": "design"}
   }
 }

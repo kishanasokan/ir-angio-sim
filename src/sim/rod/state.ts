@@ -36,7 +36,7 @@ export interface RodState {
   readonly qPrev: Float64Array;
   /** World-frame angular velocity, rad/s. */
   readonly omega: Float64Array;
-  /** Rotational inertia about axes perpendicular to d3 and about d3, kg·m². */
+  /** Rotational inertia about axes perpendicular to d3 and about d3, kg·m², scaled by solver.rotationalInertiaScale. */
   readonly inertiaPerpendicular: Float64Array;
   readonly inertiaAxial: Float64Array;
   readonly outerRadius: Float64Array;
