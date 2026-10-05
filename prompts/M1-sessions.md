@@ -29,6 +29,8 @@ For each phase list the files you will create in build order, the tests that pro
 When I approve, your only action is to save the plan as docs/M1-plan.md (a checklist per phase, a "Decisions" section with the resolutions we agreed, an empty "Progress log"), commit it as "M1: implementation plan", and stop.
 ```
 
+If the plan lists spec problems, decide each one before approving (or bring them back to the planning chat). Answers go into the plan's Decisions section.
+
 ## Session 2 · Phase A (fresh conversation)
 
 ```text
