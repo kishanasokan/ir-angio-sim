@@ -17,6 +17,26 @@ This page gets a new contributor, or a new AI chat session, productive without t
 - The simulation runs headless: three demos (`sandbox-c-left`, `sandbox-b-bend` and `sandbox-a-buckle`) and replays through `src/worker/session.ts`.
 - Nothing renders yet. The start screen shows only the disclaimer.
 
+## Next session: Phase D (session 5)
+
+Start a fresh conversation with the session 5 prompt in [prompts/M1-sessions.md](../prompts/M1-sessions.md). Phase D can build on what phase C left ready:
+
+- **Worker loop:** `src/worker/client.ts` (`PhysicsClient`) starts `src/worker/physics.worker.ts`. On startup it benchmarks the high tier at depth and picks a tier (D17); on an M2 laptop that is the standard tier.
+- **Input:** `src/input/sources/inputLoop.ts` turns one animation frame of pad, keys and mouse into a frame and sends `stop-autopilot` on takeover. The UI only has to mount it, with the keyboard and pointer sources.
+- **Demos and rumble:** demos start with the commands from `src/data/sessionSetup.ts → demoCommands`. Rumble is ready in `src/input/rumble.ts` (`rumbleStep`, `playRumble`).
+- **CI:** `.github/workflows/ci.yml` already exists. Add the Playwright step to it, then create `pages.yml`.
+- **When the phase is done:** update this page's state table and the README build status, close GitHub issue #1, and push.
+
+The gate (session 6) follows; GitHub issue #2 has its checklist.
+
+## GitHub
+
+The repository is public at [github.com/kishanasokan/ir-angio-sim](https://github.com/kishanasokan/ir-angio-sim).
+
+- CI runs lint, the typecheck, data validation, every test and the build on each push and pull request.
+- The milestone **M1 Foundations** and issues #1 to #5 track phase D, the gate, high-tier performance, the placeholder review and the missing wire-in-catheter friction.
+- Dependabot ignores the deliberate TypeScript and @types/node pins (phase A deviation 1).
+
 ## Read in this order
 
 1. [CLAUDE.md](../CLAUDE.md): the twelve golden rules. They are not optional.
