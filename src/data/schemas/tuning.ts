@@ -82,6 +82,11 @@ export const physicsTuningSchema = z.looseObject({
     settleSteps: value,
     maxStepsPerMessage: value,
     maxStepsPerMessageFast: value,
+    contactActivationDistance: value,
+    contactSolvePasses: value,
+    frictionSlipSpeed: value,
+    frictionSlipSpin: value,
+    loadRelaxSteps: value,
   }),
   tiers: z.array(tierSchema).min(1),
   feedback: z.looseObject({
@@ -163,6 +168,11 @@ export const renderTuningSchema = z.looseObject({
     deviceColorCatheter: textFactSchema,
   }),
   hud: z.looseObject({ uiRefreshRate: value }),
+  carm: z.looseObject({
+    defaultSourceToImageDistance: value,
+    defaultZoomField: value,
+    defaultTableHeight: value,
+  }),
 });
 
 export const tuningFileSchema = z.discriminatedUnion('category', [

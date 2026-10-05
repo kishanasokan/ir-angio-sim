@@ -11,7 +11,12 @@
     "lumenGridCell": {"value": 10, "unit": "mm", "confidence": "design", "note": "Cell size of the uniform grid over lumen capsules."},
     "settleSteps": {"value": 100, "unit": "count", "confidence": "design", "note": "A static test counts as settled after this many consecutive steps below settleKineticEnergy."},
     "maxStepsPerMessage": {"value": 64, "unit": "count", "confidence": "design", "note": "Most steps the worker runs per main-thread message; beyond this the sim runs in slow motion instead of skipping."},
-    "maxStepsPerMessageFast": {"value": 1000, "unit": "count", "confidence": "design", "note": "Used only with the ?fast=1 test flag so end-to-end tests are not limited by slow headless rendering."}
+    "maxStepsPerMessageFast": {"value": 1000, "unit": "count", "confidence": "design", "note": "Used only with the ?fast=1 test flag so end-to-end tests are not limited by slow headless rendering."},
+    "contactActivationDistance": {"value": 0.005, "unit": "mm", "confidence": "design", "note": "A node within this distance inside its allowed lumen surface keeps its contact active, so resting contact does not flicker on and off. Added in M1 phase B (docs/M1-plan.md D29)."},
+    "contactSolvePasses": {"value": 4, "unit": "count", "confidence": "design", "note": "Most solves per substep while lumen contacts are added (a node ended beyond the wall) or released (the contact would pull the node onto the wall), so contact only pushes. Added in M1 phase B (docs/M1-plan.md D29)."},
+    "frictionSlipSpeed": {"value": 1, "unit": "mm/s", "confidence": "design", "note": "Below this sliding speed Coulomb friction is regularized (proportional to speed) so sticking does not chatter. Added in M1 phase B (docs/M1-plan.md D29)."},
+    "frictionSlipSpin": {"value": 10, "unit": "deg/s", "confidence": "design", "note": "The same regularization for torsional friction against the wall. Added in M1 phase B (docs/M1-plan.md D29)."},
+    "loadRelaxSteps": {"value": 500, "unit": "count", "confidence": "design", "note": "At load the devices relax into their rest shapes for this many steps before step 0, so a pre-shaped tip that starts straight does not snap in the first frame. Added in M1 phase B."}
   },
   "tiers": [
     {

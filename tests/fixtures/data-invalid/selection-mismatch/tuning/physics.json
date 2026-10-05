@@ -38,6 +38,26 @@
     "maxStepsPerMessageFast": {
       "value": 1000,
       "unit": "count"
+    },
+    "contactActivationDistance": {
+      "value": 0.005,
+      "unit": "mm"
+    },
+    "contactSolvePasses": {
+      "value": 4,
+      "unit": "count"
+    },
+    "frictionSlipSpeed": {
+      "value": 1,
+      "unit": "mm/s"
+    },
+    "frictionSlipSpin": {
+      "value": 10,
+      "unit": "deg/s"
+    },
+    "loadRelaxSteps": {
+      "value": 500,
+      "unit": "count"
     }
   },
   "tiers": [

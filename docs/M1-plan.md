@@ -44,31 +44,31 @@ Riskiest part: schemas that accept all 21 files unchanged yet still catch every 
 
 Build order:
 
-- [ ] `src/sim/core/`: `types.ts` (array strides), `records.ts` (InputFrame, Command, InputLog, Snapshot, virtual pad), `rng.ts`, `hash.ts` (FNV-1a), `clock.ts`, `events.ts` → unit test 5
-- [ ] `src/sim/math/`: `detTrig.ts`, `vec3.ts`, `quat.ts` → unit tests 6 and 7
-- [ ] `src/sim/rod/state.ts`: typed arrays, with the frame convention documented in the file. `build.ts`: node layout, masses, inertias, and rest Darboux vectors from the catalog's joint angles (D9).
-- [ ] `src/sim/rod/constraints.ts`: stretch-shear and bend-twist, with the clamp joint per D10. `insertion.ts`: sheath valve, kinematic nodes, hub rotation through detTrig, hub force.
-- [ ] Minimal `src/sim/engine.ts` (free space, `step`, `hash`, `applyExternalForce`), then the solver spike described under the risk below
-- [ ] `src/sim/anatomy/graph.ts`, `lumen.ts`: capsules, uniform grid, queries → unit test 14
-- [ ] `src/sim/rod/contact.ts`: projection, translational and torsional friction, tip normal force, `tipSegment`
-- [ ] Golden scenes 1, 2, 3 and 5, then 6, 7 and 8. One scene per file in `tests/golden/`, with shared measurement helpers that follow §8's definitions (D15).
-- [ ] `src/sim/rod/coaxial.ts` → golden scene 9, and the scene 9 part of scene 10 (D14)
-- [ ] `src/sim/devices/instance.ts`, which turns a catalog instance into a runtime rod. `stack.ts`: active pair, lock, undriven devices hold L and φ, one-device stacks per D11. → unit test 11
-- [ ] `src/sim/rules/compatibility.ts`, `reasons.ts`, and the named state predicates (D12) → unit test 4
-- [ ] The order rule in the engine: `blocked-action` events and a debounced message
-- [ ] The full engine API:
+- [x] `src/sim/core/`: `types.ts` (array strides), `records.ts` (InputFrame, Command, InputLog, Snapshot, virtual pad), `rng.ts`, `hash.ts` (FNV-1a), `clock.ts`, `events.ts` → unit test 5
+- [x] `src/sim/math/`: `detTrig.ts`, `vec3.ts`, `quat.ts` → unit tests 6 and 7 (`vec3.ts` was dropped as unused; see the Progress log)
+- [x] `src/sim/rod/state.ts`: typed arrays, with the frame convention documented in the file. `build.ts`: node layout, masses, inertias, and rest Darboux vectors from the catalog's joint angles (D9).
+- [x] `src/sim/rod/constraints.ts`: stretch-shear and bend-twist, with the clamp joint per D10. `insertion.ts`: sheath valve, kinematic nodes, hub rotation through detTrig, hub force.
+- [x] Minimal `src/sim/engine.ts` (free space, `step`, `hash`, `applyExternalForce`), then the solver spike described under the risk below
+- [x] `src/sim/anatomy/graph.ts`, `lumen.ts`: capsules, uniform grid, queries → unit test 14
+- [x] `src/sim/rod/contact.ts`: projection, translational and torsional friction, tip normal force, `tipSegment`
+- [x] Golden scenes 1, 2, 3 and 5, then 6, 7 and 8. One scene per file in `tests/golden/`, with shared measurement helpers that follow §8's definitions (D15).
+- [x] `src/sim/rod/coaxial.ts` → golden scene 9, and the scene 9 part of scene 10 (D14)
+- [x] `src/sim/devices/instance.ts`, which turns a catalog instance into a runtime rod. `stack.ts`: active pair, lock, undriven devices hold L and φ, one-device stacks per D11. → unit test 11
+- [x] `src/sim/rules/compatibility.ts`, `reasons.ts`, and the named state predicates (D12) → unit test 4
+- [x] The order rule in the engine: `blocked-action` events and a debounced message
+- [x] The full engine API:
   - `load`, `step`, `command` (`swap-device`, `set-anatomy`, `reset`, `set-tier`), `snapshot`, `hash`
   - per-device L, φ, tip segment, tip normal force, hub force and wall stress (D16)
   - the five events
-- [ ] `src/sim/snapshot.ts`: Float32 millimetre buffers plus device and C-arm scalars
-- [ ] `src/sim/imaging/carm.ts` (D18) → unit test 13
+- [x] `src/sim/snapshot.ts`: Float32 millimetre buffers plus device and C-arm scalars
+- [x] `src/sim/imaging/carm.ts` (D18) → unit test 13
 
 Done when:
 
-- [ ] unit tests 4, 5, 6, 7, 11, 13 and 14 pass
-- [ ] golden scenes 1, 2, 3, 5, 6, 7, 8 and 9, and the scene 9 part of 10, pass with the prompt's tolerances
-- [ ] `npm run lint` passes, including `no-magic-numbers` in `src/sim/`
-- [ ] nothing in `src/sim/` imports three.js, React, the DOM, `src/input/` or browser globals
+- [x] unit tests 4, 5, 6, 7, 11, 13 and 14 pass
+- [x] golden scenes 1, 2, 3, 5, 6, 7, 8 and 9, and the scene 9 part of 10, pass with the prompt's tolerances
+- [x] `npm run lint` passes, including `no-magic-numbers` in `src/sim/`
+- [x] nothing in `src/sim/` imports three.js, React, the DOM, `src/input/` or browser globals
 
 The riskiest part is solver accuracy with one Gauss–Seidel iteration per substep and 2 substeps at 1 kHz. Each wire node weighs about 8 mg, so a force F needs a position correction of roughly F·h²/m per substep, which is about 1.6% of a 2 mm segment per newton. That makes two cases likely to stretch the segment at the sheath clamp past the 0.5% limit: a full-speed push–pull reversal (scene 3) and the multi-newton load of a wire buckling against a cap (scene 12).
 
@@ -222,6 +222,15 @@ Riskiest part: two rendering backends in headless CI, and the rule of no console
 - **D27 · Banned math in the sim.** ESLint in `src/sim/` also bans `Math.sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `pow`, `exp`, `log` and `hypot`. This enforces CLAUDE.md rule 4 through tooling; only tests compare detTrig against them.
 - **D28 · Scripts created early.** The `bench` and `test:e2e` scripts exist from Phase A; the files they run arrive in Phase D.
 
+### The owner's call during session 3 (agreed 2026-10-05)
+
+**D29 · The full direct design.** One Gauss–Seidel iteration per substep cannot hold the rod at physical masses: at h = 0.5 ms a 2 mm wire segment's ω·h is about 30, and in the solver spike the scene 1 cantilever sagged 57 mm instead of 1.43 mm while segments stretched 75%. D3's direct solver fixes the rod, and the rest of the core follows it:
+
+- Lumen contacts are rows in the same direct solve as the rod, so a stiff rod cannot spring back through the wall. Contact only pushes: a row that would pull its node onto the wall is released and the substep solved again.
+- Coulomb friction, sliding and twisting, uses the last substep's contact force. It is applied as implicit (backward-Euler) damping, so it resists sliding with μ·N but can never reverse it, even on a wire's 8 mg nodes.
+- A wire inside a catheter is one composite rod: the stiffnesses add, so the stiffer member sets the shared curve (scene 9's 31.9°). Beyond the catheter tip the wire continues as its own rod, attached at the tip.
+- Every test, tolerance, step rate and substep count stays as specified.
+
 ### Expected data additions (design values, `data/tuning/` only; final names logged when added)
 
 - `render`: `targetFrameRate` (60 Hz), used by the tier benchmark and the perf overlay
@@ -292,3 +301,93 @@ Riskiest part: two rendering backends in headless CI, and the rule of no console
 - `npm run typecheck` and `npm run lint` (ESLint and Prettier): exit 0.
 - `npm run dev` serves the start screen with the exact disclaimer and no console errors.
 - `npm run build` also succeeds, and the CSP tag appears only in production.
+
+### 2026-10-05 · Phase B (session 3): headless simulation core
+
+**Built**
+
+- `src/sim/core/`: strides and shared constants, records (InputFrame, Command, InputLog, virtual pad), the mulberry32 PRNG, FNV-1a hashing, the step clock and the five events.
+- `src/sim/math/`: detTrig (fdlibm-style sin, cos and atan2, at most 4.4e-16 from `Math` on [−4π, 4π]), quaternions, 3×3 helpers, cylinder inertia and the block-tridiagonal solver.
+- `src/sim/rod/`: rod state with the frame convention documented in `state.ts`, rod building with D9 rest chords, insertion and the sheath clamp (D10), the direct XPBD solve with contact rows (D29), lumen contact with implicit friction, and coaxial coupling as a composite rod.
+- `src/sim/anatomy/`: graph helpers and the capsule lumen with its uniform grid.
+- `src/sim/devices/`: the device instance shape and the stack (active pair, lock, D11, D20).
+- `src/sim/rules/`: the compatibility engine, failure modes and messages (D12), and the state predicate `wire-leads-catheter`, which the engine's order rule uses. `src/data/ruleEnvironment.ts` resolves rule paths against device instances, the case and `ruleParameters`, so `src/sim` stays free of `/data`.
+- `src/sim/engine.ts`: the full API — load, step, step-stamped commands (`reset`, `set-anatomy`, `set-tier`, `swap-device`, plus the autopilot start and stop flags), snapshot, hash and `applyExternalForce`. It tracks L, φ, tip segment, tip normal force, hub force and wall stress (D16) per device, and emits the five events. `blocked-action` fires once per block; the debounced message is the toast's job in Phase D.
+- `src/sim/snapshot.ts` with Float32 millimetre buffers, and `src/sim/imaging/carm.ts` (D18).
+- `src/data/simConfig.ts`: engine configurations in SI, built from `/data`.
+- Tests: 137 in 29 files. These are unit tests 4, 5, 6, 7, 11, 13 and 14, golden scenes 1, 2, 3, 5, 6, 7, 8 and 9 with the scene 9 part of 10, and new unit tests for the core, the math, the rod modules and the engine API.
+
+**Deviations, and why**
+
+1. **The direct design (D29).** The owner chose it once the solver spike showed one Gauss–Seidel iteration could not hold the rod. Consequences:
+   - Lumen contacts are rows in the rod's solve. Each substep solves again while contacts are added (a node ended beyond the wall) or released (the row pulled its node onto the wall), up to `contactSolvePasses` solves; the sandbox averages 1.03 to 1.13 solves per substep.
+   - A node starts a substep with a contact row only if it is predicted beyond the wall or it pressed on the wall last substep and is still within `contactActivationDistance`. Penetrations below 1e-12 m count as rounding. Without these two rules a node resting on the wall with no load flipped in and out of contact on rounding noise, and the extra solves tripled the cost.
+2. **Friction is force-based, not the prompt's position rule.** The prompt cancels tangential displacement below μ·d. Here Coulomb friction μ·N (sliding) and μ·N·r (twist) opposes the motion, using the last substep's normal force, regularized below `frictionSlipSpeed` and `frictionSlipSpin`.
+   - It is applied implicitly: the predicted sliding and spin are damped, and the node is made heavier along the wall for that solve. An explicit force made scene 6 blow up at μ = 0.1, because the damping-to-mass ratio of 8 mg nodes far exceeds the stability limit.
+   - A second instability, in scene 7 at μ = 0, came from contact rows that pulled nodes onto the wall and then released them a substep later. Push-only contact (deviation 1) removed it.
+3. **Coaxial coupling is a composite rod (D29), not the prompt's distance constraint with split corrections.** Inner-device nodes inside the catheter ride exactly on its centerline, so scene 10's gap is 7e-14 mm against a limit of 0.1008 mm. Axially each device follows its own hub, so the wire slides freely inside the catheter and `lumenFriction` is unused in M1.
+   - The inner device's mass, bending stiffness and rest curve, turned by ψ = φ_inner − φ_outer − the catheter's accumulated twist, add to the catheter's joints.
+   - Beyond the catheter tip the wire is its own chain. Its first node is held laterally on the catheter's tip segment, and its first joint uses half length, like the clamp (D10).
+4. **Two additions the prompt does not name, both needed for pre-shaped tips:**
+   - **Release ramp.** Where a chain starts (at the sheath tip or an outer device's tip), the first segment's rest bend grows with the length that has emerged. A curved tip leaving the sheath therefore unfolds instead of snapping.
+   - **Load relax.** At load and reset, the devices relax for `loadRelaxSteps` zero-input steps before step 0, because pre-shaped tips start straight in the sheath. Without it, the first steps stretched the Glidewire's angled tip by 16%; with it, by 5e-8.
+5. **Hub force** is the stretch-row λ of the first free segment projected on the access axis, as force λ/(l·h²), averaged over the step's substeps. For an inner device whose chain starts at a catheter tip, the projection axis is the catheter's tip tangent.
+6. **Scene setup choices.**
+   - Scene 7 feeds the wire at 10 mm/s, the speed of scenes 6 and 8, because the scene names no feed speed (D15).
+   - Scene 9 pulls the wire back at full speed.
+   - Scene 8 also checks that a `tip-entered-segment` event names the branch.
+   - Scene speeds come from `tuning/input` through a helper instead of literals.
+7. **Test runner.** Vitest's default module runner reaches every imported binding through a getter on a slow-mode object, which made the solver's loops about 7× slower: 14.5 s against 2.1 s for the same 2000 steps. `vitest.config.ts` now loads unit and golden tests through Node's own `import`, with tsx as the loader. The one suite that needs `import.meta.glob` (`loaders.test.ts`) keeps the Vite runner. The test timeout is 300 s.
+8. **Small structural changes.** `math/vec3.ts` and `smallMatrix.ts` were removed as unused; the block solve does its own small-matrix work. `MIN_DEVICES_TO_MOVE_PAIR` (3, from prompt §2) and `PLACEMENT_VALUES` live in `core/types.ts`.
+
+**Performance** (headless Node 24 on this M2, physics per 16.7 ms frame, sandbox in phantom C with the 5F Berenstein and the Glidewire):
+
+| Position | High tier | Standard tier |
+| --- | --- | --- |
+| Start: catheter 20 mm and wire 30 mm past the sheath tip | 3.3 ms | 0.7 ms |
+| Wire advancing to 150 mm | 7.7 ms | 1.7 ms |
+| Catheter advancing to 110 mm | 13.3 ms | 2.9 ms |
+| Deep, still or rotating (75 free nodes) | 8.9 to 9.4 ms | 2.2 ms |
+
+- Changes this session cut the cost 3 to 4×:
+  - The far kinematic part of each device is placed once per step, and only when L, φ or a rate changed.
+  - Prediction and twist accumulation cover only the free part.
+  - The block solve uses L⁻¹·U with a symmetric update and drops a unit's contact row when it has no contact.
+  - Assembly uses unrolled products and only the lower triangle.
+- **Open risk:** the high tier exceeds 4 ms per frame once about 30 nodes are free; the standard tier stays within it. The startup benchmark (D17) therefore needs a representative state. In Phase C it will run its 300 steps of phantom C with the devices at depth, so this machine picks the standard tier. Getting the high tier under budget would need hand-derived block formulas for the rod's fixed constraint structure; that is a candidate for Phase D's bench work.
+
+**Values added to `/data`** (design, `data/tuning/` only, per D4; each note says "Added in M1 phase B"):
+
+- `physics.json → solver`:
+  - `contactActivationDistance` 0.005 mm
+  - `contactSolvePasses` 4
+  - `frictionSlipSpeed` 1 mm/s
+  - `frictionSlipSpin` 10 deg/s
+  - `loadRelaxSteps` 500
+- `render.json → carm` (D18): `defaultSourceToImageDistance` 100 cm, `defaultZoomField` 30 cm and `defaultTableHeight` 88 cm.
+
+The tuning schema requires them, and the selection-mismatch fixture gained the five solver values so it still fails only with its own code.
+
+**Placeholders added:** none.
+
+**For the planning chat:**
+
+- Deviations 2 and 3: friction is force-based, and no friction acts between wire and catheter in M1.
+- The high-tier performance risk above.
+
+**Checks** (output pasted in session 3):
+
+- `npx vitest run`: 137 of 137 pass in 29 files.
+- Golden values:
+  - scene 1: 1.4300 mm, expected 1.4305
+  - scene 2: 360.000°
+  - scene 3: largest stretch 6.1e-13%
+  - scene 5: 10.0000 mm
+  - scene 6: hub force 0.1273, 0.1767 and 0.2278 N; at μ = 0 the tip advances 61.43 mm for a 60 mm hub advance
+  - scene 7: largest lag 0.129°, 1.020° and 1.718°
+  - scene 8: c-left at 0°, c-right at 180°
+  - scene 9: 31.92° against 31.94° expected, and 60.00° after pull-back
+  - scene 10 (scene 9 part): gap 6.9e-14 mm
+- `npm run lint` (ESLint, including `no-magic-numbers` and the purity rules in `src/sim/`, and Prettier) and `npm run typecheck`: exit 0.
+- `npm run validate-data`: OK.
+- `src/sim/` imports nothing from outside `src/sim/`; ESLint enforces the purity and layering rules.

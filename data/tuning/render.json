@@ -14,5 +14,10 @@
     "roadmapOutlineOpacity": {"value": 0.35, "unit": "1", "confidence": "design", "note": "M1 stand-in for roadmap: vessel outline overlay toggled by X or R."}
   },
   "threeD": {"vesselOpacity": {"value": 0.25, "unit": "1", "confidence": "design"}, "deviceColorWire": {"text": "#d9e2ec", "confidence": "design"}, "deviceColorCatheter": {"text": "#4fb3bf", "confidence": "design"}},
-  "hud": {"uiRefreshRate": {"value": 15, "unit": "Hz", "confidence": "design", "note": "React HUD reads the latest snapshot at this rate; the canvas renders every frame."}}
+  "hud": {"uiRefreshRate": {"value": 15, "unit": "Hz", "confidence": "design", "note": "React HUD reads the latest snapshot at this rate; the canvas renders every frame."}},
+  "carm": {
+    "defaultSourceToImageDistance": {"value": 100, "unit": "cm", "confidence": "design", "note": "Starting source-to-image distance, inside the sourced 89-123.5 cm range (imaging.json gantry). Added in M1 phase B (docs/M1-plan.md D18)."},
+    "defaultZoomField": {"value": 30, "unit": "cm", "confidence": "design", "note": "Starting zoom field: the largest of imaging.json gantry.zoomFields. Added in M1 phase B (docs/M1-plan.md D18)."},
+    "defaultTableHeight": {"value": 88, "unit": "cm", "confidence": "design", "note": "Starting table height, the middle of the sourced 74-102 cm range (imaging.json table). Added in M1 phase B (docs/M1-plan.md D18)."}
+  }
 }
