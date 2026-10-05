@@ -1,0 +1,51 @@
+name: Data correction
+description: A clinical, anatomical, device or physical value in /data is wrong or missing a source.
+labels: [data, medical-review]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every number the simulator uses lives in `/data` with a unit, a confidence level and a source. Thank you for helping make them right.
+        Do not include patient information.
+  - type: input
+    id: data-id
+    attributes:
+      label: Data id and field
+      description: The item id and the property path, as in the file.
+      placeholder: gw-glidewire → mechanics.bodyFlexuralModulus
+    validations:
+      required: true
+  - type: input
+    id: current
+    attributes:
+      label: Current value
+      placeholder: 8 GPa (estimated)
+  - type: input
+    id: proposed
+    attributes:
+      label: Proposed value with unit
+      placeholder: 7.5 GPa
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: A citation, a product IFU or brochure, or a paper. Give the page, table or figure.
+    validations:
+      required: true
+  - type: dropdown
+    id: confidence
+    attributes:
+      label: Confidence of the proposed value
+      options:
+        - sourced (read directly in the source)
+        - derived (computed from sourced values)
+        - estimated (standard knowledge)
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Context, ranges, or how this changes the simulation.

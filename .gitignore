@@ -28,3 +28,7 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 *.swp
+
+# Local editor and assistant files
+.DS_Store
+.claude/settings.local.json

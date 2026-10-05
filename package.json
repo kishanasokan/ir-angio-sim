@@ -5,9 +5,17 @@
   "description": "Free, browser-based, controller-first interventional radiology angio suite simulator. Educational simulation only.",
   "license": "MIT",
   "author": "Kishan Asokan",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kishanasokan/ir-angio-sim.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kishanasokan/ir-angio-sim/issues"
+  },
+  "homepage": "https://github.com/kishanasokan/ir-angio-sim#readme",
   "type": "module",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=24"
   },
   "scripts": {
     "dev": "vite",

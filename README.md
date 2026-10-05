@@ -6,11 +6,13 @@ A free, browser-based, controller-first interventional radiology simulator for m
 
 ## Build status
 
-Specification phase. Milestone **M1 (foundations)** is ready to build: scaffold, validated data layer and a rod-in-a-tube sandbox driven by a game controller. Nothing is playable yet.
+[![CI](https://github.com/kishanasokan/ir-angio-sim/actions/workflows/ci.yml/badge.svg)](https://github.com/kishanasokan/ir-angio-sim/actions/workflows/ci.yml)
+
+Milestone **M1 (foundations)** is being built. The scaffold, the validated data layer, the headless simulation core (rods, contact, coaxial devices, rules, C-arm), the worker loop, input mapping, autopilot demos, replays and rumble are done and tested. Rendering and the UI come next (phase D), so nothing is playable in the browser yet. [docs/HANDOFF.md](docs/HANDOFF.md) has the details.
 
 | Milestone | What it delivers | Status |
 | --- | --- | --- |
-| M1 Foundations | Scaffold, data validator, device sandbox with three test phantoms | Ready to build |
+| M1 Foundations | Scaffold, data validator, device sandbox with three test phantoms | In progress: phases A–C done, D and gate next |
 | M2 Core systems | Visceral anatomy, three-device stack, fluoro and DSA, flow network | Specs to write |
 | M3 First slice | Upper GI bleed with GDA embolization, end to end | Planned |
 | M4 Second slice | Uterine fibroid embolization with particles and reflux | Planned |
@@ -18,18 +20,24 @@ Specification phase. Milestone **M1 (foundations)** is ready to build: scaffold,
 
 ## Build it with Claude Code
 
-1. Install Node.js LTS (22 or newer), Git and Claude Code.
+1. Install Node.js 24 (see `.nvmrc`), Git and Claude Code.
 2. In a terminal, go to this folder and run `claude --permission-mode plan`.
-3. Follow the six sessions in [`prompts/M1-sessions.md`](prompts/M1-sessions.md): a plan, four build phases (A to D) and a final gate, each in a fresh conversation.
+3. Follow the six sessions in [`prompts/M1-sessions.md`](prompts/M1-sessions.md): a plan, four build phases (A to D) and a final gate, each in a fresh conversation. [docs/HANDOFF.md](docs/HANDOFF.md) says where the build stands.
 4. When the gate passes: `npm install && npm run dev`, open the local link in Chrome or Edge, and press **Watch a demo**.
 
 ## Run it
 
-Available after M1: `npm install && npm run dev`. Other commands are listed in [CLAUDE.md](CLAUDE.md).
+`npm ci && npm run dev` serves the app locally; until phase D it shows the start screen. Other commands are listed in [CLAUDE.md](CLAUDE.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tests
 
-Available after M1: `npm test` (unit and golden physics scenes), `npm run test:e2e` (Chromium), `npm run validate-data`.
+- `npm test` runs the unit tests and the golden physics scenes: 173 tests, about a minute.
+- `npm run validate-data` checks every fact in `/data`.
+- `npm run test:e2e` (Chromium) arrives in phase D.
+
+## Contributing
+
+Contributions from developers and clinicians are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), the golden rules in [CLAUDE.md](CLAUDE.md), and [docs/HANDOFF.md](docs/HANDOFF.md). Report a wrong clinical or device value with the **Data correction** issue form, and security problems through [SECURITY.md](SECURITY.md).
 
 ## Repository layout
 
@@ -61,7 +69,7 @@ Every fact in `/data` has a confidence level. As of 2026-10-04 the seed data hol
 | placeholder | No source yet; shown with a badge in the app | 66 |
 | design | Deliberate engineering or feel choices | 117 |
 
-Run `npm run validate-data` (after M1) for current counts. Corrections from clinicians are welcome: open an issue naming the data id, the correct value and a source.
+Run `npm run validate-data` for current counts. Corrections from clinicians are welcome: open an issue naming the data id, the correct value and a source.
 
 ## Controls (version 1)
 
