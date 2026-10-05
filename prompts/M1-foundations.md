@@ -1,10 +1,6 @@
 # M1 · Foundations: scaffold, data layer and the rod-in-a-tube sandbox
 
-**How to run this milestone.** Open the repository folder in Claude Code and send:
-
-> Build milestone M1 exactly as written in `prompts/M1-foundations.md`. Read `CLAUDE.md` and `spec/00`–`spec/02` first. Work until every item under "Done when" passes, then summarize what you built, the test count, the perf numbers and every new placeholder.
-
-Expect a long session. Approve commands when asked. If something breaks, paste the exact error back rather than rewriting this prompt.
+**How to run this milestone.** M1 is too big for one conversation. Run it as six Claude Code sessions (a plan, four build phases and a final gate) with the prompts in [`M1-sessions.md`](M1-sessions.md); each session reads this file for its section. If something breaks, paste the exact error back rather than rewriting this prompt.
 
 ---
 

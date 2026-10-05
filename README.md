@@ -18,9 +18,10 @@ Specification phase. Milestone **M1 (foundations)** is ready to build: scaffold,
 
 ## Build it with Claude Code
 
-1. Install Node.js LTS and Claude Code.
-2. Open this folder in Claude Code and send: *"Build milestone M1 exactly as written in `prompts/M1-foundations.md`."*
-3. When it finishes: `npm install && npm run dev`, open the local link, and press **Watch a demo**.
+1. Install Node.js LTS (22 or newer), Git and Claude Code.
+2. In a terminal, go to this folder and run `claude --permission-mode plan`.
+3. Follow the six sessions in [`prompts/M1-sessions.md`](prompts/M1-sessions.md): a plan, four build phases (A to D) and a final gate, each in a fresh conversation.
+4. When the gate passes: `npm install && npm run dev`, open the local link in Chrome or Edge, and press **Watch a demo**.
 
 ## Run it
 
@@ -35,7 +36,7 @@ Available after M1: `npm test` (unit and golden physics scenes), `npm run test:e
 ```
 CLAUDE.md          Rules every coding session follows (disclaimer, no invented numbers, pure deterministic sim)
 spec/              The specification set: 00 product brief, 01 architecture, 02 data schemas, index of 19 specs
-prompts/           One build prompt per milestone, in the format of the original cath lab build guide
+prompts/           One build prompt per milestone (cath lab guide format) plus the Claude Code session prompts
 data/              Every number the simulator uses, with units, confidence and sources
   sources.json       Source registry (79 entries)
   devices/           Guidewires, microcatheters, catheters, embolics, access, closure, therapeutic devices
