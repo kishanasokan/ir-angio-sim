@@ -3,6 +3,7 @@ import {
   factSchema,
   idSchema,
   numberFactSchema,
+  rangeFactSchema,
   selectionSchema,
   textFactSchema,
   tuningNumberSchema,
@@ -116,6 +117,13 @@ export const inputTuningSchema = z.looseObject({
   ...tuningBase,
   category: z.literal('input'),
   sticks: z.looseObject({ deadZone: value, responseExponent: value, triggerThreshold: value }),
+  settingsLimits: z.looseObject({
+    deadZone: rangeFactSchema,
+    deadZoneStep: value,
+    responseExponent: rangeFactSchema,
+    responseExponentStep: value,
+    rumbleStrengthStep: value,
+  }),
   devices: z.looseObject({
     advanceSpeedMax: value,
     rotationSpeedMax: value,

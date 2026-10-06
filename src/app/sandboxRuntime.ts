@@ -9,7 +9,7 @@ import { INITIAL_RUMBLE, playRumble, rumbleStep, rumbleSupported, type RumbleSta
 import { createInputLoop, type InputLoop } from '../input/sources/inputLoop';
 import { createKeyboardSource, type KeyboardSource } from '../input/sources/keyboard';
 import { createPointerSource, type PointerSource } from '../input/sources/pointer';
-import type { PadReading } from '../input/sources/gamepad';
+import { notePadPress, padPressedOnce, type PadReading } from '../input/sources/gamepad';
 import { DeviceTube } from '../render/devices/deviceMesh';
 import { createRenderer, type BackendName, type RendererHandle } from '../render/renderer';
 import { Anatomy3dView } from '../render/scenes/anatomy3d';
@@ -77,7 +77,6 @@ export class SandboxRuntime {
   private puff: PuffState = NO_PUFF;
   private mapper: MapperState = INITIAL_MAPPER_STATE;
   private previousPad: RawPad | null = null;
-  private padPressed = false;
   private padStatus: PadStatus = 'none';
   private reading: PadReading | null = null;
   private view: View = 'fluoro';
@@ -293,12 +292,12 @@ export class SandboxRuntime {
     this.raf = requestAnimationFrame(this.tick);
     this.frames.add(now);
     const demoRunning = (this.snapshot?.autopilot ?? null) !== null;
-    const result = this.loop.frame(now, demoRunning);
+    const result = this.loop.frame(now, demoRunning, useSession.getState().panel !== null);
     this.mapper = result.mapper;
     this.reading = result.reading;
     const nav = padNav(result.reading.pad, this.previousPad);
     if (anyPress(result.reading.pad, this.previousPad)) {
-      this.padPressed = true;
+      notePadPress();
     }
     this.previousPad = result.reading.pad;
     this.padStatus =
@@ -306,7 +305,7 @@ export class SandboxRuntime {
         ? 'none'
         : !result.reading.standard
           ? 'non-standard'
-          : this.padPressed
+          : padPressedOnce()
             ? 'ready'
             : 'waiting';
     this.handleButtons(result.frame.buttons, nav.length > 0);

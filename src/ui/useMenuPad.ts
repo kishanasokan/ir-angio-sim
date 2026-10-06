@@ -1,5 +1,5 @@
 import { useEffect, useState, type RefObject } from 'react';
-import { readGamepad, type GlyphSet } from '../input/sources/gamepad';
+import { notePadPress, padPressedOnce, readGamepad, type GlyphSet } from '../input/sources/gamepad';
 import type { RawPad } from '../sim/core/records';
 import type { PadStatus } from '../state/hud';
 import { anyPress, applyNav, padNav } from './nav';
@@ -9,8 +9,6 @@ import { anyPress, applyNav, padNav } from './nav';
  * focus with the D-pad, activates with A and calls `onBack` for B. It also reports the pad's glyph set and whether a
  * button has been pressed yet, because Firefox exposes a pad only after a press (prompts/M1-foundations.md §5).
  */
-
-let pressedOnce = false;
 
 export interface MenuPad {
   readonly status: PadStatus;
@@ -27,7 +25,7 @@ export function useMenuPad(root: RefObject<HTMLElement | null>, onBack?: () => v
       frame = requestAnimationFrame(poll);
       const reading = readGamepad(navigator);
       if (anyPress(reading.pad, previous)) {
-        pressedOnce = true;
+        notePadPress();
       }
       const element = root.current;
       if (element !== null) {
@@ -43,7 +41,7 @@ export function useMenuPad(root: RefObject<HTMLElement | null>, onBack?: () => v
           ? 'none'
           : !reading.standard
             ? 'non-standard'
-            : pressedOnce
+            : padPressedOnce()
               ? 'ready'
               : 'waiting';
       if (status !== last.status || reading.glyphs !== last.glyphs) {

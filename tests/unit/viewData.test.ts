@@ -2,7 +2,7 @@ import { PerspectiveCamera, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildRodInstance } from '../../src/data/catalog';
 import { inspectorTabs, humanize } from '../../src/data/inspector';
-import { loadAnatomyGraph } from '../../src/data/loaders';
+import { loadAnatomyGraph, loadCase } from '../../src/data/loaders';
 import { deviceLook, renderConfig } from '../../src/data/renderConfig';
 import {
   choiceCheck,
@@ -80,15 +80,67 @@ describe('device inspector', () => {
     tierId: 'high',
   });
 
-  it('has a tab per device, then the sheath, the phantom and the solver', () => {
+  it('has a tab per device, then the sheath, the phantom, the solver and the case', () => {
     expect(tabs.map((tab) => tab.id)).toEqual([
       'rm-berenstein-5f-65',
       'rm-glidewire-035-angled-150',
       'sheath',
       'phantom',
       'solver',
+      'case',
     ]);
     expect(humanize('maxStepsPerMessage')).toBe('Max steps per message');
+  });
+
+  it("shows an assumed core material with the assumption's own confidence and note", () => {
+    const bentson = inspectorTabs(repository(), {
+      caseId: CASE,
+      devices: [buildRodInstance(repository(), 'rm-bentson-035-145', tierSegmentLength('high'))],
+      sheathFrench: 5,
+      anatomyId: 'phantom-c-bifurcation',
+      tierId: 'high',
+    })[0]!;
+    const material = bentson.rows.find((row) => row.label === 'Material');
+    expect(material?.confidence).toBe('placeholder');
+    expect(material?.note).toBe('Stainless steel core assumed. Core material not stated in the sources.');
+  });
+
+  it('shows where every section and rest-shape region starts and ends', () => {
+    const glidewire = tabs[1]!;
+    const labels = glidewire.rows.map((row) => row.label);
+    const model = repository().rodModels.get('rm-glidewire-035-angled-150')!;
+    for (const section of model.sections) {
+      expect(labels).toContain(`${section.name} section: start from tip`);
+      expect(labels).toContain(`${section.name} section: end from tip`);
+    }
+    model.restShape.forEach((_, i) => {
+      expect(labels).toContain(`Rest shape ${i + 1}: start from tip`);
+      expect(labels).toContain(`Rest shape ${i + 1}: end from tip`);
+    });
+  });
+
+  it("covers the case's starting stack, rule parameters, demo parameters and autopilot speeds", () => {
+    const tab = tabs.find((entry) => entry.id === 'case')!;
+    const labels = tab.rows.map((row) => row.label);
+    const sandbox = loadCase(repository(), CASE);
+    // Two rows (depth and hub rotation) per starting device.
+    expect(labels.filter((label) => label.startsWith('Start, '))).toHaveLength(2 * sandbox.insertion.length);
+    expect(labels).toContain('Start, Glidewire: hub rotation');
+    expect(labels).toContain('Target distance from the access');
+    for (const key of Object.keys(repository().physics.ruleParameters)) {
+      expect(labels).toContain(`Rules: ${humanize(key)}`);
+    }
+    for (const script of sandbox.autopilot) {
+      for (const key of Object.keys(script.params)) {
+        expect(labels).toContain(`Demo ${script.id}: ${humanize(key).toLowerCase()}`);
+      }
+    }
+    for (const key of Object.keys(repository().input.autopilot)) {
+      expect(labels).toContain(`Autopilot: ${humanize(key)}`);
+    }
+    const hub = tab.rows.find((row) => row.label === 'Start, Glidewire: hub rotation');
+    expect(hub?.clinical).toEqual({ kind: 'number', value: 180, unit: 'deg' });
+    expect(hub?.confidence).toBe('design');
   });
 
   it('shows the placeholders and the estimated body modulus of the Glidewire with their notes', () => {
@@ -111,6 +163,10 @@ describe('device inspector', () => {
     for (const key of Object.keys(repository().physics.feedback)) {
       expect(labels).toContain(`Feedback: ${humanize(key)}`);
     }
+    for (const key of Object.keys(repository().input.mouse)) {
+      expect(labels).toContain(`Mouse: ${humanize(key)}`);
+    }
+    expect(labels).toContain('Tier high auto-select: Benchmark depth');
     const rotation = solver.rows.find((row) => row.label === 'C-arm: Rotation speed max');
     expect(rotation?.confidence).toBe('sourced');
     expect(rotation?.sources[0]?.url).toMatch(/^https:\/\//);

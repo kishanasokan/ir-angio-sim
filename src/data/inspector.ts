@@ -151,13 +151,19 @@ function factRows(repository: Repository, prefix: string, facts: unknown): Inspe
 
 export function deviceTab(repository: Repository, instance: RodDeviceInstance, role: string): InspectorTab {
   const name = instance.brandName ?? instance.genericName ?? instance.rodModelId;
+  // The material is a design choice unless the rod model states an assumption about the real device's core, which
+  // carries its own confidence (a placeholder until a source confirms it).
+  const assumption = instance.material.assumption;
   const material: InspectorRow = {
     label: 'Material',
     clinical: { kind: 'text', text: instance.material.name },
     si: null,
-    confidence: 'design',
-    sources: [],
-    note: instance.material.assumption ?? null,
+    confidence: assumption?.provenance.confidence ?? 'design',
+    sources: sources(repository, assumption?.provenance.sources ?? []),
+    note:
+      assumption === undefined
+        ? null
+        : [assumption.text, assumption.provenance.note].filter((text) => text !== undefined).join('. '),
   };
   return {
     id: instance.rodModelId,
@@ -245,8 +251,10 @@ export function solverTab(repository: Repository, tierId: string): InspectorTab 
     }),
     ...factRows(repository, 'Solver: ', repository.physics.solver),
     ...factRows(repository, 'Feedback: ', repository.physics.feedback),
+    ...factRows(repository, `Tier ${tierId} auto-select: `, tier?.autoSelect),
     ...factRows(repository, 'Controls: ', repository.input.devices),
     ...factRows(repository, 'Sticks: ', repository.input.sticks),
+    ...factRows(repository, 'Mouse: ', repository.input.mouse),
     ...factRows(repository, 'C-arm: ', gantry),
     ...factRows(repository, 'Table: ', table),
     ...factRows(repository, 'C-arm controls: ', repository.input.control),
@@ -255,7 +263,45 @@ export function solverTab(repository: Repository, tierId: string): InspectorTab 
   return { id: 'solver', title: 'Solver and feedback', subtitle: `${tierId} tier`, rows };
 }
 
-/** Every tab: the stack's devices (outermost first), then the sheath, the phantom and the solver. */
+/** A device's display name: brand, else generic name, else the rod model id. */
+function deviceName(repository: Repository, rodModelId: string): string {
+  const model = repository.rodModels.get(rodModelId);
+  const item = model === undefined ? undefined : repository.devices.get(model.deviceId);
+  return item?.brandName ?? item?.genericName ?? rodModelId;
+}
+
+/**
+ * The case's values the simulation uses: where each device starts, the target distance and the rule parameters the
+ * compatibility checks read, and each demo's parameters with the autopilot's speeds.
+ */
+export function caseTab(repository: Repository, caseId: string): InspectorTab {
+  const sandbox = loadCase(repository, caseId);
+  const labelled = (label: string, value: ResolvedValue): InspectorRow => ({
+    ...resolvedRow(repository, value),
+    label,
+  });
+  const rows: InspectorRow[] = [];
+  for (const entry of sandbox.insertion) {
+    const name = deviceName(repository, entry.rodModelId);
+    rows.push(
+      labelled(`Start, ${name}: tip past the sheath tip`, entry.tipBeyondAccess),
+      labelled(`Start, ${name}: hub rotation`, entry.hubRotation),
+    );
+  }
+  if (sandbox.targetDistance !== null) {
+    rows.push(labelled('Target distance from the access', sandbox.targetDistance));
+  }
+  rows.push(...factRows(repository, 'Rules: ', repository.physics.ruleParameters));
+  for (const script of sandbox.autopilot) {
+    for (const [key, value] of Object.entries(script.params)) {
+      rows.push(labelled(`Demo ${script.id}: ${humanize(key).toLowerCase()}`, value));
+    }
+  }
+  rows.push(...factRows(repository, 'Autopilot: ', repository.input.autopilot));
+  return { id: 'case', title: 'Case and demos', subtitle: sandbox.title, rows };
+}
+
+/** Every tab: the stack's devices (outermost first), then the sheath, the phantom, the solver and the case. */
 export function inspectorTabs(
   repository: Repository,
   options: {
@@ -274,5 +320,6 @@ export function inspectorTabs(
     sheathTab(repository, options.caseId, options.sheathFrench),
     phantomTab(repository, options.anatomyId),
     solverTab(repository, options.tierId),
+    caseTab(repository, options.caseId),
   ];
 }

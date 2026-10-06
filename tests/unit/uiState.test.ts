@@ -7,6 +7,7 @@ import {
   stepPuff,
   tipLocation,
 } from '../../src/app/hudView';
+import { settingRanges } from '../../src/data/inputConfig';
 import { loadAnatomyGraph } from '../../src/data/loaders';
 import { neutralPad } from '../../src/input/mapping/mapPad';
 import { PAD_BUTTONS } from '../../src/sim/core/records';
@@ -37,7 +38,11 @@ const DEFAULTS: AppSettings = {
   muted: false,
   pulseRate: 7.5,
 };
-const LIMITS = { tiers: ['high', 'standard'], pulseRates: [3.75, 7.5, 15, 30] };
+const LIMITS = {
+  tiers: ['high', 'standard'],
+  pulseRates: [3.75, 7.5, 15, 30],
+  ...settingRanges(repository()),
+};
 
 describe('settings (irsim:settings)', () => {
   it('round-trips through storage under irsim:settings', () => {
@@ -75,6 +80,19 @@ describe('settings (irsim:settings)', () => {
       LIMITS,
     );
     expect(parsed).toEqual({ ...DEFAULTS, muted: true });
+    // The ranges come from tuning/input → settingsLimits: just past them falls back, the ends are kept.
+    const edges = parseSettings(
+      JSON.stringify({
+        deadZone: LIMITS.deadZone.max + LIMITS.deadZone.step,
+        responseExponent: LIMITS.responseExponent.max,
+        rumbleStrength: LIMITS.rumbleStrength.max + LIMITS.rumbleStrength.step,
+      }),
+      DEFAULTS,
+      LIMITS,
+    );
+    expect(edges.deadZone).toBe(DEFAULTS.deadZone);
+    expect(edges.responseExponent).toBe(LIMITS.responseExponent.max);
+    expect(edges.rumbleStrength).toBe(DEFAULTS.rumbleStrength);
   });
 
   it('survives storage that throws, as in a private window', () => {

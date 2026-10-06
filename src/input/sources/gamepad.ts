@@ -28,6 +28,19 @@ export interface PadReading {
   readonly standard: boolean;
 }
 
+// Whether any screen has seen a button press since the page loaded. The prompt "Press any button on your controller"
+// shows until the first press (Firefox exposes a pad only after one), so every screen shares this flag: a press on
+// the start screen counts in the sandbox too.
+let pressedOnce = false;
+
+export function notePadPress(): void {
+  pressedOnce = true;
+}
+
+export function padPressedOnce(): boolean {
+  return pressedOnce;
+}
+
 export function readGamepad(source: Pick<Navigator, 'getGamepads'> | undefined): PadReading {
   const pads = source?.getGamepads?.() ?? [];
   const gamepad = pads.find((pad): pad is Gamepad => pad !== null && pad.connected) ?? null;

@@ -45,6 +45,7 @@ export function SandboxScreen({ launch }: { readonly launch: Launch }) {
       <main
         className="relative flex h-full w-full flex-col overflow-hidden bg-suite-950"
         data-testid="sandbox"
+        data-anatomy={hud?.anatomyId}
       >
         <div className="relative flex min-h-0 flex-1 gap-4 p-4">
           <aside className="z-10 flex w-72 shrink-0 flex-col gap-4 overflow-y-auto max-lg:absolute max-lg:top-4 max-lg:left-4 max-lg:w-64">

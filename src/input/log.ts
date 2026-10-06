@@ -88,11 +88,18 @@ export function parseLog(text: string, currentDataHash: string): InputLog {
   } catch {
     throw new InputLogError('This file is not an input log (it is not JSON).', 'not-a-log');
   }
+  return checkLog(value, currentDataHash);
+}
+
+/** The same checks for a log that is already an object, such as one sent to the physics worker. */
+export function checkLog(value: unknown, currentDataHash: string): InputLog {
   if (
     !isRecord(value) ||
     value.schema !== 'ir-sim/input-log@1' ||
     typeof value.dataHash !== 'string' ||
     typeof value.seed !== 'number' ||
+    typeof value.caseId !== 'string' ||
+    typeof value.anatomyId !== 'string' ||
     !Array.isArray(value.frames) ||
     !Array.isArray(value.commands)
   ) {

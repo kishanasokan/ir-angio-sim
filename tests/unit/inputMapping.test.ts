@@ -38,9 +38,16 @@ describe('input mapping', () => {
       );
       expect(out).toBeGreaterThanOrEqual(previous);
       expect(Math.sign(out) === Math.sign(x) || out === 0).toBe(true);
-      expect(Math.abs(x) <= settings.deadZone ? out : 1).not.toBe(Math.abs(x) <= settings.deadZone ? 1 : 0);
+      // Inside the dead zone the output is exactly 0; outside it, never.
+      expect(out === 0).toBe(Math.abs(x) <= settings.deadZone);
       previous = out;
     }
+    // The dead zone is radial: a diagonal whose components each lie inside it still moves both axes.
+    const component = 0.9 * settings.deadZone;
+    const diagonal = radialDeadZone(component, -component, settings.deadZone, [0, 0]);
+    expect(diagonal[0]).toBeGreaterThan(0);
+    expect(diagonal[1]).toBeLessThan(0);
+    expect(radialDeadZone(component, 0, settings.deadZone, [0, 0])).toEqual([0, 0]);
     expect(responseCurve(radialDeadZone(1, 0, settings.deadZone, [0, 0])[0], settings.responseExponent)).toBe(
       1,
     );

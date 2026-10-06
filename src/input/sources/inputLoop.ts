@@ -1,4 +1,4 @@
-import type { InputFrame } from '../../sim/core/records';
+import type { ButtonAction, InputFrame } from '../../sim/core/records';
 import type { InputConfig, InputSettings } from '../mapping/settings';
 import { INITIAL_MAPPER_STATE, type MapperState } from '../mapping/frame';
 import { arbitrate, initialArbiter, type ArbiterState } from './arbiter';
@@ -31,8 +31,32 @@ export interface InputLoopResult {
 }
 
 export interface InputLoop {
-  /** Runs once per animation frame. */
-  frame(now: number, demoRunning: boolean): InputLoopResult;
+  /** Runs once per animation frame. With `panelOpen`, the controls that move through the panel stay out of the sim. */
+  frame(now: number, demoRunning: boolean, panelOpen?: boolean): InputLoopResult;
+}
+
+/**
+ * While a panel (picker, inspector, pause menu) is open, the D-pad, A and B move through it, as do Tab, Enter and
+ * Backspace on the keyboard. Those presses belong to the panel, so the frame the simulation gets drops their actions
+ * (pair moves, field of view, act, saved angle, back) and, in Control mode, the table height and collimation the
+ * D-pad holds. Sticks, triggers and every other button still reach it, and the UI still reads the whole frame.
+ */
+const PANEL_NAVIGATION: readonly ButtonAction[] = [
+  'pair-up',
+  'pair-down',
+  'fov-wider',
+  'fov-narrower',
+  'act',
+  'save-angle',
+  'back',
+];
+
+export function withoutPanelNavigation(frame: InputFrame): InputFrame {
+  return {
+    ...frame,
+    axes: frame.mode === 'control' ? { ...frame.axes, tableHeight: 0, collimation: 0 } : frame.axes,
+    buttons: frame.buttons.filter((action) => !PANEL_NAVIGATION.includes(action)),
+  };
 }
 
 export function createInputLoop(options: {
@@ -47,7 +71,7 @@ export function createInputLoop(options: {
   let last: number | null = null;
   const MS_PER_S = 1000;
   return {
-    frame(now: number, demoRunning: boolean): InputLoopResult {
+    frame(now: number, demoRunning: boolean, panelOpen = false): InputLoopResult {
       const reading = readGamepad(options.gamepads);
       const interval = last === null ? 0 : (now - last) / MS_PER_S;
       last = now;
@@ -68,7 +92,7 @@ export function createInputLoop(options: {
       if (result.takeover) {
         options.client.command({ cmd: 'stop-autopilot', args: {} });
       }
-      const { step: _step, ...frame } = result.frame;
+      const { step: _step, ...frame } = panelOpen ? withoutPanelNavigation(result.frame) : result.frame;
       options.client.tick(now, frame);
       return { reading, frame: result.frame, mapper: result.state.mapper, takeover: result.takeover };
     },

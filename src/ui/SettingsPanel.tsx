@@ -92,9 +92,9 @@ export function SettingsPanel({ limits }: { readonly limits: SettingsLimits }) {
       <Row label="Stick dead zone">
         <Slider
           value={settings.deadZone}
-          min={0}
-          max={0.4}
-          step={0.01}
+          min={limits.deadZone.min}
+          max={limits.deadZone.max}
+          step={limits.deadZone.step}
           onChange={(v) => set({ deadZone: v })}
           format={percent}
         />
@@ -102,9 +102,9 @@ export function SettingsPanel({ limits }: { readonly limits: SettingsLimits }) {
       <Row label="Response curve" hint="1 is linear; higher gives finer control near the center.">
         <Slider
           value={settings.responseExponent}
-          min={1}
-          max={3}
-          step={0.1}
+          min={limits.responseExponent.min}
+          max={limits.responseExponent.max}
+          step={limits.responseExponent.step}
           onChange={(v) => set({ responseExponent: v })}
           format={(v) => v.toFixed(1)}
         />
@@ -121,9 +121,9 @@ export function SettingsPanel({ limits }: { readonly limits: SettingsLimits }) {
       <Row label="Rumble strength">
         <Slider
           value={settings.rumbleStrength}
-          min={0}
-          max={1}
-          step={0.05}
+          min={limits.rumbleStrength.min}
+          max={limits.rumbleStrength.max}
+          step={limits.rumbleStrength.step}
           onChange={(v) => set({ rumbleStrength: v })}
           format={percent}
         />

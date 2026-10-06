@@ -103,6 +103,52 @@ describe('input loop', () => {
     expect(sent).toHaveLength(1);
     expect(sent[0]?.mode).toBe('control');
   });
+
+  it('keeps the D-pad, A and B out of the simulation while a panel is open', () => {
+    const sent: Omit<InputFrame, 'step'>[] = [];
+    const client: InputClient = { tick: (_now, frame) => sent.push(frame), command: () => {} };
+    const base = neutralPad();
+    const pressed = (indices: number[]): Gamepad => {
+      const buttons = [...base.buttons];
+      for (const index of indices) {
+        buttons[index] = 1;
+      }
+      return {
+        id: 'Xbox Wireless Controller',
+        mapping: 'standard',
+        connected: true,
+        axes: [...base.axes],
+        buttons: buttons.map((value) => ({ value, pressed: value > 0.5, touched: false })),
+      } as unknown as Gamepad;
+    };
+    let pad = pressed([]);
+    const loop = createInputLoop({
+      client,
+      keyboard: keys([]),
+      pointer,
+      gamepads: { getGamepads: () => [pad] },
+      settings: () => config.defaults,
+      config,
+    });
+    loop.frame(0, false, true);
+    // Cath mode: D-pad right (field of view) and A, pressed with a panel open, reach the UI but not the engine; the
+    // view button still does.
+    pad = pressed([PAD.right, PAD.a, PAD.view]);
+    const cath = loop.frame(16, false, true);
+    expect(cath.frame.buttons).toEqual(['view-3d', 'fov-narrower', 'act']);
+    expect(sent.at(-1)?.buttons).toEqual(['view-3d']);
+    // Control mode: the held D-pad moves the table and collimation only when no panel is open.
+    pad = pressed([PAD.y]);
+    loop.frame(32, false, false);
+    pad = pressed([PAD.up, PAD.right]);
+    const open = loop.frame(48, false, true);
+    expect(open.frame.axes.tableHeight).toBe(1);
+    expect(sent.at(-1)?.axes.tableHeight).toBe(0);
+    expect(sent.at(-1)?.axes.collimation).toBe(0);
+    loop.frame(64, false, false);
+    expect(sent.at(-1)?.axes.tableHeight).toBe(1);
+    expect(sent.at(-1)?.axes.collimation).toBe(1);
+  });
 });
 
 describe('sandbox setup choices', () => {

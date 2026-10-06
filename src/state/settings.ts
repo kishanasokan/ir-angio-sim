@@ -18,9 +18,19 @@ export interface AppSettings extends InputSettings {
   readonly pulseRate: number;
 }
 
+/** A setting's allowed range and its slider step (tuning/input → settingsLimits). */
+export interface SettingRange {
+  readonly min: number;
+  readonly max: number;
+  readonly step: number;
+}
+
 export interface SettingsLimits {
   readonly tiers: readonly string[];
   readonly pulseRates: readonly number[];
+  readonly deadZone: SettingRange;
+  readonly responseExponent: SettingRange;
+  readonly rumbleStrength: SettingRange;
 }
 
 type Storage = Pick<globalThis.Storage, 'getItem' | 'setItem'>;
@@ -44,27 +54,25 @@ export function parseSettings(
   if (!isRecord(saved)) {
     return defaults;
   }
-  const unit = (key: keyof AppSettings, fallback: number): number => {
-    const value = saved[key];
-    return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1 ? value : fallback;
-  };
   const flag = (key: keyof AppSettings, fallback: boolean): boolean => {
     const value = saved[key];
     return typeof value === 'boolean' ? value : fallback;
   };
-  const exponent = saved.responseExponent;
+  const within = (key: keyof AppSettings, range: SettingRange, fallback: number): number => {
+    const value = saved[key];
+    return typeof value === 'number' && Number.isFinite(value) && value >= range.min && value <= range.max
+      ? value
+      : fallback;
+  };
   const tier = saved.tier;
   const pulseRate = saved.pulseRate;
   return {
-    deadZone: unit('deadZone', defaults.deadZone),
-    responseExponent:
-      typeof exponent === 'number' && Number.isFinite(exponent) && exponent > 0
-        ? exponent
-        : defaults.responseExponent,
+    deadZone: within('deadZone', limits.deadZone, defaults.deadZone),
+    responseExponent: within('responseExponent', limits.responseExponent, defaults.responseExponent),
     invertLeftY: flag('invertLeftY', defaults.invertLeftY),
     invertRightY: flag('invertRightY', defaults.invertRightY),
     mirrorSticks: flag('mirrorSticks', defaults.mirrorSticks),
-    rumbleStrength: unit('rumbleStrength', defaults.rumbleStrength),
+    rumbleStrength: within('rumbleStrength', limits.rumbleStrength, defaults.rumbleStrength),
     tier: typeof tier === 'string' && (tier === 'auto' || limits.tiers.includes(tier)) ? tier : defaults.tier,
     muted: flag('muted', defaults.muted),
     pulseRate:

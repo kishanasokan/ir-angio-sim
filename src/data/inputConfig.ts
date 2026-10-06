@@ -12,6 +12,33 @@ type Quantity = { readonly value: number; readonly unit: string };
 
 const si = (quantity: Quantity): number => valueToSI(quantity.value, quantity.unit);
 
+/** A setting's allowed range and slider step. */
+export interface SettingRangeValues {
+  readonly min: number;
+  readonly max: number;
+  readonly step: number;
+}
+
+/** The dead zones, response exponents and rumble strengths a learner may choose in Settings (tuning/input → settingsLimits). */
+export function settingRanges(repository: Repository): {
+  readonly deadZone: SettingRangeValues;
+  readonly responseExponent: SettingRangeValues;
+  readonly rumbleStrength: SettingRangeValues;
+} {
+  const limits = repository.input.settingsLimits;
+  const range = (bounds: { readonly min: number; readonly max: number; readonly unit: string }, step: Quantity) => ({
+    min: valueToSI(bounds.min, bounds.unit),
+    max: valueToSI(bounds.max, bounds.unit),
+    step: si(step),
+  });
+  return {
+    deadZone: range(limits.deadZone, limits.deadZoneStep),
+    responseExponent: range(limits.responseExponent, limits.responseExponentStep),
+    // Rumble strength scales the actuator's magnitudes, which run from 0 to 1.
+    rumbleStrength: { min: 0, max: 1, step: si(limits.rumbleStrengthStep) },
+  };
+}
+
 export function defaultInputSettings(repository: Repository): InputSettings {
   const { sticks, rumble } = repository.input;
   return {

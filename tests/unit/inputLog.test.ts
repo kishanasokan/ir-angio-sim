@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readDataFiles } from '../../scripts/lib/dataFiles';
 import { dataHash } from '../../src/data/dataHash';
 import {
+  checkLog,
   createLogRecorder,
   InputLogError,
   parseLog,
@@ -81,6 +82,15 @@ describe('input logs', () => {
     }
     const bad = { ...recorded(), commands: [{ step: 1, cmd: 'launch-rockets', args: {} }] };
     expect(() => parseLog(JSON.stringify(bad), HASH)).toThrow(/malformed/);
+    const { anatomyId: _anatomyId, ...noAnatomy } = recorded();
+    expect(() => parseLog(JSON.stringify(noAnatomy), HASH)).toThrow(InputLogError);
+  });
+
+  it('checks a log that is already an object the same way, as the physics worker does for a replay', () => {
+    const log = recorded();
+    expect(checkLog(log, HASH)).toBe(log);
+    expect(() => checkLog({ ...log, dataHash: '00000000' }, HASH)).toThrow(/different data/);
+    expect(() => checkLog(null, HASH)).toThrow(/not an ir-sim\/input-log@1/);
   });
 
   it('hashes /data independently of line endings and file order', () => {

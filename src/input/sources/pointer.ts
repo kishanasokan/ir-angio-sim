@@ -9,7 +9,10 @@ import type { PointerState } from '../mapping/mapPointer';
 const LEFT = 0;
 const MIDDLE = 1;
 const RIGHT = 2;
-/** WheelEvent pixels per notch in line-free browsers. */
+/**
+ * WheelEvent pixels per notch in browsers that report pixel deltas (Chromium reports one notch as 100). A unit
+ * conversion, not a feel value: how far a notch advances the wire is tuning/input → mouse.wheelAdvancePerNotch.
+ */
 const PIXELS_PER_NOTCH = 100;
 
 export interface PointerSource {

@@ -218,8 +218,8 @@ export interface RodDeviceInstance {
     readonly name: string;
     readonly density: ResolvedValue;
     readonly poissonRatio: ResolvedValue;
-    /** An assumed core material when the sources do not state it. */
-    readonly assumption?: string;
+    /** An assumed core material when the sources do not state it, with that assumption's own confidence and note. */
+    readonly assumption?: { readonly text: string; readonly provenance: Provenance };
   };
   readonly wallFriction: ResolvedValue;
   /** Friction inside this device's lumen; null for wires. */
@@ -305,8 +305,12 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     return design(label, friction.coefficient, `friction ${id}`);
   };
   const wallFriction = frictionValue('Wall friction coefficient', model.frictionId);
+  // M1 couples a wire inside a catheter as one composite rod with no friction between them (docs/M1-plan.md, phase B
+  // deviation 3; issue #5), so the label says the value is resolved but not yet applied.
   const lumenFriction =
-    model.lumenFrictionId === undefined ? null : frictionValue('Lumen friction coefficient', model.lumenFrictionId);
+    model.lumenFrictionId === undefined
+      ? null
+      : frictionValue('Lumen friction coefficient (not applied in M1)', model.lumenFrictionId);
 
   let bodyYoungsModulus: ResolvedValue | null = null;
   if (model.bodyYoungsModulusFrom !== undefined) {
@@ -356,7 +360,7 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
       'GJ = E/(2(1 + ν))·J with J = 2I',
     );
 
-    parameters.push(toTip);
+    parameters.push(fromTip, toTip);
     const ends: readonly (readonly [string, keyof SectionRange])[] =
       modulus.range.atFromTip === modulus.range.atToTip
         ? [['', 'atFromTip']]
@@ -452,7 +456,7 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
       bendAngle: design(`Rest shape ${i + 1}: bend angle`, region.bendAngle, `${path}.bendAngle`),
       toward: region.toward ?? 'd1',
     };
-    parameters.push(resolved.toTip, resolved.bendAngle);
+    parameters.push(resolved.fromTip, resolved.toTip, resolved.bendAngle);
     return resolved;
   });
   const distribution = distributeRestShape(
@@ -500,7 +504,14 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
       name: bulk.name,
       density,
       poissonRatio,
-      ...(model.materialAssumption === undefined ? {} : { assumption: model.materialAssumption.text }),
+      ...(model.materialAssumption === undefined
+        ? {}
+        : {
+            assumption: {
+              text: model.materialAssumption.text,
+              provenance: provenanceOf(model.materialAssumption, 'design'),
+            },
+          }),
     },
     wallFriction,
     lumenFriction,

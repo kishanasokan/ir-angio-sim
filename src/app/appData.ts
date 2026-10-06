@@ -1,6 +1,6 @@
 import packageJson from '../../package.json';
 import { BUNDLED_DATA_FILES } from '../data/bundledFiles';
-import { defaultInputSettings, inputConfig, rumbleConfig } from '../data/inputConfig';
+import { defaultInputSettings, inputConfig, rumbleConfig, settingRanges } from '../data/inputConfig';
 import { loadCase, loadRepository, type CaseSI, type Repository } from '../data/loaders';
 import { renderConfig, type RenderConfig } from '../data/renderConfig';
 import { deviceLabel, inventoryInstances, type DeviceLabel } from '../data/sandboxChoices';
@@ -71,7 +71,7 @@ export function appData(): AppData {
       muted: false,
       pulseRate: render.fluoro.defaultPulseRate,
     },
-    limits: { tiers: rodTiers, pulseRates: render.fluoro.pulseRates },
+    limits: { tiers: rodTiers, pulseRates: render.fluoro.pulseRates, ...settingRanges(repository) },
     physicsBudgetMs: budget === undefined ? null : fromSI(valueToSI(budget.value, budget.unit), 'ms'),
   };
   return cached;

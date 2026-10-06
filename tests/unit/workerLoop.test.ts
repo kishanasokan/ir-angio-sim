@@ -9,9 +9,14 @@ import {
   startClock,
   targetStep,
 } from '../../src/worker/timing';
+import { readDataFiles } from '../../scripts/lib/dataFiles';
+import { defaultInputSettings } from '../../src/data/inputConfig';
+import { sandboxSession } from '../../src/data/sessionSetup';
+import { sandboxConfig } from '../../src/data/simConfig';
+import type { InputSettings } from '../../src/input/mapping/settings';
 import { NEUTRAL_AXES, neutralFrame } from '../../src/sim/core/records';
-import { demoSetup } from '../golden/demo';
-import { repository } from '../helpers/repository';
+import { APP_VERSION, demoSession, demoSetup } from '../golden/demo';
+import { DATA_ROOT, repository } from '../helpers/repository';
 
 describe('loop timing', () => {
   it('turns wall time into a target step, and pausing stops it', () => {
@@ -67,5 +72,36 @@ describe('session runner', () => {
     const session = new Session(demoSetup());
     expect(session.advance(1000, 64)).toBe(64);
     expect(session.engine.currentStep).toBe(64);
+  });
+
+  it("drives a demo the same way whatever input settings the learner chose (unit test 10's last case)", () => {
+    // Long enough for the wire to advance, turn and fluoro to tap: every kind of autopilot input.
+    const steps = 3000;
+    const run = (settings?: InputSettings) => {
+      const setup = sandboxSession(repository(), {
+        appVersion: APP_VERSION,
+        files: readDataFiles(DATA_ROOT),
+        ...(settings === undefined ? {} : { settings }),
+      });
+      const session = demoSession('sandbox-c-left', setup);
+      session.advance(steps, steps);
+      return session;
+    };
+    const defaults = run();
+    const learner = run({
+      ...defaultInputSettings(repository()),
+      deadZone: 0.3,
+      responseExponent: 3,
+      invertLeftY: true,
+      invertRightY: true,
+      mirrorSticks: true,
+    });
+    expect(defaults.engine.currentStep).toBe(steps);
+    expect(learner.log.settings).not.toEqual(defaults.log.settings);
+    expect(learner.log.frames).toEqual(defaults.log.frames);
+    expect(learner.engine.hash()).toBe(defaults.engine.hash());
+    expect(defaults.engine.device(1).inserted).toBeGreaterThan(
+      sandboxConfig(repository()).stack[1]!.inserted,
+    );
   });
 });

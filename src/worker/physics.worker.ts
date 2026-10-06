@@ -1,6 +1,8 @@
 /// <reference lib="webworker" />
 import { BUNDLED_DATA_FILES } from '../data/bundledFiles';
+import { dataHash } from '../data/dataHash';
 import { loadRepository } from '../data/loaders';
+import { checkLog } from '../input/log';
 import { sandboxSession } from '../data/sessionSetup';
 import { benchmarkTier } from './benchmark';
 import type { MainToWorker, WorkerToMain } from './protocol';
@@ -28,19 +30,26 @@ scope.onmessage = (event: MessageEvent<MainToWorker>) => {
     switch (message.type) {
       case 'init': {
         const repository = loadRepository(BUNDLED_DATA_FILES);
+        // A replay runs with its own log's seed, case and phantom, and only against the data it was recorded with
+        // (spec 02 §13). Its step-0 set-tier command puts it on the recorded tier.
+        const replay =
+          message.replay === undefined ? undefined : checkLog(message.replay, dataHash(BUNDLED_DATA_FILES));
         const choice =
-          message.tierId === undefined ? benchmarkTier(repository, () => performance.now()) : null;
+          message.tierId === undefined && replay === undefined
+            ? benchmarkTier(repository, () => performance.now())
+            : null;
+        const anatomyId = replay?.anatomyId ?? message.anatomyId;
         const setup = sandboxSession(repository, {
           appVersion: message.appVersion,
           files: BUNDLED_DATA_FILES,
-          caseId: message.caseId,
-          ...(message.anatomyId === undefined ? {} : { anatomyId: message.anatomyId }),
+          caseId: replay?.caseId ?? message.caseId,
+          ...(anatomyId === undefined ? {} : { anatomyId }),
           ...(message.innerDevice === undefined ? {} : { innerDevice: message.innerDevice }),
           tierId: message.tierId ?? choice?.tierId ?? 'high',
-          seed: message.seed,
+          seed: replay?.seed ?? message.seed,
           settings: message.settings,
         });
-        session = new Session(message.replay === undefined ? setup : { ...setup, replay: message.replay });
+        session = new Session(replay === undefined ? setup : { ...setup, replay });
         const solver = repository.physics.solver;
         maxSteps = message.fast ? solver.maxStepsPerMessageFast.value : solver.maxStepsPerMessage.value;
         paused = false;
