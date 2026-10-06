@@ -9,14 +9,14 @@ The simulator is specified as 19 documents plus one build prompt per milestone. 
 | 00 | [Product brief](00-product-brief.md) | Vision, audience, modes, scope, case catalog, controls, scoring, platform, decision log | Phase 1 | Drafted |
 | 01 | [Architecture and stack](01-architecture.md) | Stack, module map, threads, determinism, units, rendering, tiers, budgets, testing, CI | Phase 1 | Drafted |
 | 02 | [Data layer and schemas](02-data-schemas.md) | Confidence levels, fact shapes, units, sources, devices, rules, anatomy graph, tuning, cases, runtime records, validator | Phase 1 | Drafted |
-| 03 | Anatomy and variant generator | Base tree from the intracranial circulation to the feet, visceral branches, variant edits and frequencies, disease modifiers, meshes | Phase 2 | Planned |
-| 04 | Device mechanics | Rod model, per-class parameters, coaxial coupling, contact and friction, damage thresholds, tuning protocol | Phase 2 | Planned |
+| 03 | [Anatomy and variant generator](03-anatomy.md) | Base tree from the intracranial circulation to the feet, visceral branches, variant edits and frequencies, disease modifiers, meshes | Phase 2 | Drafted for M2 (visceral tree) |
+| 04 | [Device mechanics](04-device-mechanics.md) | Rod model, per-class parameters, coaxial coupling, contact and friction, damage thresholds, tuning protocol | Phase 2 | Drafted for M2 |
 | 05 | Device library and compatibility | Catalog of 150–300 items, naming policy, compatibility engine | Phase 3 | Planned |
 | 06 | Access and closure | Ultrasound and landmark puncture, needle forces, micropuncture, sheaths, closure sequences, access complications | Phase 3 | Planned |
-| 07 | Flow, contrast and embolics | Network flow, hand and power injection, contrast transport, extravasation, each embolic's behavior, endpoints | Phase 2 | Planned |
-| 08 | Imaging chain and C-arm | Fluoro, DSA, roadmap, bolus chase, cone-beam CT, 3D overlay, gantry and table kinematics, collimation, dose | Phase 2 | Planned |
+| 07 | [Flow, contrast and embolics](07-flow-contrast.md) | Network flow, hand and power injection, contrast transport, extravasation, each embolic's behavior, endpoints | Phase 2 | Drafted for M2 (flow, contrast, injection) |
+| 08 | [Imaging chain and C-arm](08-imaging.md) | Fluoro, DSA, roadmap, bolus chase, cone-beam CT, 3D overlay, gantry and table kinematics, collimation, dose | Phase 2 | Drafted for M2 (iodine, DSA, roadmap, dose) |
 | 09 | Patient and pharmacology | Vitals, hemorrhage, sedation, anticoagulation, kidney limits, reactions, drug cart, labs | Phase 3 | Planned |
-| 10 | Input and haptics | Two-mode controller map, keyboard and mouse parity, remapping, response curves, rumble cues | Phase 2 | Planned (M1 builds the subset in its prompt) |
+| 10 | [Input and haptics](10-input.md) | Two-mode controller map, keyboard and mouse parity, remapping, response curves, rumble cues | Phase 2 | Drafted for M2 |
 | 11 | UI, suite and audio | X-ray-first screen, Siemens-style conventions without branding, roadmap and side-by-side, 3D toggle, HUD, sounds, visual style | Phase 4 | Planned |
 | 12 | Case engine and authoring | Case file format, step graph, triggers, complication injection, autopilot scripts | Phase 4 | Planned |
 | 13 | Case library | One spec per case, the random-case generator, the optional cardiac track | Phases 3–5 | Planned |
@@ -24,14 +24,14 @@ The simulator is specified as 19 documents plus one build prompt per milestone. 
 | 15 | Teaching layer | Step lists, learn-more panels, hints that highlight targets and suggest tools, anatomy labels, citations | Phase 4 | Planned |
 | 16 | Validation and QA | Golden scenes, expert review, performance budgets, browser matrix | Phase 5 | Planned |
 | 17 | Platform | Repository and license, static hosting, local saves, trademark notice | Phase 5 | Planned |
-| 18 | Milestone build prompts | One prompt per milestone, in `prompts/` | Continuous | M1 ready |
+| 18 | Milestone build prompts | One prompt per milestone, in `prompts/` | Continuous | M1 built; M2 ready |
 
 ## Milestones and gates
 
 | Milestone | Phase | Builds | Specs it needs | Gate to pass |
 | --- | --- | --- | --- | --- |
 | [M1 Foundations](../prompts/M1-foundations.md) | 1 | Repository scaffold, data validators, rod-in-a-tube sandbox with a gamepad | 00, 01, 02 | Sample device, anatomy and case files validate; the sandbox holds 60 fps |
-| M2 Core systems | 2 | Visceral tree, wire and catheter mechanics with a three-device stack, fluoro, DSA, flow network | 03, 04, 07, 08, 10 | Golden physics scenes pass; an IR reviewer calls the wire feel credible |
+| [M2 Core systems](../prompts/M2-core-systems.md) | 2 | Visceral tree, wire and catheter mechanics with a three-device stack, fluoro, DSA, flow network | 03, 04, 07, 08, 10 | Golden physics scenes pass; an IR reviewer calls the wire feel credible |
 | M3 First slice | 3 | Upper GI bleed with GDA embolization end to end, debrief and replay | 05, 06, 09, 13 (GDA), 14 | Autopilot and a human both finish the case; expert face-validity review |
 | M4 Second slice | 4 | Uterine fibroid embolization: particles and reflux, guided and exam modes | 11, 12, 13 (UFE), 15 | Reviewers find flow-directed embolics plausible |
 | M5 Launch set | 5 | The remaining launch cases, local saves, GitHub release on static hosting | 13, 16, 17, 18 | At least 12 cases pass their autopilots and human play-throughs |
