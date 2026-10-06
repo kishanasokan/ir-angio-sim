@@ -11,10 +11,44 @@
     "background": {"value": 0.62, "unit": "1", "confidence": "design", "note": "Gray level of unattenuated field before window/level."},
     "contrastPuffMaxOpacity": {"value": 0.7, "unit": "1", "confidence": "design", "note": "M1 stand-in for contrast: the lumen opacifies while RT is held; replaced by the flow model in M2."},
     "contrastPuffFade": {"value": 1.0, "unit": "s", "confidence": "design", "note": "Fade after RT is released."},
-    "roadmapOutlineOpacity": {"value": 0.35, "unit": "1", "confidence": "design", "note": "M1 stand-in for roadmap: vessel outline overlay toggled by X or R."}
+    "roadmapOutlineOpacity": {"value": 0.35, "unit": "1", "confidence": "design", "note": "M1 stand-in for roadmap: vessel outline overlay toggled by X or R."},
+    "wireOpacity": {"value": 0.55, "unit": "1", "confidence": "design", "note": "Fraction of the beam a guidewire absorbs along a path as long as its diameter, before the rod model's radiopacity factors. M1 transmittance stand-in until spec 08's ray-integrated attenuation; wires show darker than catheters. Added in M1 phase D."},
+    "catheterOpacity": {"value": 0.5, "unit": "1", "confidence": "design", "note": "The same for catheter material: a solid path as long as the outer diameter. Through a tube only the wall attenuates, so a catheter shows as two edge lines with a lighter lumen. Added in M1 phase D."},
+    "softTissueBandOpacity": {"value": 0.22, "unit": "1", "confidence": "design", "note": "Opacity at the center of the faint soft-tissue band drawn around each phantom: a cylinder along the phantom axis, so its shadow fades toward its edges. Added in M1 phase D."},
+    "softTissueBandMargin": {"value": 15, "unit": "mm", "confidence": "design", "note": "The soft-tissue band's radius reaches this far beyond the phantom's widest lumen, and its ends this far beyond the inlet and the caps. Added in M1 phase D."},
+    "collimatedGray": {"value": 0.06, "unit": "1", "confidence": "design", "note": "Gray level behind the collimator blades. Added in M1 phase D."},
+    "roadmapOutlineGray": {"value": 0.92, "unit": "1", "confidence": "design", "note": "Gray level of the roadmap outline stand-in, blended in at roadmapOutlineOpacity. Added in M1 phase D."},
+    "roadmapOutlineWidth": {"value": 1.5, "unit": "px", "confidence": "design", "note": "Width of the roadmap outline: the vessel mask's edge is found this many pixels to each side. Added in M1 phase D."}
   },
-  "threeD": {"vesselOpacity": {"value": 0.25, "unit": "1", "confidence": "design"}, "deviceColorWire": {"text": "#d9e2ec", "confidence": "design"}, "deviceColorCatheter": {"text": "#4fb3bf", "confidence": "design"}},
-  "hud": {"uiRefreshRate": {"value": 15, "unit": "Hz", "confidence": "design", "note": "React HUD reads the latest snapshot at this rate; the canvas renders every frame."}},
+  "tubeRadialSegments": {"value": 12, "unit": "count", "confidence": "design", "note": "Sides of every device and vessel tube mesh, in both views. Added in M1 phase D."},
+  "threeD": {
+    "vesselOpacity": {"value": 0.25, "unit": "1", "confidence": "design"},
+    "deviceColorWire": {"text": "#d9e2ec", "confidence": "design"},
+    "deviceColorCatheter": {"text": "#4fb3bf", "confidence": "design"},
+    "vesselColor": {"text": "#c9736d", "confidence": "design", "note": "Color of the translucent phantom lumen. Added in M1 phase D."},
+    "sheathColor": {"text": "#7d8a97", "confidence": "design", "note": "Color of the introducer sheath, from the valve to the sheath tip. Added in M1 phase D."},
+    "backgroundColor": {"text": "#0a0f14", "confidence": "design", "note": "Background of the 3D view. Added in M1 phase D."},
+    "cameraFov": {"value": 40, "unit": "deg", "confidence": "design", "note": "Vertical field of view of the orbit camera. Added in M1 phase D."},
+    "cameraDistance": {"value": 1.6, "unit": "1", "confidence": "design", "note": "The orbit camera starts this many bounding-box diagonals from the phantom's center, looking along the C-arm's beam so both views start alike. Added in M1 phase D."},
+    "hemisphereLightIntensity": {"value": 1.6, "unit": "1", "confidence": "design", "note": "Sky-and-ground fill light. Added in M1 phase D."},
+    "keyLightIntensity": {"value": 2.2, "unit": "1", "confidence": "design", "note": "Directional key light from above the camera. Added in M1 phase D."},
+    "surfaceRoughness": {"value": 0.45, "unit": "1", "confidence": "design", "note": "Roughness of every lit surface in the 3D view (lumen, devices, sheath); none is metallic. Added in M1 phase D."}
+  },
+  "hud": {
+    "uiRefreshRate": {"value": 15, "unit": "Hz", "confidence": "design", "note": "React HUD reads the latest snapshot at this rate; the canvas renders every frame."},
+    "toastDuration": {"value": 3.5, "unit": "s", "confidence": "design", "note": "How long a toast stays on screen. Added in M1 phase D."},
+    "blockedMessageDebounce": {"value": 2.5, "unit": "s", "confidence": "design", "note": "A blocked action's message is not shown again within this time, so holding a blocked push does not flood the screen (prompts/M1-foundations.md §2). Added in M1 phase D."},
+    "tipForceFullScale": {"value": 0.5, "unit": "N", "confidence": "design", "note": "Tip force bar full scale. A display scale, not an injury threshold. Added in M1 phase D."},
+    "wallStressFullScaleTime": {"value": 5, "unit": "s", "confidence": "design", "note": "The wall-stress bar is full after this long at the tip-force full scale: its full scale is tipForceFullScale times this time, in N·s (the unit table has no N·s). A display scale, not an injury threshold. Added in M1 phase D."}
+  },
+  "audio": {
+    "alarmToneFrequency": {"value": 880, "unit": "Hz", "confidence": "design", "note": "Alarm tone played with the hub-force-danger rumble, so rumble is always backed by sound (spec 00 §9; docs/M1-plan.md D22). Added in M1 phase D."},
+    "alarmToneDuration": {"value": 220, "unit": "ms", "confidence": "design", "note": "Added in M1 phase D."},
+    "alarmToneGain": {"value": 0.12, "unit": "1", "confidence": "design", "note": "Peak gain, 0..1. Added in M1 phase D."},
+    "blockedToneFrequency": {"value": 330, "unit": "Hz", "confidence": "design", "note": "Softer tone for a blocked action (docs/M1-plan.md D22). Added in M1 phase D."},
+    "blockedToneDuration": {"value": 120, "unit": "ms", "confidence": "design", "note": "Added in M1 phase D."},
+    "blockedToneGain": {"value": 0.06, "unit": "1", "confidence": "design", "note": "Peak gain, 0..1. Added in M1 phase D."}
+  },
   "targetFrameRate": {"value": 60, "unit": "Hz", "confidence": "design", "note": "The frame rate the app aims for: the startup tier benchmark compares physics time with autoSelect.maxPhysicsPerFrame per frame at this rate, and the perf overlay reports against it. Added in M1 phase C (docs/M1-plan.md D17)."},
   "carm": {
     "defaultSourceToImageDistance": {"value": 100, "unit": "cm", "confidence": "design", "note": "Starting source-to-image distance, inside the sourced 89-123.5 cm range (imaging.json gantry). Added in M1 phase B (docs/M1-plan.md D18)."},

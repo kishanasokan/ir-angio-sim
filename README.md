@@ -8,32 +8,69 @@ A free, browser-based, controller-first interventional radiology simulator for m
 
 [![CI](https://github.com/kishanasokan/ir-angio-sim/actions/workflows/ci.yml/badge.svg)](https://github.com/kishanasokan/ir-angio-sim/actions/workflows/ci.yml)
 
-Milestone **M1 (foundations)** is being built. The scaffold, the validated data layer, the headless simulation core (rods, contact, coaxial devices, rules, C-arm), the worker loop, input mapping, autopilot demos, replays and rumble are done and tested. Rendering and the UI come next (phase D), so nothing is playable in the browser yet. [docs/HANDOFF.md](docs/HANDOFF.md) has the details.
+Milestone **M1 (foundations)** is built and in its final gate. The device sandbox is playable in the browser:
+
+- a wire and a 5F catheter, modeled as Cosserat rods, in three test phantoms
+- a fluoroscopy-style view with pulsed frames, last-image hold, a contrast puff and a roadmap outline, plus a 3D view
+- a HUD with the device stack, the resistance meter and the C-arm readouts
+- sandbox setup that blocks incompatible devices with the rule and its source
+- a device picker and a device inspector that shows every value's confidence and source
+- three autopilot demos, and full controller, keyboard and mouse control
+
+The gate's last step is the owner's test drive on a laptop (below). [docs/HANDOFF.md](docs/HANDOFF.md) has the details.
 
 | Milestone | What it delivers | Status |
 | --- | --- | --- |
-| M1 Foundations | Scaffold, data validator, device sandbox with three test phantoms | In progress: phases A–C done, D and gate next |
+| M1 Foundations | Scaffold, data validator, device sandbox with three test phantoms | Phases A–D done; the gate is next |
 | M2 Core systems | Visceral anatomy, three-device stack, fluoro and DSA, flow network | Specs to write |
 | M3 First slice | Upper GI bleed with GDA embolization, end to end | Planned |
 | M4 Second slice | Uterine fibroid embolization with particles and reflux | Planned |
 | M5 Launch set | At least 12 cases, local saves, public release | Planned |
+
+### Performance
+
+Physics cost from `npm run bench` (headless Node 24 on a Linux x64 build machine). The budget is 4 ms of physics per 16.7 ms frame:
+
+| Run | High tier (1 kHz, 2 mm) | Standard tier (500 Hz, 4 mm) |
+| --- | --- | --- |
+| Golden scene 8: wire alone into phantom C | 6.9 ms per frame | 1.8 ms per frame |
+| sandbox-c-left demo: wire and 5F catheter in phantom C | 9.9 ms per frame | 2.5 ms per frame |
+
+At startup the app benchmarks the high tier at depth and picks the standard tier when the high tier is over budget, as it is on an Apple M2 laptop ([issue #3](https://github.com/kishanasokan/ir-angio-sim/issues/3)). Settings can override the choice.
+
+Perf overlay in phantom C with the wire and the 5F catheter (P in the sandbox): **to be measured on the owner's laptop at the M1 gate**, as FPS, physics ms per frame, tier, backend, browser and machine.
 
 ## Build it with Claude Code
 
 1. Install Node.js 24 (see `.nvmrc`), Git and Claude Code.
 2. In a terminal, go to this folder and run `claude --permission-mode plan`.
 3. Follow the six sessions in [`prompts/M1-sessions.md`](prompts/M1-sessions.md): a plan, four build phases (A to D) and a final gate, each in a fresh conversation. [docs/HANDOFF.md](docs/HANDOFF.md) says where the build stands.
-4. When the gate passes: `npm install && npm run dev`, open the local link in Chrome or Edge, and press **Watch a demo**.
+4. When the gate passes: `npm ci && npm run dev`, open the local link in Chrome or Edge, and press **Watch a demo**.
 
 ## Run it
 
-`npm ci && npm run dev` serves the app locally; until phase D it shows the start screen. Other commands are listed in [CLAUDE.md](CLAUDE.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+```sh
+npm ci
+npm run dev
+```
+
+Open the local link in Chrome or Edge, read the disclaimer, then **Enter sandbox** or **Watch a demo**.
+
+- Connect a controller and press any button (Xbox, DualSense and 8BitDo pads work), or use the keyboard and mouse. The start screen and the pause menu show both control maps.
+- In the sandbox: Y or C switches Cath and Control mode, LT or Space takes fluoro, RB or B opens the device picker, I opens the inspector, P the perf overlay, View or G the 3D view, and Menu or Esc pauses.
+- `npm run build && npm run preview` serves the production build. With WebGPU missing, the app runs on WebGL 2 by itself; `?webgl=1` forces WebGL 2.
+- Every push to `main` deploys the app to GitHub Pages once Pages is enabled in the repository settings, with "GitHub Actions" as the source.
+
+Other commands are listed in [CLAUDE.md](CLAUDE.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tests
 
-- `npm test` runs the unit tests and the golden physics scenes: 173 tests, about a minute.
+- `npm test` runs 206 unit tests and golden physics scenes in about a minute. The golden scenes check, among others, cantilever deflection, twist transmission, inextensibility, lumen containment, friction, torque lag, branch selection, coaxial bending, determinism with replay, and buckling.
+- `npm run test:e2e` builds the app, serves the production preview and runs 4 end-to-end tests in Chromium on both WebGPU and WebGL 2, so 8 runs. They cover the start screen and disclaimer, a full demo, a fake gamepad driving the wire and the C-arm, and a blocked sheath. Every test fails on any console error.
 - `npm run validate-data` checks every fact in `/data`.
-- `npm run test:e2e` (Chromium) arrives in phase D.
+- `npm run bench` prints the physics cost per tier.
+
+CI runs all of them on every push and pull request.
 
 ## Contributing
 
@@ -59,7 +96,7 @@ data/              Every number the simulator uses, with units, confidence and s
 
 ## Where the numbers come from
 
-Every fact in `/data` has a confidence level. As of 2026-10-04 the seed data holds:
+Every fact in `/data` has a confidence level. As of 2026-10-06 (`npm run validate-data`) the data holds:
 
 | Confidence | Meaning | Count |
 | --- | --- | --- |
@@ -67,7 +104,7 @@ Every fact in `/data` has a confidence level. As of 2026-10-04 the seed data hol
 | derived | Computed from sourced values, with the derivation noted | 17 |
 | estimated | Standard knowledge or research notes, with a note | 42 |
 | placeholder | No source yet; shown with a badge in the app | 66 |
-| design | Deliberate engineering or feel choices | 117 |
+| design | Deliberate engineering or feel choices | 156 |
 
 Run `npm run validate-data` for current counts. Corrections from clinicians are welcome: open an issue naming the data id, the correct value and a source.
 

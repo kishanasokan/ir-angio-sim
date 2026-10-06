@@ -35,6 +35,7 @@ scope.onmessage = (event: MessageEvent<MainToWorker>) => {
           files: BUNDLED_DATA_FILES,
           caseId: message.caseId,
           ...(message.anatomyId === undefined ? {} : { anatomyId: message.anatomyId }),
+          ...(message.innerDevice === undefined ? {} : { innerDevice: message.innerDevice }),
           tierId: message.tierId ?? choice?.tierId ?? 'high',
           seed: message.seed,
           settings: message.settings,

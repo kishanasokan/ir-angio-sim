@@ -50,3 +50,22 @@ export function chooseTier(
 ): string {
   return highMsPerFrame > maxPhysicsPerFrame ? fallback : high;
 }
+
+/**
+ * The next target step for a message: wall time's step, never behind what was already requested and at most
+ * `maxSteps` ahead of it, because the worker runs at most that many steps per message (spec 01 §3).
+ */
+export function nextTarget(requested: number, wallStep: number, maxSteps: number): number {
+  return Math.min(Math.max(requested, wallStep), requested + maxSteps);
+}
+
+/**
+ * Moves the clock so that wall time `now` maps to `step`. When the worker cannot keep up, the capped target becomes
+ * the new present: the simulation runs in slow motion and never races to catch up, and input applies at once.
+ */
+export function slipClock(clock: LoopClock, now: number, step: number, stepRate: number): LoopClock {
+  const MS_PER_S = 1000;
+  const elapsed = (step * MS_PER_S) / stepRate;
+  const reference = clock.pausedAt ?? now;
+  return { ...clock, start: reference - clock.paused - elapsed };
+}

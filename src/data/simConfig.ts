@@ -145,6 +145,11 @@ export interface SandboxOptions {
   readonly frictionOverride?: number | null;
   /** Start the innermost device's tip this far past the sheath tip (m), the others keeping their distance behind it. */
   readonly startDepth?: number;
+  /**
+   * A rod model from the case inventory for the innermost slot of the starting stack (sandbox setup's wire choice). It
+   * starts where the case puts that slot's device: the same depth and hub rotation.
+   */
+  readonly innerDevice?: string;
 }
 
 /** The sandbox's engine configuration: the case's stack and start, every phantom and both rod tiers. */
@@ -163,10 +168,15 @@ export function sandboxConfig(repository: Repository, options: SandboxOptions = 
     (rodModelId) => sandbox.insertion.find((entry) => entry.rodModelId === rodModelId)?.tipBeyondAccess.value ?? 0,
   );
   const shift = options.startDepth === undefined ? 0 : options.startDepth - (starts.at(-1) ?? 0);
-  const stack: StackEntry[] = sandbox.initialStack.map((rodModelId, i) => {
-    const start = sandbox.insertion.find((entry) => entry.rodModelId === rodModelId);
+  const inner = options.innerDevice;
+  if (inner !== undefined && (!sandbox.inventory.includes(inner) || !repository.rodModels.has(inner))) {
+    throw new Error(`Case ${caseId}: "${inner}" is not a rod model in its inventory.`);
+  }
+  const last = sandbox.initialStack.length - 1;
+  const stack: StackEntry[] = sandbox.initialStack.map((slotId, i) => {
+    const start = sandbox.insertion.find((entry) => entry.rodModelId === slotId);
     return {
-      rodModelId,
+      rodModelId: i === last && inner !== undefined ? inner : slotId,
       inserted: sheath + (starts[i] ?? 0) + shift,
       rotation: start?.hubRotation.value ?? 0,
     };

@@ -14,9 +14,9 @@ concurrency:
 
 jobs:
   check:
-    name: Lint, validate, test and build
+    name: Lint, validate, test, build and end-to-end tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -29,4 +29,18 @@ jobs:
       - run: npm run validate-data
       - run: npm test
       - run: npm run build
-      # Phase D of M1 adds the Playwright end-to-end tests here and a GitHub Pages workflow (docs/M1-plan.md).
+      # End-to-end tests in Chromium on WebGPU (SwiftShader's software Vulkan) and forced WebGL 2, against the
+      # production preview (docs/M1-plan.md D23).
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: npm run test:e2e
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

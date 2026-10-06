@@ -105,15 +105,15 @@ Riskiest part: replays must stay deterministic across the worker boundary, and t
 
 Build order:
 
-- [ ] `src/render/renderer.ts`: `WebGPURenderer` with `await init()`, the backend reported, and a test flag that forces WebGL 2
-- [ ] Fluoro view:
+- [x] `src/render/renderer.ts`: `WebGPURenderer` with `await init()`, the backend reported, and a test flag that forces WebGL 2
+- [x] Fluoro view:
   - `src/render/scenes/fluoro.ts`: C-arm projection from `carm.ts` and the display mirror
   - `devices/deviceMesh.ts`
   - `post/fluoroPost.ts` in TSL: gray background, pulses, noise, blur, vignette, collimation, last-image hold
   - the phantom band, contrast puff and roadmap outline
-- [ ] `src/render/scenes/anatomy3d.ts`: translucent phantom, tube meshes, orbit camera
-- [ ] `src/state/`: Zustand stores for settings (`irsim:settings`), the session, and the HUD at 15 Hz
-- [ ] `src/ui/`:
+- [x] `src/render/scenes/anatomy3d.ts`: translucent phantom, tube meshes, orbit camera
+- [x] `src/state/`: Zustand stores for settings (`irsim:settings`), the session, and the HUD at 15 Hz
+- [x] `src/ui/`:
   - StartScreen: title, disclaimer, Enter sandbox, Watch a demo, the controls reference with detected glyphs, Settings
   - SandboxSetup, with blocked combinations
   - HUD: mode, fine and lock indicators, device stack, resistance meter, tip force, wall stress, imaging readouts, DEMO badge
@@ -121,18 +121,18 @@ Build order:
   - DevicePicker, with swap-device
   - DeviceInspector: every value the sim uses, with its confidence badge, source link and note. One tab per device, plus sheath and phantom, and solver and feedback.
   - PerfOverlay, PauseMenu, ControlsOverlay
-- [ ] `src/audio/tones.ts` (D22)
-- [ ] `tests/e2e/`: end-to-end tests 1 to 4 (D23, D25). A fake-gamepad helper through `addInitScript`, `?fast=1`, and a console-error guard in every test; SwiftShader flags when WebGL is missing.
-- [ ] `scripts/bench.ts`: runs golden scene 8 on each tier and prints physics ms per simulated second
-- [ ] `.github/workflows/ci.yml` and `pages.yml`
-- [ ] README: Build status, Run it, Tests, the confidence counts from the report, perf numbers
-- [ ] Playwright screenshots of the start screen, fluoro view and 3D view, checked against the prompt
+- [x] `src/audio/tones.ts` (D22)
+- [x] `tests/e2e/`: end-to-end tests 1 to 4 (D23, D25). A fake-gamepad helper through `addInitScript`, `?fast=1`, and a console-error guard in every test; SwiftShader flags when WebGL is missing.
+- [x] `scripts/bench.ts`: runs golden scene 8 on each tier and prints physics ms per simulated second
+- [x] `.github/workflows/ci.yml` and `pages.yml`
+- [x] README: Build status, Run it, Tests, the confidence counts from the report, perf numbers
+- [x] Playwright screenshots of the start screen, fluoro view and 3D view, checked against the prompt
 
 Done when:
 
-- [ ] end-to-end tests 1 to 4 pass
-- [ ] every earlier test, lint and `npm run validate-data` pass
-- [ ] `npm run build` succeeds
+- [x] end-to-end tests 1 to 4 pass
+- [x] every earlier test, lint and `npm run validate-data` pass
+- [x] `npm run build` succeeds
 
 Riskiest part: two rendering backends in headless CI, and the rule of no console errors.
 
@@ -484,3 +484,136 @@ The demos finish in 36.9 s (c-left), 24.6 s (b-bend) and 16.2 s (buckle) of simu
   - scene 12: hub 49.98 mm, tip −36.96 mm (the tip folds back), largest hub force 2.09 N, 2 danger events, largest stretch 0.26%
 - Scenes 1 to 3 and 5 to 9 still pass: 1.4325 mm, 360.0°, 6e-13%, 10.0000 mm, hub forces 0.128 / 0.177 / 0.228 N, lags 1.27° / 1.68° / 2.12°, branch selection both ways, and 31.92° then 60.00°.
 - `npm run lint`, `npm run typecheck`, `npm run validate-data` and `npm run build`: exit 0.
+
+### 2026-10-06 · Phase D (session 5): rendering, UI and end-to-end tests
+
+**Built**
+
+- `src/render/`:
+  - `renderer.ts`: `WebGPURenderer` on a canvas it owns, `await init()`, and the backend actually used, reported to the HUD and the perf overlay. `?webgl=1` forces WebGL 2.
+  - `scenes/fluoro.ts`, `post/fluoroPost.ts` (TSL) and `scenes/carmCamera.ts`. The camera sits at the focal spot from `carm.ts`, with the zoom field at the SID as its field of view, and the post pass mirrors the image: in AP the left daughter shows on screen right.
+    - Each object adds optical depth to a half-float target (multiplicative transmittance). A device's depth is the chord the ray cuts through the rod or tube wall, found from the surface normal, so a catheter shows two walls around a lighter lumen; the distal section takes the rod model's `radiopacity.tipBoost`.
+    - The soft-tissue band is a faint cylinder around the phantom. The lumen shows only under the contrast puff (RT or E, with its fade) and always writes a vessel mask, which the roadmap outline (X or R) edge-detects live.
+    - The frame pass runs once per pulse at the chosen pulse rate: transmission × the unattenuated gray, a 3×3 blur, quantum noise ∝ √T, vignette and collimator blades. The image holds between pulses and after fluoro stops (LIH); the monitor is black before the first pulse.
+  - `devices/deviceMesh.ts` and `geometry/tube.ts`: tube meshes rebuilt each frame in place from the snapshot's nodes (parallel-transport frames, dome caps), from the sheath valve to the tip.
+  - `scenes/anatomy3d.ts`: the lit translucent phantom, devices, the sheath and an orbit camera (Alt + mouse). It opens looking along the C-arm's beam from the detector side, so it starts oriented like the fluoro image.
+  - `scenes/phantom.ts`: the phantom in millimetres, the D18 isocenter at the lumen's bounding-box center, and the band.
+- `src/state/`: Zustand stores for settings (`irsim:settings`; invalid or missing fields fall back to defaults, and blocked storage is tolerated), the session (screen, launch choice, panels, view, roadmap, toasts) and the HUD, written at `hud.uiRefreshRate`.
+- `src/ui/`:
+  - start screen: title, disclaimer, Enter sandbox, Watch a demo with the three scripts, a controls reference with the detected glyphs and both mode maps, and Settings
+  - sandbox setup: phantom, sheath size and wire, with the 5F catheter fixed. Each pairing runs the static rules; a block shows the rule's message and linked source and disables Start.
+  - HUD: CATH/CONTROL, FINE and LOCK, the device stack from sheath to wire (depth past the sheath tip, rotation, "Tip in: …"), the resistance meter with amber and red marks, tip force and wall stress, the monitor's readouts (FLUORO/LIH, p/s, "LAO 25 CRA 10", SID, FOV, collimation, fluoro time), the DEMO badge and a hint bar
+  - toasts: later-milestone features, blocked actions with message and source (debounced per rule), and demo completion
+  - device picker: the inventory with each wire's compatibility with the catheter; picking another wire issues `swap-device`
+  - device inspector: a tab per device, then sheath, phantom, and solver and feedback. Each value shows as written and in SI, with its confidence badge, linked source and note; placeholder rows are highlighted.
+  - perf overlay, pause menu (resume, change phantom, settings, controls, quit), and controller navigation of panels and menus
+- `src/app/`:
+  - `sandboxRuntime.ts`: owns the renderer, both views, the physics client, input, rumble (`rumbleStep`/`playRumble` on the tip force and events), tones and toasts.
+  - `appData.ts`: loads and validates `/data` once on the main thread.
+  - `hudView.ts`: past-the-carina (D25), the puff fade and frame statistics.
+  - `flags.ts`: `?fast=1` and `?webgl=1`.
+  - The sandbox screen is loaded on demand, so the start screen does not pull in three.js.
+- `src/audio/tones.ts` (D22): an alarm tone with the hub-force-danger rumble and a softer one on blocked actions, with a mute switch.
+- `src/data/`: `renderConfig.ts` (display values converted once, device looks), `sandboxChoices.ts` (labels with brand next to generic name, static pairing checks, rule sources) and `inspector.ts` (the inspector's rows).
+- `tests/e2e/`: end-to-end tests 1 to 4, a fake standard gamepad through `addInitScript`, `?fast=1`, and a console-error guard on every test. Two Playwright projects run every test: `webgpu` (SwiftShader's software Vulkan) and `webgl2` (forced).
+- `scripts/bench.ts`: golden scene 8 at hub 0° and 180°, and the sandbox-c-left demo, on each rod tier, in physics ms per simulated second and per frame.
+- CI: `ci.yml` installs Playwright's Chromium and runs `test:e2e` after the build, uploading traces on failure. `pages.yml` builds with `BASE_PATH=/<repo-name>/` and deploys `dist/` to GitHub Pages from `main`; the owner enables Pages once.
+- Tests: 206 in 40 files, 33 more than phase C (`appLoop`, `viewData` and `uiState` cover the new pure code), plus 4 end-to-end tests on 2 backends.
+
+**Deviations, and why**
+
+1. **The renderer probes WebGPU.** three r186 always sends a texture-view `swizzle`, and Chromium 141 (installed in this container) throws a TypeError on it, which would blank the view. After `init()` the renderer draws one probe frame through a render target; if that throws, it rebuilds on WebGL 2 with a fresh canvas and reports WebGL 2.
+   - The `webgpu` test project adds a test-only shim that drops the identity swizzle, so the WebGPU path is exercised here too. It changes nothing on newer Chromium.
+   - That project also needs `--use-vulkan=swiftshader`; without it, SwiftShader's WebGPU device is lost after a few frames.
+   - Each test asserts the backend the browser can actually offer: WebGL 2 when forced or when no adapter exists, otherwise WebGPU.
+2. **Snapshot additions** (not hashed; every golden value is unchanged, scene 11 still hashes `9e0d3d89`):
+   - `input`: the mode, fluoro and inject of the last step, so the HUD and monitor show what the simulation ran, demo or live.
+   - `fluoroLastStep`: with `?fast=1` one message covers 2 s of simulated time, exactly one fluoro-tap period of the demo, so the last step alone always fell between taps. The monitor counts fluoro as on if any step since the last snapshot ran with it.
+   - `anatomyId`: `set-anatomy` changes the phantom the views must draw.
+3. **The loop keeps one input message in flight.** Frames that pass while the worker is busy merge into one: the newest axes, plus every button pressed. When the per-message cap binds, the clock slips, so the simulation runs in slow motion without racing to catch up afterwards. Input is dropped while paused.
+   - Without this, a slow worker built an unbounded queue, and frames stamped ahead of the engine waited ever longer to apply.
+4. **One input path for the UI too.** `createInputLoop` returns the frame it sends and the mapper state, and the UI acts on that frame's buttons (picker, inspector, pause, view, roadmap, toasts).
+   - The keyboard source now latches a key pressed and released between two polls for one poll; a quick tap was being lost.
+   - The pointer source ignores Alt, which belongs to the 3D orbit camera.
+   - The D-pad and A move DOM focus in menus and panels; that never reaches the simulation.
+5. **Setup's wire choice.** `sandboxConfig` takes `innerDevice`, an inventory rod model for the stack's inner slot, which starts where the case starts that slot. Spec 02 §13's log header has no field for it, so input logs do not record the choice yet; replays arrive with spec 14.
+6. **Variant facts reach the rules.** A rod model's variant selection that is itself a fact now supplies its property to the rules as `geometry.<key>`, as `innerDiameter` already did (spec 02 §4.4). `limit-wire-length` therefore evaluates for the Bentson (145 cm) and Amplatz (180 cm) wires, whose lengths are placeholders, instead of returning unknown. The picker shows "Not checked" for any unknown result.
+7. **Contrast in its own channel.** Where the phantom's tubes overlap at a junction, added contrast depth drew a dark star. Contrast now uses a separate channel with max blending, so it counts once.
+8. **No N·s unit** in spec 02 §5, so the wall-stress bar's full scale is a time: `hud.wallStressFullScaleTime` at `hud.tipForceFullScale`.
+9. **Smaller choices.**
+   - The meters show the largest hub force, tip force and wall stress in the stack.
+   - The picker does not offer catheter exchange, because `swap-device` swaps the inner device only.
+   - Demo titles are UI copy; the descriptions come from the case.
+   - The audio context starts on the first key press or click, as browsers require.
+   - Tones are skipped until then and while muted.
+
+**Values added to `/data`** (design, `data/tuning/render.json` only, per D4; each note says "Added in M1 phase D"; the schema requires them):
+
+- `fluoro`:
+  - `wireOpacity` 0.55
+  - `catheterOpacity` 0.5
+  - `softTissueBandOpacity` 0.22
+  - `softTissueBandMargin` 15 mm
+  - `collimatedGray` 0.06
+  - `roadmapOutlineGray` 0.92
+  - `roadmapOutlineWidth` 1.5 px
+- `tubeRadialSegments` 12
+- `threeD`:
+  - `vesselColor` #c9736d
+  - `sheathColor` #7d8a97
+  - `backgroundColor` #0a0f14
+  - `cameraFov` 40°
+  - `cameraDistance` 1.6 bounding-box diagonals
+  - `hemisphereLightIntensity` 1.6
+  - `keyLightIntensity` 2.2
+  - `surfaceRoughness` 0.45
+- `hud`:
+  - `toastDuration` 3.5 s
+  - `blockedMessageDebounce` 2.5 s
+  - `tipForceFullScale` 0.5 N
+  - `wallStressFullScaleTime` 5 s
+- `audio`:
+  - `alarmToneFrequency` 880 Hz, `alarmToneDuration` 220 ms, `alarmToneGain` 0.12
+  - `blockedToneFrequency` 330 Hz, `blockedToneDuration` 120 ms, `blockedToneGain` 0.06
+
+The report now counts 818 sourced, 17 derived, 42 estimated, 66 placeholder and 156 design facts. Design went from 130 to 156 with these 26.
+
+**Placeholders added:** none.
+
+**Performance** (`npm run bench`, headless Node 24 in this Linux x64 container, not the M2; physics per 16.7 ms frame):
+
+| Run | High tier | Standard tier |
+| --- | --- | --- |
+| Golden scene 8 (wire alone, hub 0° and 180°) | 6.9 and 7.0 ms | 1.8 and 1.8 ms |
+| sandbox-c-left demo, wire and 5F catheter | 9.9 ms | 2.5 ms |
+
+The startup benchmark picks the standard tier here, as on the M2. Browser frame rates in this container mean nothing, because it renders in software (SwiftShader). The gate's 60 fps and ≤4 ms test drive on the owner's laptop still has to be measured and recorded in the README.
+
+**For the planning chat:**
+
+- Setup's sheath and wire choices are not in the input log header (deviation 5): a header field for spec 14.
+- Variant facts now reach the rules (deviation 6), extending the `innerDiameter` supply of spec 02 §11.1.
+- Spec 02 §5 has no N·s unit (deviation 8).
+- WebGPU in older Chromium with this three.js release (deviation 1).
+- The high tier stays over budget at depth (issue #3).
+
+**Checks** (output pasted in session 5):
+
+- `npm run lint` (ESLint and Prettier) and `npm run typecheck`: exit 0.
+- `npm run validate-data`: OK, with the counts above.
+- `npm test`: 206 of 206 pass in 40 files. The golden values are unchanged from phase C:
+  - scene 1: 1.4325 mm
+  - scene 2: 359.987°
+  - scene 3: 6.1e-13%
+  - scene 4: 0.0000, 0.0000 and 0.0103 mm
+  - scene 5: 10.0000 mm
+  - scene 6: 0.1275, 0.1766 and 0.2276 N
+  - scene 7: 1.270°, 1.684° and 2.120°
+  - scene 8: c-left and c-right
+  - scene 9: 31.92° then 60.00°
+  - scene 10: 7.0e-13 mm and 3.9e-5 mm
+  - scene 11: `9e0d3d89`
+  - scene 12: hub 49.98 mm, tip −36.96 mm, 2.088 N, 2 danger events, 0.262%
+- `npm run build`: exit 0 (validate, typecheck, Vite).
+- `npm run test:e2e`: 8 of 8 pass, the 4 tests on both `webgpu` and `webgl2`; the demo takes 11 to 13 s with `?fast=1`.
+- In the browser: all three demos ran with no console errors. A `BASE_PATH=/ir-angio-sim/` build served from that path loads with no failed requests. sandbox-a-buckle buckles the wire in the 3D view and turns the meter red at 1.22 N. Screenshots of the start screen, fluoro view and 3D view were checked against §6 and §7.

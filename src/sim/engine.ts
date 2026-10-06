@@ -156,6 +156,11 @@ export class SimEngine {
   private rng: Rng = createRng(0);
   private autopilot: string | null = null;
   private fluoroTime = 0;
+  /** The input the last step ran with, for the snapshot; plain fields keep the step allocation-free. */
+  private lastMode: InputFrame['mode'] = 'cath';
+  private lastFluoro = 0;
+  private lastInject = 0;
+  private fluoroLastStep = -1;
   private swap: SwapState | null = null;
   private blocked = false;
   private readonly hit: LumenHit = createLumenHit();
@@ -273,7 +278,11 @@ export class SimEngine {
     }
     if (frame.triggers.fluoro > 0) {
       this.fluoroTime += dt;
+      this.fluoroLastStep = this.stepCount;
     }
+    this.lastMode = frame.mode;
+    this.lastFluoro = frame.triggers.fluoro;
+    this.lastInject = frame.triggers.inject;
 
     const h = dt / tier.substeps;
     for (let s = 0; s < tier.substeps; s += 1) {
@@ -374,6 +383,7 @@ export class SimEngine {
     return {
       step: this.stepCount,
       timeS: this.stepCount / tier.stepRate,
+      anatomyId: this.currentAnatomy.id,
       devices: this.records.map((record) => {
         const segment = record.tipSegment;
         return packDevice({
@@ -391,6 +401,8 @@ export class SimEngine {
       stack: { activeOuter: this.stack.activeOuter, locked: this.stack.locked },
       carm: this.carm,
       fluoroTimeS: this.fluoroTime,
+      fluoroLastStep: this.fluoroLastStep,
+      input: { mode: this.lastMode, fluoro: this.lastFluoro, inject: this.lastInject },
       autopilot: this.autopilot,
       events: [...this.events],
     };
@@ -546,6 +558,10 @@ export class SimEngine {
     this.stack = createStack(this.records.length);
     this.carm = config.carm === undefined ? null : initialCarm(config.carm);
     this.fluoroTime = 0;
+    this.lastMode = 'cath';
+    this.lastFluoro = 0;
+    this.lastInject = 0;
+    this.fluoroLastStep = -1;
     this.swap = null;
     this.blocked = false;
     this.rebuildWorld();

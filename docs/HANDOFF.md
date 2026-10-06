@@ -2,7 +2,7 @@
 
 This page gets a new contributor, or a new AI chat session, productive without the history of earlier conversations. The repository carries everything: rules, specs, plans, decisions and a log of what each phase built.
 
-## Current state (2026-10-05)
+## Current state (2026-10-06)
 
 | Milestone M1 (Foundations) | Status | Commit |
 | --- | --- | --- |
@@ -10,30 +10,28 @@ This page gets a new contributor, or a new AI chat session, productive without t
 | Session 2 · Phase A: scaffold and data layer | Done | `M1 phase A: scaffold and data layer` |
 | Session 3 · Phase B: headless simulation core | Done | `M1 phase B: simulation core` |
 | Session 4 · Phase C: worker, input, autopilot and replay | Done | `M1 phase C: worker, input, autopilot and replay` |
-| Session 5 · Phase D: rendering, UI, end-to-end tests, bench, CI, README | **Next** | `M1 phase D: rendering, UI and end-to-end tests` |
-| Session 6 · Gate | After D | `M1: done` |
+| Session 5 · Phase D: rendering, UI, end-to-end tests, bench, CI, README | Done | `M1 phase D: rendering, UI and end-to-end tests` |
+| Session 6 · Gate | **Next** | `M1: done` |
 
-- All 173 unit and golden tests pass.
-- The simulation runs headless: three demos (`sandbox-c-left`, `sandbox-b-bend` and `sandbox-a-buckle`) and replays through `src/worker/session.ts`.
-- Nothing renders yet. The start screen shows only the disclaimer.
+- All 206 unit and golden tests pass, and the 4 end-to-end tests pass on both WebGPU and WebGL 2.
+- The app is playable: start screen, sandbox setup, the fluoro and 3D views, the HUD, the device picker and inspector, the perf overlay, the pause menu and the three demos.
+- Still to measure: the owner's 60 fps and ≤4 ms test drive on the M2 (the gate).
 
-## Next session: Phase D (session 5)
+## Next session: the gate (session 6)
 
-Start a fresh conversation with the session 5 prompt in [prompts/M1-sessions.md](../prompts/M1-sessions.md). Phase D can build on what phase C left ready:
+Start a fresh conversation with the session 6 prompts in [prompts/M1-sessions.md](../prompts/M1-sessions.md): the `/goal`, the independent review and the M1 summary. GitHub issue #2 has its checklist. What phase D left in place:
 
-- **Worker loop:** `src/worker/client.ts` (`PhysicsClient`) starts `src/worker/physics.worker.ts`. On startup it benchmarks the high tier at depth and picks a tier (D17); on an M2 laptop that is the standard tier.
-- **Input:** `src/input/sources/inputLoop.ts` turns one animation frame of pad, keys and mouse into a frame and sends `stop-autopilot` on takeover. The UI only has to mount it, with the keyboard and pointer sources.
-- **Demos and rumble:** demos start with the commands from `src/data/sessionSetup.ts → demoCommands`. Rumble is ready in `src/input/rumble.ts` (`rumbleStep`, `playRumble`).
-- **CI:** `.github/workflows/ci.yml` already exists. Add the Playwright step to it, then create `pages.yml`.
-- **When the phase is done:** update this page's state table and the README build status, close GitHub issue #1, and push.
-
-The gate (session 6) follows; GitHub issue #2 has its checklist.
+- **The app:** `src/app/sandboxRuntime.ts` runs one sandbox session on the main thread. It owns the renderer, both views, the physics client, input, rumble and tones, and writes the HUD store. React (`src/ui/`) draws only the HUD and the panels.
+- **Rendering:** `src/render/`. The fluoro view adds optical depth per object into a float target, and a TSL post pass turns it into the image once per pulse. The 3D view shares the device geometry. The phase D Progress log entry in the plan explains the model.
+- **Tests:** `npm run test:e2e` builds, serves the production preview and runs every test in two Chromium projects, `webgpu` (SwiftShader's software Vulkan) and `webgl2` (forced with `?webgl=1`).
+- **Bench:** `npm run bench` prints physics cost per tier for golden scene 8 and the sandbox-c-left demo.
+- **CI and Pages:** `ci.yml` runs everything, end-to-end tests included. `pages.yml` deploys `main` to GitHub Pages once the owner enables Pages (Settings → Pages → source "GitHub Actions").
 
 ## GitHub
 
 The repository is public at [github.com/kishanasokan/ir-angio-sim](https://github.com/kishanasokan/ir-angio-sim).
 
-- CI runs lint, the typecheck, data validation, every test and the build on each push and pull request.
+- CI runs lint, the typecheck, data validation, every test, the build and the end-to-end tests on each push and pull request. A second workflow deploys `main` to GitHub Pages.
 - The milestone **M1 Foundations** and issues #1 to #5 track phase D, the gate, high-tier performance, the placeholder review and the missing wire-in-catheter friction.
 - Dependabot ignores the deliberate TypeScript and @types/node pins (phase A deviation 1).
 
@@ -43,7 +41,7 @@ The repository is public at [github.com/kishanasokan/ir-angio-sim](https://githu
 2. [spec/README.md](../spec/README.md), then the spec for your area. M1 uses specs 00, 01 and 02.
 3. [docs/M1-plan.md](M1-plan.md) in full. Its **Decisions** (D1 to D30) settle everything the prompt leaves open, and its **Progress log** says what each phase built, every deviation and why, the values added to `/data`, and the measured results.
 4. [prompts/M1-foundations.md](../prompts/M1-foundations.md): the build prompt. Its §8 lists every required test.
-5. [prompts/M1-sessions.md](../prompts/M1-sessions.md): the prompt for each session. To continue, run session 5.
+5. [prompts/M1-sessions.md](../prompts/M1-sessions.md): the prompt for each session. To continue, run session 6.
 
 ## How the work flows
 
@@ -59,9 +57,14 @@ src/data/        loads and validates /data, converts to SI once, builds engine, 
 src/sim/         pure, deterministic simulation: rods, contact, coaxial coupling, stack, rules, C-arm, autopilot
 src/input/       mappers (pure), sources, the arbiter, rumble, input logs
 src/worker/      session runner (pure), protocol, physics worker, client, tier benchmark
-src/app, src/ui  React app shell; phase D builds the UI and rendering
-tests/unit       Vitest unit tests (the prompt's numbered tests plus module tests)
-tests/golden     golden physics scenes 1 to 12, one per file, with shared helpers
+src/app/         boot, the sandbox runtime (renderer, client, input, rumble, tones), URL flags, HUD helpers
+src/ui/          React screens, HUD and panels (start, setup, sandbox, picker, inspector, pause, perf)
+src/state/       Zustand stores: settings (irsim:settings), session, HUD
+src/render/      renderer boot and fallback, fluoro view and TSL post pass, 3D view, tube geometry
+src/audio/       tones
+tests/e2e/       Playwright end-to-end tests 1 to 4, fake gamepad, console-error guard
+tests/unit/      Vitest unit tests (the prompt's numbered tests plus module tests)
+tests/golden/    golden physics scenes 1 to 12, one per file, with shared helpers
 data/            every number, with units, confidence and sources
 docs/            implementation plans and this page
 ```
@@ -73,18 +76,24 @@ docs/            implementation plans and this page
 - **Stability settings matter.** `solver.rotationalInertiaScale` (1000) keeps a buckled wire's snap-through stable. The first two joints of a chain share the bend at the sheath tip or catheter tip, so nodes cross it smoothly. Both are explained in the plan's phase C entry. Rerun golden scenes 3, 4 and 12 after touching contact, insertion or the junction.
 - **Performance.** On an M2 laptop the high tier costs 8 to 14 ms of physics per frame once the devices are deep, so the startup benchmark (D17) picks the standard tier (0.7 to 2.6 ms). Making the high tier fit its 4 ms budget is open work.
 - **Determinism.** Nothing in `src/sim/` may read wall time or `Math.random`, or use trigonometry outside `detTrig`. Golden scene 11 compares hashes; a replay must match the live run exactly.
+- **WebGPU in old Chromium.** three r186 sends a texture-view `swizzle` that Chromium 141 rejects. The renderer then falls back to WebGL 2 by itself, after a probe frame. The `webgpu` test project adds a test-only shim (`tests/e2e/fixtures.ts`) so that path still runs, and needs `--use-vulkan=swiftshader`, or SwiftShader's WebGPU device is lost.
+- **A preinstalled Chromium.** Where Playwright's own browser is not installed, set `PLAYWRIGHT_CHROMIUM_PATH` (for example `/opt/pw-browsers/chromium`). CI installs Playwright's own.
+- **`?fast=1` covers seconds per message.** One message runs 1000 steps, so anything sampled once per snapshot can alias. The fluoro state therefore uses `fluoroLastStep`.
+- **One input path.** The UI acts on the frame the input loop sends the worker. Do not read the keyboard or the pad separately for anything that reaches the simulation. Menu navigation by D-pad only moves DOM focus.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Local dev server (the start screen for now) |
+| `npm run dev` | Local dev server; add `?webgl=1` to force WebGL 2 |
 | `npm test` | Unit tests and golden scenes, about a minute |
 | `npx vitest run tests/golden/scene06` | One golden scene |
 | `npm run lint` | ESLint and Prettier |
 | `npm run typecheck` | TypeScript |
 | `npm run validate-data` | Schema and provenance validation of `/data` |
 | `npm run build` | Validate, typecheck and build for production |
+| `npm run test:e2e` | Build, serve the preview and run the Playwright tests on both backends |
+| `npm run bench` | Physics cost per tier: golden scene 8 and the sandbox-c-left demo |
 
 ## Open items for review
 
@@ -92,3 +101,4 @@ docs/            implementation plans and this page
 - The Glidewire's floppy-tip placeholders (30 mm at 2% stiffness) decide where it folds at a cap (D30).
 - There is no friction between a wire and a catheter in M1 (composite coupling; phase B deviation 3).
 - High-tier performance, above.
+- Sandbox setup's sheath and wire choices are not yet recorded in input logs (spec 02 §13 has no header field; replays are spec 14).

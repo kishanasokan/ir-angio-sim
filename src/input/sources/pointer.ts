@@ -2,7 +2,8 @@ import type { PointerState } from '../mapping/mapPointer';
 
 /**
  * The mouse source: accumulates drags (left and right button), wheel notches and middle clicks on the view between
- * animation frames; take() returns them and starts again (prompts/M1-foundations.md §5).
+ * animation frames; take() returns them and starts again (prompts/M1-foundations.md §5). Alt with the mouse belongs
+ * to the 3D view's orbit camera, so the source ignores it.
  */
 
 const LEFT = 0;
@@ -20,6 +21,9 @@ export function createPointerSource(element: HTMLElement): PointerSource {
   let state = { leftDx: 0, leftDy: 0, rightDx: 0, rightDy: 0, wheel: 0, middleClicks: 0 };
   const buttons = new Set<number>();
   const onDown = (event: PointerEvent) => {
+    if (event.altKey) {
+      return;
+    }
     buttons.add(event.button);
     if (event.button === MIDDLE) {
       state.middleClicks += 1;
@@ -41,6 +45,9 @@ export function createPointerSource(element: HTMLElement): PointerSource {
     }
   };
   const onWheel = (event: WheelEvent) => {
+    if (event.altKey) {
+      return;
+    }
     // Up (negative deltaY) is positive: away from the user.
     const notches =
       event.deltaMode === WheelEvent.DOM_DELTA_PIXEL

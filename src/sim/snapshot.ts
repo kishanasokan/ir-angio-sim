@@ -1,4 +1,5 @@
 import type { SimEvent } from './core/events';
+import type { InputMode } from './core/records';
 import { DEGREES_PER_RADIAN, MILLIMETRES_PER_METRE } from './core/types';
 import type { CarmState } from './imaging/carm';
 import type { RodState } from './rod/state';
@@ -31,10 +32,17 @@ export interface DeviceSnapshot {
 export interface Snapshot {
   readonly step: number;
   readonly timeS: number;
+  /** The anatomy in use, which set-anatomy commands change. */
+  readonly anatomyId: string;
   readonly devices: readonly DeviceSnapshot[];
   readonly stack: { readonly activeOuter: number; readonly locked: boolean };
   readonly carm: CarmState | null;
   readonly fluoroTimeS: number;
+  /** The last step that ran with fluoro on, −1 if none: a message may cover many steps, so the monitor can tell that
+   * fluoro pulsed in between even when the last step ran without it. */
+  readonly fluoroLastStep: number;
+  /** The input the last step ran with: mode, fluoro pedal and contrast plunger (0..1), live or autopilot. */
+  readonly input: { readonly mode: InputMode; readonly fluoro: number; readonly inject: number };
   readonly autopilot: string | null;
   readonly events: readonly SimEvent[];
 }

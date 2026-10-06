@@ -477,6 +477,13 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
   if (findItemProperty(item, 'innerDiameter') === undefined && model.innerDiameter !== undefined) {
     supplied['geometry.innerDiameter'] = model.innerDiameter;
   }
+  // A variant selection that is itself a fact supplies a property the item lacks (spec 02 §4.4), for the rules too:
+  // the Bentson's length, for example, which limit-wire-length reads.
+  for (const [key, selection] of Object.entries(variant)) {
+    if (isRecord(selection) && 'confidence' in selection && findItemProperty(item, key) === undefined) {
+      supplied[`geometry.${key}`] ??= selection;
+    }
+  }
 
   return {
     rodModelId: model.id,
