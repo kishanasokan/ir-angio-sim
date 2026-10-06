@@ -616,4 +616,7 @@ The startup benchmark picks the standard tier here, as on the M2. Browser frame 
   - scene 12: hub 49.98 mm, tip −36.96 mm, 2.088 N, 2 danger events, 0.262%
 - `npm run build`: exit 0 (validate, typecheck, Vite).
 - `npm run test:e2e`: 8 of 8 pass, the 4 tests on both `webgpu` and `webgl2`; the demo takes 11 to 13 s with `?fast=1`.
+- CI on the phase commit (19ed780): everything passed except end-to-end test 3 on both backends, which never saw the Y press. The Gamepad API is read once per animation frame. Software rendering gives about 215 ms per frame here and slower frames on the CI runner, so the test's fixed 250 ms press could fall between two reads.
+  - The test now holds Y until the HUD shows CONTROL (one press edge, so one toggle) and prints the frame interval it measures. The follow-up commit carries the fix.
+  - At the 60 fps the app targets, a press lasts several frames, so the app itself is unchanged.
 - In the browser: all three demos ran with no console errors. A `BASE_PATH=/ir-angio-sim/` build served from that path loads with no failed requests. sandbox-a-buckle buckles the wire in the 3D view and turns the meter red at 1.22 N. Screenshots of the start screen, fluoro view and 3D view were checked against §6 and §7.

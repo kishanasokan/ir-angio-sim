@@ -1,5 +1,5 @@
 import { PAD_AXES, PAD_BUTTONS } from '../../src/sim/core/records';
-import { installFakeGamepad, setAxis, setButton, tapButton } from './fakeGamepad';
+import { installFakeGamepad, setAxis, setButton } from './fakeGamepad';
 import { enterSandbox, expect, numberAttribute, test } from './fixtures';
 
 // End-to-end test 3 (prompts/M1-foundations.md §8): a fake gamepad injected with page.addInitScript. Holding the right
@@ -25,9 +25,28 @@ test('a gamepad drives the wire, switches to Control mode and swings the C-arm',
   // A stick is not a button press: the HUD still asks for one (Firefox exposes a pad only after a press).
   await expect(page.getByTestId('pad-status')).toHaveText('Press any button on your controller');
 
-  // Y switches to Control mode, and the pad now counts as connected, with Xbox glyphs from its id.
-  await tapButton(page, PAD_BUTTONS.y);
-  await expect(page.getByTestId('mode')).toHaveText('CONTROL');
+  // Y switches to Control mode, and the pad now counts as connected, with Xbox glyphs from its id. The Gamepad API is
+  // read once per animation frame, and headless CI renders slowly in software, so Y stays held until the HUD shows the
+  // switch: a fixed short press can fall between two reads. It is one press edge, so it toggles once.
+  const frameMs = await page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        const times: number[] = [];
+        const tick = (now: number) => {
+          times.push(now);
+          if (times.length < 6) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve((now - (times[0] ?? now)) / (times.length - 1));
+          }
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+  console.log(`animation frame interval ${frameMs.toFixed(0)} ms`);
+  await setButton(page, PAD_BUTTONS.y, 1);
+  await expect(page.getByTestId('mode')).toHaveText('CONTROL', { timeout: 30_000 });
+  await setButton(page, PAD_BUTTONS.y, 0);
   await expect(page.getByTestId('pad-status')).toHaveText('Xbox-style controller connected');
 
   // RT rotates the C-arm toward LAO.

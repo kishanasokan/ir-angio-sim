@@ -65,10 +65,3 @@ export async function setButton(page: Page, index: number, value: number): Promi
     [index, value] as const,
   );
 }
-
-/** Presses and releases a button, held long enough for several animation frames to see it. */
-export async function tapButton(page: Page, index: number, holdMs = 250): Promise<void> {
-  await setButton(page, index, 1);
-  await page.waitForTimeout(holdMs);
-  await setButton(page, index, 0);
-}
