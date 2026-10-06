@@ -142,10 +142,10 @@ Riskiest part: two rendering backends in headless CI, and the rule of no console
 
 ## Gate (session 6)
 
-- [ ] `/goal` from `prompts/M1-sessions.md`: build, lint, test, validate-data and test:e2e exit 0, and the three demos run headless with no console errors
-- [ ] an independent review subagent; fix the gaps it finds, rerun every check, commit
-- [ ] the M1 summary at the end of this file; commit "M1: done"
-- [ ] the owner's test drive: at least 60 fps and at most 4 ms physics per frame in phantom C with the wire and the 5F catheter, recorded in the README
+- [x] `/goal` from `prompts/M1-sessions.md`: build, lint, test, validate-data and test:e2e exit 0, and the three demos run headless with no console errors
+- [x] an independent review subagent; fix the gaps it finds, rerun every check, commit
+- [x] the M1 summary at the end of this file; commit "M1: done"
+- [ ] the owner's test drive: at least 60 fps and at most 4 ms physics per frame in phantom C with the wire and the 5F catheter, recorded in the README. Deferred by the owner to the final stage (D31).
 
 ## Decisions
 
@@ -237,6 +237,13 @@ Riskiest part: two rendering backends in headless CI, and the rule of no console
 
 - The case's `sandbox-a-buckle.extraPush` is now 50 mm (it was 20).
 - Golden scene 12 measures over the demo's extra push instead of a fixed 20 mm. Its other checks are unchanged: tip advance below 2 mm (D2), hub force above danger, a danger event, and segments within 0.5%.
+
+### The owner's call during session 6 (agreed 2026-10-06)
+
+**D31 · The test drive and the medical review wait for the final stage.** The owner will do the hands-on test drive (the gate's 60 fps and ≤4 ms on their laptop, recorded in the README) and the medical review of the placeholders (issue #4) at the project's final stage, not at the M1 gate.
+
+- M1 is declared done with those two items open. Everything else in the gate passes.
+- The build itself keeps the startup benchmark (D17), so a laptop where the high tier is over budget runs the standard tier.
 
 ### Expected data additions (design values, `data/tuning/` only; final names logged when added)
 
@@ -620,3 +627,117 @@ The startup benchmark picks the standard tier here, as on the M2. Browser frame 
   - The test now holds Y until the HUD shows CONTROL (one press edge, so one toggle) and prints the frame interval it measures. The follow-up commit carries the fix.
   - At the 60 fps the app targets, a press lasts several frames, so the app itself is unchanged.
 - In the browser: all three demos ran with no console errors. A `BASE_PATH=/ir-angio-sim/` build served from that path loads with no failed requests. sandbox-a-buckle buckles the wire in the 3D view and turns the meter red at 1.22 N. Screenshots of the start screen, fluoro view and 3D view were checked against §6 and §7.
+
+### 2026-10-06 · Gate (session 6)
+
+The session moved from the owner's desktop to a cloud container mid-way (Linux x64, Node 24.21, Chromium 141 from `/opt/pw-browsers`). The desktop's uncommitted work, `tests/e2e/05-demos.spec.ts`, came along and is part of this gate.
+
+**Checks before any change**
+
+- `npm run lint`, `npm run typecheck`, `npm run validate-data` and `npm run build`: exit 0.
+- `npm test`: 206 of 206 pass in 40 files.
+- `npm run test:e2e`: 12 of 12 pass. That is end-to-end tests 1 to 4 plus the two other demos (`05-demos.spec.ts`: sandbox-b-bend and sandbox-a-buckle run start to finish), on `webgpu` and `webgl2`, with the console-error guard on every test.
+
+**The independent review.** A subagent with fresh context reviewed the build against `prompts/M1-foundations.md` and `CLAUDE.md`. It found no blocking defect and listed these gaps; all are fixed except where noted.
+
+1. **No friction between the wire and the catheter** (prompt §2, coaxial coupling). Known since phase B (deviation 3) and tracked in issue #5. Not fixed here: issue #5's two designs are a spec 04 choice for the owner. The inspector row now reads "Lumen friction coefficient (not applied in M1)", so it no longer suggests the sim uses the value.
+2. **The inspector left out values the sim uses** (Done-when). A new "Case and demos" tab shows each starting device's depth and hub rotation, the target distance, the rule parameters, every demo parameter, and the autopilot's speeds and takeover threshold. The solver tab adds the mouse rates and the high tier's auto-select values. Device tabs add where each section and rest-shape region starts.
+3. **A placeholder showed a design badge.** An assumed core material (the Bentson's and the Amplatz's "Stainless steel core assumed") now keeps the assumption's own confidence and note, so the row reads placeholder.
+4. **Replays** (prompt §4). The worker now builds a replay from the log's own seed, case and phantom, checks the log against the current data hash (`checkLog`, shared with `parseLog`), and skips the tier benchmark for it. Still open: the setup's wire choice has no field in the input log (phase D deviation 5; spec 14). This is latent, because nothing sends a replay in M1.
+5. **An end-to-end check for every screen flow** (rule 8, and the Done-when's "fires rumble"):
+   - new `06-panels.spec.ts`: the inspector, the perf overlay, the pause menu (resume, change phantom, quit) and the picker's wire exchange (`swap-device`);
+   - the buckle demo now runs with a fake pad whose actuator records each effect, and asserts `dual-rumble` effects with a strong part (hub-force-danger) and a weak part (contact).
+6. **A unit assertion that could never fail** (unit test 10's dead zone). It now requires exactly 0 inside the dead zone and a nonzero output outside it, plus the radial case: a diagonal whose components each lie inside the dead zone still moves both axes.
+7. **"Autopilot frames ignore user settings" on the real path.** A session test runs sandbox-c-left with the default settings and with skewed learner settings, and requires identical frames and hash.
+8. **Feel values in code** (rule 3). The Settings sliders' ranges and steps moved to `tuning/input → settingsLimits`, and a saved setting outside its range falls back to the default. `PIXELS_PER_NOTCH` stays in code: it is the browser's pixel-to-notch convention, a unit conversion. The feel value is `mouse.wheelAdvancePerNotch`.
+9. **Two UX bugs.**
+   - While a panel is open, the D-pad, A and B (Tab, Enter and Backspace on the keyboard) move through it, but the same presses also changed the field of view, and in Control mode moved the table or saved an angle. The input loop now keeps panel-navigation actions, and the held D-pad's table height and collimation, out of the simulation's frame while a panel is open. The UI still reads the whole frame (`withoutPanelNavigation`).
+   - A button press on the start screen did not count in the sandbox, which asked again. The start screen and the sandbox now share one flag in the gamepad source.
+10. **README counts** are refreshed.
+
+**Found while testing.** The new perf-overlay test pressed P twice within one frame of the ~10 fps software renderer, so no poll saw the key released between the presses. Input acts on press edges by design, as with the gamepad, and no learner double-taps that fast at 60 fps. The test now lets two frames pass between repeated presses of one key.
+
+**Performance** (issue #3). A profile of the high tier in the sandbox-c-left demo splits the cost into three parts: the block Cholesky 26%, assembling J·W·Jᵀ 30%, and building the chains 25% (capsule tests 7%). The rest is small.
+
+- Two changes keep every result bit for bit: the six demo runs (three demos on two tiers) hash exactly as before, and every golden value is unchanged.
+  - The block solve skips the coupling blocks' structural zeros. Forward substitution keeps a column's leading zeros, so it finds them at run time and skips only exact-zero products.
+  - The solve skips the external-force terms when no force acts, which is every run outside the cantilever scene.
+- High tier: 3–5% faster in three alternated A/B runs of the demos, and 11–18% in `npm run bench`.
+- It stays about twice its 4 ms budget, so issue #3 stays open. Its remaining options (hand-derived block formulas, unrolled kernels, WebAssembly) each change code across the hot path, not one kernel, because the cost is spread over all three parts.
+
+**Values added to `/data`** (design, `data/tuning/input.json` only; each note says "Added at the M1 gate"): `settingsLimits.deadZone` 0–0.4, `deadZoneStep` 0.01, `responseExponent` 1–3, `responseExponentStep` 0.1 and `rumbleStrengthStep` 0.05. These are the values the sliders already used. The schema requires them. The report now counts 818 sourced, 17 derived, 42 estimated, 66 placeholder and 161 design facts.
+
+**Placeholders added:** none.
+
+**Checks after the fixes**
+
+- `npm run lint` (ESLint and Prettier), `npm run typecheck`, `npm run validate-data` and `npm run build`: exit 0.
+- `npm test`: 213 of 213 pass in 40 files, 7 more than before the gate. The golden values are unchanged from phase D:
+  - scene 1: 1.4325 mm
+  - scene 2: 359.987°
+  - scene 3: 6.1e-13%
+  - scene 4: 0.0000, 0.0000 and 0.0103 mm
+  - scene 5: 10.0000 mm
+  - scene 6: 0.1275, 0.1766 and 0.2276 N
+  - scene 7: 1.270°, 1.684° and 2.120°
+  - scene 8: c-left and c-right
+  - scene 9: 31.92° then 60.00°
+  - scene 10: 7.0e-13 mm and 3.9e-5 mm
+  - scene 11: `9e0d3d89`
+  - scene 12: hub 49.98 mm, tip −36.96 mm, 2.088 N, 2 danger events, 0.262%
+- `npm run test:e2e`: 20 of 20 pass, the 10 tests on `webgpu` and `webgl2`. All three demos finish with no console errors, and sandbox-a-buckle turns the meter red and fires rumble.
+- `npm run bench` (this container; physics ms per 16.7 ms frame):
+
+| Run | High tier | Standard tier |
+| --- | --- | --- |
+| Golden scene 8, hub 0° and 180° | 5.2 and 5.8 ms | 1.4 and 1.4 ms |
+| sandbox-c-left demo, wire and 5F catheter | 8.2 ms | 2.2 ms |
+
+## M1 summary
+
+**What M1 built.** A browser app, `npm ci && npm run dev`, with no backend:
+
+- **The data layer.** Zod schemas for every schema id in spec 02; a validator with all 14 error codes, a report and a fixture per code; units converted once at load; device instances with per-segment properties and provenance on every value; rest shapes; and loaders for the phantoms and the sandbox case.
+- **A pure, deterministic simulation** (`src/sim/`):
+  - Cosserat rods solved directly with a block-tridiagonal Cholesky, with contact rows, implicit Coulomb friction and the sheath clamp (D29);
+  - coaxial coupling as a composite rod;
+  - the device stack and the order rule;
+  - the compatibility engine;
+  - C-arm kinematics;
+  - three closed-loop autopilots;
+  - hashing, snapshots and replays.
+  ESLint enforces its purity, `no-magic-numbers` and the banned Math functions.
+- **Input on one path.** Gamepad, keyboard, mouse, autopilot and replay all become one `InputFrame` through pure mappers, with rumble and sounds.
+- **A physics worker** with step-stamped commands, input logs and the startup tier benchmark (D17).
+- **Rendering.** WebGPU with a WebGL 2 fallback, a fluoro view with a TSL post pass (pulses, last-image hold, noise, blur, collimation, contrast puff, roadmap outline), and a 3D view.
+- **The UI.** The start screen with the exact disclaimer, sandbox setup with blocked pairings, the HUD, the device picker and inspector, the perf overlay, the pause menu and settings.
+- **Tooling.** CI with lint, data validation, tests, the build and end-to-end tests; a GitHub Pages deploy; and `npm run bench`.
+
+**Tests.** 213 Vitest tests in 40 files: unit tests 1 to 15, golden physics scenes 1 to 12, and module tests. There are also 10 end-to-end tests, each run on WebGPU and on WebGL 2.
+
+**Performance measured.** Headless physics in this container (table above): the standard tier costs 1.4–2.2 ms per frame, within the 4 ms budget, and the high tier 5–8 ms, over it. The startup benchmark therefore picks the standard tier here, as it did on the owner's M2.
+
+**Still to measure on the owner's laptop** (D31, at the final stage): FPS and physics ms per frame in the perf overlay, in phantom C with the wire and the 5F catheter, plus the tier, backend, browser and machine, recorded in the README. Frame rates in this container mean nothing, because it renders in software.
+
+**Placeholders added during M1:** none. The 66 placeholders all came with the seed data. `npm run validate-data` lists them, and issue #4 holds them for the medical review (D31).
+
+**Data to check** (none is known to be wrong; each shapes how M1 behaves):
+
+1. The sandbox's three wires have body moduli of 8 GPa (Glidewire, estimated), 9 GPa (Bentson, placeholder) and 9.5 GPa (Amplatz, sourced). These differ by under 20%, so the wires will feel alike apart from their tips. The Glidewire's note already says "tune with faculty".
+2. The Glidewire's floppy tip (30 mm at 2% of the body stiffness, placeholders) decides where it folds at a cap. That is why the buckling demo needed 50 mm of extra push (D30).
+3. `fr-device-in-device` (0.1, placeholder) is resolved but unused until wire-in-catheter friction exists (issue #5).
+4. The sheath length (11 cm, placeholder) sets how far every device reaches. For example, a 400 mm device cannot reach phantom A's cap.
+5. `solver.rotationalInertiaScale` (1000, design) keeps snap-through stable but slows short bending and twisting waves: scene 7's lag at μ = 0 went from 0.13° to 1.27°. It is worth a look in the wire-feel review.
+6. Spec 02 and the seed data disagree in two places (phase A deviations 2 and 3): nine embolic items have no generic name, and twelve microcatheter ids contain dots.
+
+**Left for M2**
+
+- **The M2 specs and prompt.** Specs 03, 04, 07, 08 and 10, and an M2 build prompt, are written in the planning chat before any M2 build session. None exists yet.
+- **Carried over from M1:**
+  - wire-in-catheter friction (issue #5, spec 04);
+  - high-tier performance (issue #3);
+  - the rail fallback tier (spec 01 §9; its details belong to spec 04);
+  - an input-log field for the setup's wire (spec 14);
+  - the spec 02 versus data mismatches above;
+  - the owner's test drive and the placeholder review (D31).
+- **Open questions to measure in M2:** spec 01 §15's question 1, whether the solver holds the stiffest rail wires (up to 158 GPa, `harrison2011`) at 1 kHz.

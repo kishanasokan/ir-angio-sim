@@ -8,7 +8,7 @@ A free, browser-based, controller-first interventional radiology simulator for m
 
 [![CI](https://github.com/kishanasokan/ir-angio-sim/actions/workflows/ci.yml/badge.svg)](https://github.com/kishanasokan/ir-angio-sim/actions/workflows/ci.yml)
 
-Milestone **M1 (foundations)** is built and in its final gate. The device sandbox is playable in the browser:
+Milestone **M1 (foundations)** is done. The device sandbox is playable in the browser:
 
 - a wire and a 5F catheter, modeled as Cosserat rods, in three test phantoms
 - a fluoroscopy-style view with pulsed frames, last-image hold, a contrast puff and a roadmap outline, plus a 3D view
@@ -17,11 +17,11 @@ Milestone **M1 (foundations)** is built and in its final gate. The device sandbo
 - a device picker and a device inspector that shows every value's confidence and source
 - three autopilot demos, and full controller, keyboard and mouse control
 
-The gate's last step is the owner's test drive on a laptop (below). [docs/HANDOFF.md](docs/HANDOFF.md) has the details.
+Two gate items wait for the project's final stage, by the owner's choice: the hands-on test drive on a laptop (below) and the medical review of the placeholder values. [docs/HANDOFF.md](docs/HANDOFF.md) has the details, and [docs/M1-plan.md](docs/M1-plan.md) ends with the M1 summary.
 
 | Milestone | What it delivers | Status |
 | --- | --- | --- |
-| M1 Foundations | Scaffold, data validator, device sandbox with three test phantoms | Phases A–D done; the gate is next |
+| M1 Foundations | Scaffold, data validator, device sandbox with three test phantoms | Done; the test drive and the placeholder review wait for the final stage |
 | M2 Core systems | Visceral anatomy, three-device stack, fluoro and DSA, flow network | Specs to write |
 | M3 First slice | Upper GI bleed with GDA embolization, end to end | Planned |
 | M4 Second slice | Uterine fibroid embolization with particles and reflux | Planned |
@@ -33,12 +33,12 @@ Physics cost from `npm run bench` (headless Node 24 on a Linux x64 build machine
 
 | Run | High tier (1 kHz, 2 mm) | Standard tier (500 Hz, 4 mm) |
 | --- | --- | --- |
-| Golden scene 8: wire alone into phantom C | 6.9 ms per frame | 1.8 ms per frame |
-| sandbox-c-left demo: wire and 5F catheter in phantom C | 9.9 ms per frame | 2.5 ms per frame |
+| Golden scene 8: wire alone into phantom C | 5.2 to 5.8 ms per frame | 1.4 ms per frame |
+| sandbox-c-left demo: wire and 5F catheter in phantom C | 8.2 ms per frame | 2.2 ms per frame |
 
 At startup the app benchmarks the high tier at depth and picks the standard tier when the high tier is over budget, as it is on an Apple M2 laptop ([issue #3](https://github.com/kishanasokan/ir-angio-sim/issues/3)). Settings can override the choice.
 
-Perf overlay in phantom C with the wire and the 5F catheter (P in the sandbox): **to be measured on the owner's laptop at the M1 gate**, as FPS, physics ms per frame, tier, backend, browser and machine.
+Perf overlay in phantom C with the wire and the 5F catheter (P in the sandbox): **to be measured on the owner's laptop at the final stage**, as FPS, physics ms per frame, tier, backend, browser and machine.
 
 ## Build it with Claude Code
 
@@ -65,8 +65,8 @@ Other commands are listed in [CLAUDE.md](CLAUDE.md) and [CONTRIBUTING.md](CONTRI
 
 ## Tests
 
-- `npm test` runs 206 unit tests and golden physics scenes in about a minute. The golden scenes check, among others, cantilever deflection, twist transmission, inextensibility, lumen containment, friction, torque lag, branch selection, coaxial bending, determinism with replay, and buckling.
-- `npm run test:e2e` builds the app, serves the production preview and runs 4 end-to-end tests in Chromium on both WebGPU and WebGL 2, so 8 runs. They cover the start screen and disclaimer, a full demo, a fake gamepad driving the wire and the C-arm, and a blocked sheath. Every test fails on any console error.
+- `npm test` runs 213 unit tests and golden physics scenes in about a minute. The golden scenes check, among others, cantilever deflection, twist transmission, inextensibility, lumen containment, friction, torque lag, branch selection, coaxial bending, determinism with replay, and buckling.
+- `npm run test:e2e` builds the app, serves the production preview and runs 10 end-to-end tests in Chromium on both WebGPU and WebGL 2, so 20 runs. They cover the start screen and disclaimer, all three demos (with rumble on a connected controller), a fake gamepad driving the wire and the C-arm, a blocked sheath, the device inspector, the perf overlay, the pause menu and the device picker's wire exchange. Every test fails on any console error.
 - `npm run validate-data` checks every fact in `/data`.
 - `npm run bench` prints the physics cost per tier.
 
@@ -104,7 +104,7 @@ Every fact in `/data` has a confidence level. As of 2026-10-06 (`npm run validat
 | derived | Computed from sourced values, with the derivation noted | 17 |
 | estimated | Standard knowledge or research notes, with a note | 42 |
 | placeholder | No source yet; shown with a badge in the app | 66 |
-| design | Deliberate engineering or feel choices | 156 |
+| design | Deliberate engineering or feel choices | 161 |
 
 Run `npm run validate-data` for current counts. Corrections from clinicians are welcome: open an issue naming the data id, the correct value and a source.
 
