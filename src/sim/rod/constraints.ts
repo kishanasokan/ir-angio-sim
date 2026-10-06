@@ -55,6 +55,8 @@ export interface Variables {
   readonly inverse: Float64Array;
   /** External force (nodes) or torque (segments) this substep, world. */
   readonly force: Float64Array;
+  /** True once any variable carries a nonzero force this substep; until then the solve skips the force terms. */
+  forced: boolean;
   /** Position or rotation correction from the solve, world. */
   readonly delta: Float64Array;
 }
@@ -99,6 +101,7 @@ function createVariables(capacity: number): Variables {
     index: new Int32Array(capacity),
     inverse: new Float64Array(MAT3 * capacity),
     force: new Float64Array(VEC3 * capacity),
+    forced: false,
     delta: new Float64Array(VEC3 * capacity),
   };
 }
@@ -146,6 +149,7 @@ export function resetSolver(solver: Solver, units: number): void {
     solver.system = grown.system;
   }
   solver.variables.count = 0;
+  solver.variables.forced = false;
   solver.units.count = 0;
 }
 
@@ -212,6 +216,9 @@ export function addSegmentVariable(
 export function addVariableForce(solver: Solver, id: number, fx: number, fy: number, fz: number): void {
   if (id < 0) {
     return;
+  }
+  if (fx !== 0 || fy !== 0 || fz !== 0) {
+    solver.variables.forced = true;
   }
   const o = VEC3 * id;
   const force = solver.variables.force;
@@ -364,7 +371,7 @@ export function solveUnits(solver: Solver, h: number): boolean {
   const h2 = h * h;
   const { entryCount, entryVariable, entryJacobian, entryWeighted, constraint, contactActive, lambda } =
     units;
-  const { inverse, force, delta } = vars;
+  const { inverse, force, forced, delta } = vars;
   const unitCount = units.count;
 
   // K = J·W for every entry, only for the rows its group has.
@@ -456,8 +463,13 @@ export function solveUnits(solver: Solver, h: number): boolean {
           }
         }
       }
-      // Right-hand side −C − h²·Σ K·f for this group's rows.
+      // Right-hand side −C − h²·Σ K·f for this group's rows. With no force anywhere the sum is exactly +0, and
+      // −C − h²·(+0) is −C, so it is skipped.
       for (let a = 0; a < sizeA; a += 1) {
+        if (!forced) {
+          rhs[UNIT_ROWS * u + rowA + a] = -constraint[UNIT_ROWS * u + rowA + a]!;
+          continue;
+        }
         let forcing = 0;
         for (let na = 0; na < countA; na += 1) {
           const ea = MAX_ENTRIES * slotA + na;
@@ -510,7 +522,7 @@ export function solveUnits(solver: Solver, h: number): boolean {
       }
     }
   }
-  for (let v = 0; v < vars.count; v += 1) {
+  for (let v = 0; forced && v < vars.count; v += 1) {
     const m = MAT3 * v;
     const f = VEC3 * v;
     const fx = force[f]!;
