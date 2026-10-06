@@ -151,6 +151,27 @@ export function wireW(): SimDeviceSpec {
   return buildRodInstance(fixtureSource, 'rm-fixture-w', highTier().segmentLength);
 }
 
+/**
+ * Wire W with another device's flexural modulus fact, on a tier: test data for stiffness checks. The geometry, the
+ * material and the 400 mm length stay wire W's.
+ */
+export function wireWithModulus(
+  name: string,
+  modulus: { readonly confidence: string; readonly [key: string]: unknown },
+  tierId = 'high',
+): SimDeviceSpec {
+  const base = fixtureItems[0]!;
+  const baseModel = fixtureRodModels[0]!;
+  const item: DeviceItem = { ...base, id: `gw-fixture-${name}`, mechanics: { bodyFlexuralModulus: modulus } };
+  const model: RodModel = { ...baseModel, id: `rm-fixture-${name}`, deviceId: item.id };
+  const source: CatalogSource = {
+    ...fixtureSource,
+    devices: new Map([...fixtureSource.devices, [item.id, item]]),
+    rodModels: new Map([...fixtureSource.rodModels, [model.id, model]]),
+  };
+  return buildRodInstance(source, model.id, tierParams(repository(), tierId).segmentLength);
+}
+
 /** Catheter K: uniform tube, OD 5F, ID 0.039 in, 1.0 GPa, ν 0.4, 1200 kg/m³, 400 mm, 60° over the distal 15 mm. */
 export function catheterK(): SimDeviceSpec {
   return buildRodInstance(fixtureSource, 'rm-fixture-k', highTier().segmentLength);
@@ -189,11 +210,12 @@ export function sceneEngine(
   anatomy: SimAnatomy,
   devices: readonly SceneDevice[],
   friction?: number,
+  tierId = 'high',
 ): SimEngine {
   const sheath = SHEATH();
   const config: SimConfig = {
     seed: 1,
-    tier: highTier(),
+    tier: tierParams(repository(), tierId),
     devices: Object.fromEntries(devices.map((device) => [device.spec.rodModelId, device.spec])),
     stack: devices.map((device) => ({
       rodModelId: device.spec.rodModelId,

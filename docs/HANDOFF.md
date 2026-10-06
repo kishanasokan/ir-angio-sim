@@ -13,7 +13,7 @@ This page gets a new contributor, or a new AI chat session, productive without t
 | Session 5 · Phase D: rendering, UI, end-to-end tests, bench, CI, README | Done | `M1 phase D: rendering, UI and end-to-end tests` |
 | Session 6 · Gate | Done | `M1: done` |
 
-- All 213 unit and golden tests pass, and the 10 end-to-end tests pass on both WebGPU and WebGL 2.
+- All 217 unit and golden tests pass (213 at `M1: done`, plus the M2 stiff-wire checks), and the 10 end-to-end tests pass on both WebGPU and WebGL 2.
 - The app is playable: start screen, sandbox setup, the fluoro and 3D views, the HUD, the device picker and inspector, the perf overlay, the pause menu and the three demos.
 - The gate's independent review found no blocking defect; its gaps are fixed or tracked (the gate entry in [docs/M1-plan.md](M1-plan.md) lists them). The plan ends with the **M1 summary**.
 - Deferred by the owner to the final stage (D31): the 60 fps and ≤4 ms test drive on the M2 laptop, and the medical review of the placeholders (issue #4).
@@ -23,7 +23,8 @@ This page gets a new contributor, or a new AI chat session, productive without t
 M2 (core systems: visceral tree, three-device stack, fluoro and DSA, flow network) needs specs 03, 04, 07, 08 and 10 and an M2 build prompt. None exists yet, and they are written with the owner in the planning chat ([spec/README.md](../spec/README.md)). Bring them:
 
 - the M1 summary's "Data to check" and "Left for M2" ([docs/M1-plan.md](M1-plan.md));
-- issue #5 (wire-in-catheter friction, two designs to choose from) and issue #3 (high-tier performance) for spec 04;
+- [docs/M2-notes.md](M2-notes.md): what M1's engine shows for M2. The stiffest sourced rail wire holds on both tiers (spec 01 §15, question 1, now answered). A straight rod pushed end-on into a cap makes the solve singular. The catheter-tip junction is unstable for soft, light inner devices: a microcatheter beyond a 5F catheter stretches 20%, which matters for the three-device stack. It also shows where the high tier's time goes;
+- issue #5 (wire-in-catheter friction, two designs to choose from; M2-notes §3 argues for the sliding constraint) and issue #3 (high-tier performance) for spec 04;
 - phase D deviation 5 (the setup's wire is not in the input log) for spec 14.
 
 What M1 left in place:

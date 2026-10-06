@@ -22,7 +22,7 @@ Two gate items wait for the project's final stage, by the owner's choice: the ha
 | Milestone | What it delivers | Status |
 | --- | --- | --- |
 | M1 Foundations | Scaffold, data validator, device sandbox with three test phantoms | Done; the test drive and the placeholder review wait for the final stage |
-| M2 Core systems | Visceral anatomy, three-device stack, fluoro and DSA, flow network | Specs to write |
+| M2 Core systems | Visceral anatomy, three-device stack, fluoro and DSA, flow network | Specs to write; groundwork in [docs/M2-notes.md](docs/M2-notes.md) |
 | M3 First slice | Upper GI bleed with GDA embolization, end to end | Planned |
 | M4 Second slice | Uterine fibroid embolization with particles and reflux | Planned |
 | M5 Launch set | At least 12 cases, local saves, public release | Planned |
@@ -65,7 +65,7 @@ Other commands are listed in [CLAUDE.md](CLAUDE.md) and [CONTRIBUTING.md](CONTRI
 
 ## Tests
 
-- `npm test` runs 213 unit tests and golden physics scenes in about a minute. The golden scenes check, among others, cantilever deflection, twist transmission, inextensibility, lumen containment, friction, torque lag, branch selection, coaxial bending, determinism with replay, and buckling.
+- `npm test` runs 217 unit tests and golden physics scenes in about a minute. The golden scenes check, among others, cantilever deflection, twist transmission, inextensibility, lumen containment, friction, torque lag, branch selection, coaxial bending, determinism with replay, and buckling.
 - `npm run test:e2e` builds the app, serves the production preview and runs 10 end-to-end tests in Chromium on both WebGPU and WebGL 2, so 20 runs. They cover the start screen and disclaimer, all three demos (with rumble on a connected controller), a fake gamepad driving the wire and the C-arm, a blocked sheath, the device inspector, the perf overlay, the pause menu and the device picker's wire exchange. Every test fails on any console error.
 - `npm run validate-data` checks every fact in `/data`.
 - `npm run bench` prints the physics cost per tier.
