@@ -161,6 +161,8 @@ export interface RodSectionInstance {
   readonly name: string;
   readonly fromTip: ResolvedValue;
   readonly toTip: ResolvedValue;
+  /** The section's own outer diameter (outerDiameterFrom), or the device's. */
+  readonly outerDiameter: ResolvedValue;
   /** Pa. */
   readonly youngsModulus: SectionRange;
   /** EI, N·m². */
@@ -210,6 +212,7 @@ export interface RodDeviceInstance {
   readonly brandName?: string;
   readonly manufacturer?: string;
   readonly length: ResolvedValue;
+  /** The device's outer diameter; for a device whose sections each name their own, the most proximal section's. */
   readonly outerDiameter: ResolvedValue;
   /** Null for solid wires. */
   readonly innerDiameter: ResolvedValue | null;
@@ -281,7 +284,30 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     resolveNumber(label, quantity, { defaultConfidence: 'design', where: `${where}: ${path}` });
 
   const length = required(fromItem('Length', ['length', 'usableLength']), 'length');
-  const outerDiameter = required(fromItem('Outer diameter', ['diameter', 'outerDiameter']), 'diameter');
+  // Sections may take their own outer diameter from an item property (spec 04 §5): a tapered microcatheter.
+  const sectionDiameters = model.sections.map((section, i) => {
+    if (section.outerDiameterFrom === undefined) {
+      return undefined;
+    }
+    const fact = getPath(item, section.outerDiameterFrom);
+    if (!isRecord(fact)) {
+      throw new CatalogError(`${where}: ${item.id} has no ${section.outerDiameterFrom}.`);
+    }
+    const selection = variant[section.outerDiameterFrom.split('.').at(-1) ?? ''];
+    return resolveNumber(`${section.name} section: outer diameter`, fact, {
+      ...(selection === undefined ? {} : { selection }),
+      where: `${where}: sections[${i}] ${item.id} ${section.outerDiameterFrom}`,
+    });
+  });
+  const proximal = model.sections.reduce(
+    (best, section, i) => (best < 0 || section.toTip.value > (model.sections[best]?.toTip.value ?? 0) ? i : best),
+    -1,
+  );
+  const outerDiameter = required(
+    fromItem('Outer diameter', ['diameter', 'outerDiameter']) ??
+      (sectionDiameters.every((value) => value !== undefined) ? sectionDiameters[proximal] : undefined),
+    'diameter (item geometry, or outerDiameterFrom on every rod model section)',
+  );
   const innerDiameter =
     fromItem('Inner diameter', ['innerDiameter']) ??
     (model.innerDiameter === undefined ? undefined : design('Inner diameter', model.innerDiameter, 'innerDiameter')) ??
@@ -305,12 +331,9 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     return design(label, friction.coefficient, `friction ${id}`);
   };
   const wallFriction = frictionValue('Wall friction coefficient', model.frictionId);
-  // M1 couples a wire inside a catheter as one composite rod with no friction between them (docs/M1-plan.md, phase B
-  // deviation 3; issue #5), so the label says the value is resolved but not yet applied.
+  // Friction against devices inside this one, on the hub forces (spec 04 §2.3).
   const lumenFriction =
-    model.lumenFrictionId === undefined
-      ? null
-      : frictionValue('Lumen friction coefficient (not applied in M1)', model.lumenFrictionId);
+    model.lumenFrictionId === undefined ? null : frictionValue('Lumen friction coefficient', model.lumenFrictionId);
 
   let bodyYoungsModulus: ResolvedValue | null = null;
   if (model.bodyYoungsModulusFrom !== undefined) {
@@ -323,13 +346,7 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     });
   }
 
-  const outer = outerDiameter.value;
   const inner = innerDiameter?.value ?? 0;
-  const secondMoment = secondMomentOfArea(outer, inner);
-  // Torsion uses the polar moment J = 2I (spec 02 §11.1).
-  const polarMoment = 2 * secondMoment;
-  const geometryProvenance =
-    innerDiameter === null ? [outerDiameter.provenance] : [outerDiameter.provenance, innerDiameter.provenance];
   const parameters: ResolvedValue[] = [length, outerDiameter];
   if (innerDiameter !== null) {
     parameters.push(innerDiameter);
@@ -342,6 +359,12 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     const path = `sections[${i}] (${section.name})`;
     const fromTip = design(`${section.name} section: start from tip`, section.fromTip, `${path}.fromTip`);
     const toTip = design(`${section.name} section: end from tip`, section.toTip, `${path}.toTip`);
+    const sectionOuter = sectionDiameters[i] ?? outerDiameter;
+    const secondMoment = secondMomentOfArea(sectionOuter.value, inner);
+    // Torsion uses the polar moment J = 2I (spec 02 §11.1).
+    const polarMoment = 2 * secondMoment;
+    const geometryProvenance =
+      innerDiameter === null ? [sectionOuter.provenance] : [sectionOuter.provenance, innerDiameter.provenance];
     const modulus = sectionModulus(section, bodyYoungsModulus, `${where}: ${path}`);
     const bending: SectionRange = {
       atFromTip: modulus.range.atFromTip * secondMoment,
@@ -361,6 +384,9 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     );
 
     parameters.push(fromTip, toTip);
+    if (sectionDiameters[i] !== undefined) {
+      parameters.push(sectionOuter);
+    }
     const ends: readonly (readonly [string, keyof SectionRange])[] =
       modulus.range.atFromTip === modulus.range.atToTip
         ? [['', 'atFromTip']]
@@ -386,6 +412,7 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
       name: section.name,
       fromTip,
       toTip,
+      outerDiameter: sectionOuter,
       youngsModulus: modulus.range,
       bendingStiffness: bending,
       torsionalStiffness: torsion,
@@ -415,7 +442,6 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     torsionalStiffness: new Float64Array(count),
     massPerLength: new Float64Array(count),
   };
-  const massPerLength = density.value * crossSectionArea(outer, inner);
   for (let j = 0; j < count; j += 1) {
     const midpoint = (count - j - 0.5) * segmentLength;
     const k = sections.findIndex(
@@ -432,6 +458,8 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     const modulus =
       section.youngsModulus.atFromTip + (section.youngsModulus.atToTip - section.youngsModulus.atFromTip) * t;
     const shear = shearModulus(modulus, poissonRatio.value);
+    const outer = section.outerDiameter.value;
+    const secondMoment = secondMomentOfArea(outer, inner);
     segments.section[j] = k;
     segments.outerRadius[j] = outer / 2;
     segments.innerRadius[j] = inner / 2;
@@ -439,8 +467,8 @@ export function buildRodInstance(source: CatalogSource, rodModelId: string, segm
     segments.shearModulus[j] = shear;
     segments.secondMoment[j] = secondMoment;
     segments.bendingStiffness[j] = modulus * secondMoment;
-    segments.torsionalStiffness[j] = shear * polarMoment;
-    segments.massPerLength[j] = massPerLength;
+    segments.torsionalStiffness[j] = shear * 2 * secondMoment;
+    segments.massPerLength[j] = density.value * crossSectionArea(outer, inner);
   }
 
   parameters.push(density, poissonRatio, wallFriction);

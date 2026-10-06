@@ -44,6 +44,25 @@ const fixtureItems: DeviceItem[] = [
       length: { value: 400, unit: 'mm', confidence: 'design' },
     },
   },
+  {
+    id: 'mc-fixture-m',
+    kind: 'microcatheter',
+    genericName: 'Golden-scene microcatheter M',
+    geometry: {
+      outerDiameter: { value: 2.4, unit: 'Fr', confidence: 'design' },
+      length: { value: 600, unit: 'mm', confidence: 'design' },
+    },
+  },
+  {
+    id: 'gw-fixture-v',
+    kind: 'guidewire',
+    genericName: 'Golden-scene 0.014 in wire V',
+    geometry: {
+      diameter: { value: 0.014, unit: 'in', confidence: 'design' },
+      length: { value: 800, unit: 'mm', confidence: 'design' },
+    },
+    mechanics: { bodyFlexuralModulus: { value: 40, unit: 'GPa', confidence: 'design' } },
+  },
 ];
 
 const fixtureRodModels: RodModel[] = [
@@ -99,6 +118,57 @@ const fixtureRodModels: RodModel[] = [
       body: { value: 1, unit: '1', confidence: 'design' },
     },
   },
+  {
+    id: 'rm-fixture-m',
+    deviceId: 'mc-fixture-m',
+    variant: {},
+    materialId: 'mat-fixture-k',
+    innerDiameter: { value: 0.021, unit: 'in', confidence: 'design' },
+    sections: [
+      {
+        name: 'body',
+        fromTip: designLength(0),
+        toTip: designLength(600),
+        youngsModulus: { value: 0.5, unit: 'GPa', confidence: 'design' },
+      },
+    ],
+    restShape: [],
+    frictionId: 'fr-fixture-wall',
+    lumenFrictionId: 'fr-fixture-lumen',
+    radiopacity: {
+      tipBoost: { value: 1, unit: '1', confidence: 'design' },
+      body: { value: 1, unit: '1', confidence: 'design' },
+    },
+  },
+  {
+    id: 'rm-fixture-v',
+    deviceId: 'gw-fixture-v',
+    variant: {},
+    materialId: 'mat-fixture-v',
+    sections: [
+      {
+        name: 'body',
+        fromTip: designLength(0),
+        toTip: designLength(800),
+        youngsModulusRatio: { value: 1, unit: '1', confidence: 'design' },
+      },
+    ],
+    bodyYoungsModulusFrom: 'mechanics.bodyFlexuralModulus',
+    // A 45° tip toward d1 over the distal 3 mm.
+    restShape: [
+      {
+        fromTip: designLength(0),
+        toTip: designLength(3),
+        bendAngle: { value: 45, unit: 'deg', confidence: 'design' },
+        toward: 'd1',
+      },
+    ],
+    frictionId: 'fr-fixture-wall',
+    radiopacity: {
+      tipBoost: { value: 1, unit: '1', confidence: 'design' },
+      body: { value: 1, unit: '1', confidence: 'design' },
+    },
+  },
 ];
 
 const fixtureFriction: Friction[] = [
@@ -127,6 +197,12 @@ const fixtureBulk: BulkMaterial[] = [
     density: { value: 1200, unit: 'kg/m3', confidence: 'design' },
     poissonRatio: { value: 0.4, unit: '1', confidence: 'design' },
   },
+  {
+    id: 'mat-fixture-v',
+    name: 'Wire V nitinol',
+    density: { value: 6450, unit: 'kg/m3', confidence: 'design' },
+    poissonRatio: { value: 0.33, unit: '1', confidence: 'design' },
+  },
 ];
 
 const fixtureSource: CatalogSource = {
@@ -146,24 +222,42 @@ export function fullSpeed(): { readonly advance: number; readonly rotate: number
   return { advance: speeds.advanceSpeedMax, rotate: speeds.rotationSpeedMax };
 }
 
+/** Wire W's flexural modulus fact, for wireWithModulus. */
+export const WIRE_W_MODULUS_FACT = fixtureItems[0]!.mechanics!.bodyFlexuralModulus! as {
+  readonly confidence: string;
+  readonly [key: string]: unknown;
+};
+
 /** Wire W: uniform straight rod, 0.035 in, 9.5 GPa, ν 0.3, 7900 kg/m³, 400 mm. */
 export function wireW(): SimDeviceSpec {
   return buildRodInstance(fixtureSource, 'rm-fixture-w', highTier().segmentLength);
 }
 
 /**
- * Wire W with another device's flexural modulus fact, on a tier: test data for stiffness checks. The geometry, the
- * material and the 400 mm length stay wire W's.
+ * Wire W with another device's flexural modulus fact, on a tier: test data for stiffness checks. The diameter and
+ * material stay wire W's; the length is wire W's 400 mm unless given (with the 11 cm sheath, 400 mm reaches 290 mm
+ * past the sheath tip).
  */
 export function wireWithModulus(
   name: string,
   modulus: { readonly confidence: string; readonly [key: string]: unknown },
   tierId = 'high',
+  lengthMm = 400,
 ): SimDeviceSpec {
   const base = fixtureItems[0]!;
   const baseModel = fixtureRodModels[0]!;
-  const item: DeviceItem = { ...base, id: `gw-fixture-${name}`, mechanics: { bodyFlexuralModulus: modulus } };
-  const model: RodModel = { ...baseModel, id: `rm-fixture-${name}`, deviceId: item.id };
+  const item: DeviceItem = {
+    ...base,
+    id: `gw-fixture-${name}`,
+    geometry: { ...base.geometry, length: { value: lengthMm, unit: 'mm', confidence: 'design' } },
+    mechanics: { bodyFlexuralModulus: modulus },
+  };
+  const model: RodModel = {
+    ...baseModel,
+    id: `rm-fixture-${name}`,
+    deviceId: item.id,
+    sections: baseModel.sections.map((section) => ({ ...section, toTip: designLength(lengthMm) })),
+  };
   const source: CatalogSource = {
     ...fixtureSource,
     devices: new Map([...fixtureSource.devices, [item.id, item]]),
@@ -175,6 +269,31 @@ export function wireWithModulus(
 /** Catheter K: uniform tube, OD 5F, ID 0.039 in, 1.0 GPa, ν 0.4, 1200 kg/m³, 400 mm, 60° over the distal 15 mm. */
 export function catheterK(): SimDeviceSpec {
   return buildRodInstance(fixtureSource, 'rm-fixture-k', highTier().segmentLength);
+}
+
+/** Catheter S: catheter K without its curve, for comparisons. */
+export function catheterStraight(tierId = 'high'): SimDeviceSpec {
+  const model: RodModel = { ...fixtureRodModels[1]!, id: 'rm-fixture-s', restShape: [] };
+  const source: CatalogSource = {
+    ...fixtureSource,
+    rodModels: new Map([...fixtureSource.rodModels, [model.id, model]]),
+  };
+  return buildRodInstance(source, model.id, tierParams(repository(), tierId).segmentLength);
+}
+
+/** Catheter K on a tier. */
+export function catheterKOn(tierId: string): SimDeviceSpec {
+  return buildRodInstance(fixtureSource, 'rm-fixture-k', tierParams(repository(), tierId).segmentLength);
+}
+
+/** Microcatheter M: uniform straight tube, OD 2.4F, ID 0.021 in, 0.5 GPa, catheter K's polymer, 600 mm. */
+export function microcatheterM(tierId = 'high'): SimDeviceSpec {
+  return buildRodInstance(fixtureSource, 'rm-fixture-m', tierParams(repository(), tierId).segmentLength);
+}
+
+/** Wire V: 0.014 in, 40 GPa, nitinol density, 800 mm, 45° over the distal 3 mm. */
+export function wireV(tierId = 'high'): SimDeviceSpec {
+  return buildRodInstance(fixtureSource, 'rm-fixture-v', tierParams(repository(), tierId).segmentLength);
 }
 
 /** A repository rod model on the high tier. */
@@ -205,14 +324,19 @@ export interface SceneDevice {
   readonly rotation?: number;
 }
 
-/** An engine loaded with a golden scene: the repository's solver settings, the high tier, the given devices. */
+/**
+ * An engine loaded with a golden scene: the repository's solver settings (with any overrides), the high tier, the
+ * given devices.
+ */
 export function sceneEngine(
   anatomy: SimAnatomy,
   devices: readonly SceneDevice[],
   friction?: number,
   tierId = 'high',
+  physics: Partial<SimConfig['physics']> = {},
 ): SimEngine {
   const sheath = SHEATH();
+  const settings = engineSettings(repository());
   const config: SimConfig = {
     seed: 1,
     tier: tierParams(repository(), tierId),
@@ -225,7 +349,8 @@ export function sceneEngine(
     anatomy,
     accessId: 'inlet-sheath',
     sheathLength: sheath,
-    ...engineSettings(repository()),
+    ...settings,
+    physics: { ...settings.physics, ...physics },
     frictionOverride: friction ?? null,
   };
   const engine = new SimEngine();

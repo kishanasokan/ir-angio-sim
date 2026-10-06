@@ -23,13 +23,15 @@ Movable devices are ordered outermost first. The active pair moves with the D-pa
 
 ### 2.3 Device-in-device friction (M2, closes issue #5's design question)
 
-Because relative sliding inside the combined beam is kinematic, friction between devices acts on the **hub force** of the device that slides, not on its motion (the hand supplies whatever force the rate needs; pinned devices hold). For each overlapping pair (outer `o`, inner `i`) whose insertion rates differ, the sliding friction force is
+Because relative sliding inside the combined beam is kinematic, friction between devices acts on the **hub forces**, not on the motion (the hand supplies whatever force the rate needs; pinned devices hold). For each overlapping pair (outer `o`, inner `i`) whose insertion rates differ, the sliding friction force is
 
 ```
-F = μ_io · ( |T_i| · Σ θ_j  +  EI_i · Σ |κ_{j+1} − 2κ_j + κ_{j−1}| / l )
+F = μ_io · ( |T_i| · Σ θ_j  +  Σ EI_i,j · |κ_{j+1} − 2κ_j + κ_{j−1}| / l )
 ```
 
-over the joints `j` of the overlap, where `μ_io` is the inner device's `lumenFrictionId` coefficient against the outer device (`physics/materials → fr-device-in-device`), `θ_j` the joint angle, `κ_j = θ_j / l̄_j`, `EI_i` the inner device's bending stiffness and `T_i` the inner device's axial load (its hub force without this term, from the last step). The first term is the capstan law for a loaded device sliding round bends; the second is the contact force a stiff device needs to follow changes of curvature. `F` opposes the relative motion: it adds to the hub force of each device that is driven, with the sign of its own relative motion. Torsional device-in-device friction is not modeled in M2 (open question 1).
+over the outer device's joints `j` where it holds the inner one, where `μ_io` is the outer device's `lumenFrictionId` coefficient (`physics/materials → fr-device-in-device` for the M2 catheters and microcatheters), `θ_j` the joint angle, `κ_j = θ_j / l`, `EI_i,j` the inner device's bending stiffness at joint `j` and `T_i` the inner device's axial load (its hub force from this step's solve, before friction). The first term is the capstan law for a loaded device sliding round bends; the second is the contact force a stiff device needs to follow changes of curvature. Each device rubs on the innermost device around it at every arc, so in a three-device stack the microwire rubs on the microcatheter, and on the catheter only where it runs beyond a retracted microcatheter.
+
+`F` acts on both hubs, equal and opposite, against each one's motion relative to the other: the driven hand feels resistance, and the hand pinning the other device feels drag. Below `solver.frictionSlipSpeed` it grows linearly with the relative insertion speed, as wall friction does, so a locked pair (same rate) feels none. The engine reports it per device (`frictionForce`) as well as inside the hub force. Torsional device-in-device friction is not modeled in M2 (open question 1).
 
 ## 3. Contact
 
@@ -41,11 +43,11 @@ A node must stay within `max(0, R − r − margin)` of some lumen capsule axis;
 
 A perfectly straight rod pushed end-on into a cap makes the contact row a combination of the stretch rows, so the factorization finds a pivot that is not positive (docs/M2-notes.md §2). When a substep's solve fails, the solver:
 
-1. breaks the symmetry: every node with an active contact row moves `solver.symmetryBreak` (design) along its segment's material axis `d1`, a deterministic direction perpendicular to the rod, and the substep is assembled and solved again;
-2. if that also fails, gives the contact rows a compliance `solver.contactFallbackCompliance` (design) and solves again;
+1. **breaks the symmetry:** every active contact row's normal turns `solver.symmetryBreak` (design) toward its segment's material axis `d1`, a deterministic direction perpendicular to the rod, and the substep is solved again. If that solves, each active contact row then takes the wall's own plane at its node's corrected position and the substep is solved once more, so the tilt only chooses the side the rod gives way to and a tip that slid across a curved cap follows the cap; if that last system is singular, the tilted solution stands;
+2. if the tilted system is also singular, gives the contact rows a compliance `solver.contactFallbackCompliance` (design) and solves again;
 3. if that also fails, counts a solve failure, keeps the prediction, and projects every dynamic node that left the lumen back onto its allowed surface, so a failed substep never leaves a device outside the vessel.
 
-Real wires are never perfectly straight, so step 1 stands in for the imperfection that makes them buckle sideways.
+Real wires are never perfectly straight, so step 1 stands in for the imperfection that makes them buckle sideways. Moving the nodes instead of tilting the normals does not help: the stretch rows' Jacobians depend on the segments' orientations, not on the node positions. In the substep that falls back, the tip slides sideways about (advance per substep) / tan(`symmetryBreak`), because a straight rod's first-order shortening is zero; this sets the angle (`tuning/physics → solver.symmetryBreak`). Solving step 1's refreshed system repeatedly, until the nodes lie exactly on the wall, diverges for the same reason. The engine counts substeps rescued at steps 1 and 2 (`contactFallbacks`, `compliantFallbacks`) beside `solveFailures`.
 
 ## 4. Feedback
 
@@ -83,7 +85,7 @@ Golden scenes (headless; high tier unless stated):
 
 13. **Coaxial junction stays inextensible.** In phantom C, each of these stacks advances its inner device 60 mm, follows with the outer one 40 mm, then pulls the inner one back 30 mm while rotating: catheter K + microcatheter fixture; catheter K + 0.014 in wire fixture; microcatheter + wire; and the three together (with pair moves and lock). Every segment stays within 0.5% of its length, with no failed solve, and every inner device stays within its outer device's clearance.
 14. **Device-in-device friction.** The microcatheter fixture advanced 30 mm through catheter K: its hub force gains the friction term only while it slides, the term is zero at μ = 0, larger through K's 60° tip than through a straight catheter, and it rises with μ.
-15. **End-on push into a cap.** A straight 0.035 in rod pushed 50 mm past contact with phantom A's cap at sandbox-a-buckle's push speed: no node leaves the lumen by more than 0.05 mm, segments stay within 0.5%, the tip advances less than 2 mm after contact, and at most `solver.maxFallbackSubsteps` substeps fall back past step 1 of §3.2.
+15. **End-on push into a cap.** On both rod tiers, wire W (straight, 600 mm) pushed 10 mm past its first contact with phantom A's cap at sandbox-a-buckle's push speed: at least one substep falls back to step 1 of §3.2 and none past it, no solve fails, no node leaves the lumen by more than 0.05 mm, segments stay within 0.5%, the tip advances less than 2 mm after contact, and the hub force passes `feedback.hubForceDanger`. Pushed further, the rod locks up as a helix in the rigid tube at tens of newtons, where one linearization per substep no longer holds 0.5% (beyond about 30 mm); the hand-force ceiling of open question 2 bounds that load.
 16. **Rail branch selection.** On the fallback tier, golden scene 8's setup puts the tip in `c-left` at hub rotation 0 and in `c-right` at 180°; a rail device never leaves the centerline.
 17. **Stiffest rail wire** (added after M1): the stiffest wire in `/data` passes scene 1's cantilever and scene 3's push-pull criteria on both rod tiers (`tests/golden/rail-wire.golden.test.ts`).
 

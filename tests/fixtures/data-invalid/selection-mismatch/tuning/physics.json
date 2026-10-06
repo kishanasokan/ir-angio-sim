@@ -62,6 +62,18 @@
     "loadRelaxSteps": {
       "value": 500,
       "unit": "count"
+    },
+    "symmetryBreak": {
+      "value": 6,
+      "unit": "deg",
+      "confidence": "design",
+      "note": "Degenerate-contact fallback (spec 04 §3.2): when a straight rod pressed end-on against a wall makes the solve singular, each contact normal tilts this far toward its segment's d1, standing in for the imperfections that make a real wire buckle sideways. Added in M2 phase A."
+    },
+    "contactFallbackCompliance": {
+      "value": 0.001,
+      "unit": "mm/N",
+      "confidence": "design",
+      "note": "Compliance the contact rows get in the same fallback, so the system stays positive definite: 1 um of give per newton. Added in M2 phase A."
     }
   },
   "tiers": [

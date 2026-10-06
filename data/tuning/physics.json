@@ -17,7 +17,9 @@
     "rotationalInertiaScale": {"value": 1000, "unit": "1", "confidence": "design", "note": "Multiplies each rod segment's rotational inertia. A 2 mm segment of a thin wire would otherwise spin on a microsecond time scale, too fast to follow with one linearization per substep: when a buckled wire snaps through or is pushed hard against a cap (sandbox-a-buckle) the solve diverges. In that test 300 still diverged and 500 held; 1000 leaves a factor of two. Static shapes are unchanged; it slows only short bending and twisting waves (below a few centimetres), and twist still crosses a device within a few milliseconds. Added in M1 phase C."},
     "frictionSlipSpeed": {"value": 1, "unit": "mm/s", "confidence": "design", "note": "Below this sliding speed Coulomb friction is regularized (proportional to speed) so sticking does not chatter. Added in M1 phase B (docs/M1-plan.md D29)."},
     "frictionSlipSpin": {"value": 10, "unit": "deg/s", "confidence": "design", "note": "The same regularization for torsional friction against the wall. Added in M1 phase B (docs/M1-plan.md D29)."},
-    "loadRelaxSteps": {"value": 500, "unit": "count", "confidence": "design", "note": "At load the devices relax into their rest shapes for this many steps before step 0, so a pre-shaped tip that starts straight does not snap in the first frame. Added in M1 phase B."}
+    "loadRelaxSteps": {"value": 500, "unit": "count", "confidence": "design", "note": "At load the devices relax into their rest shapes for this many steps before step 0, so a pre-shaped tip that starts straight does not snap in the first frame. Added in M1 phase B."},
+    "symmetryBreak": {"value": 6, "unit": "deg", "confidence": "design", "note": "Degenerate-contact fallback (spec 04 §3.2): when a straight rod pressed end-on against a wall makes the solve singular, each contact normal tilts this far toward its segment's d1, standing in for the imperfections that make a real wire buckle sideways. The tip then slides sideways about (advance per substep)/tan(angle) in that substep: 0.19 mm on the high tier at 20 mm/s. 0.05 deg slid it 11 mm and stretched segments by 150%; 1 to 6 deg all held (docs/M2-plan.md Progress log). Added in M2 phase A."},
+    "contactFallbackCompliance": {"value": 0.001, "unit": "mm/N", "confidence": "design", "note": "Compliance the contact rows get if the tilted system is still singular (spec 04 §3.2 step 2), so it becomes positive definite: 1 um of give per newton. Not reached by any golden scene. Added in M2 phase A."}
   },
   "tiers": [
     {
@@ -166,6 +168,133 @@
       "lumenFrictionId": "fr-device-in-device",
       "radiopacity": {"tipBoost": {"value": 1.2, "unit": "1", "confidence": "design"}, "body": {"value": 0.8, "unit": "1", "confidence": "design"}},
       "materialId": "mat-catheter-polymer"
+    },
+    {
+      "id": "rm-cobra-c2-5f-65",
+      "deviceId": "cath-cobra",
+      "variant": {"outerDiameter": {"value": 5, "unit": "Fr"}, "length": {"value": 65, "unit": "cm"}},
+      "variantNote": "Outer diameter and length chosen from the item's sourced options and range; the C2 curve size from the item's C1 to C3 family. Added in M2 phase A.",
+      "innerDiameter": {"value": 0.039, "unit": "in", "confidence": "placeholder", "note": "Must exceed the largest compatible wire (0.038 in, sourced); confirm from the instructions for use."},
+      "sections": [
+        {
+          "name": "tip",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 20, "unit": "mm", "confidence": "placeholder", "note": "Soft-tip length unpublished."},
+          "youngsModulus": {"value": 0.3, "unit": "GPa", "confidence": "placeholder", "note": "Soft tip; tune with play-testing."}
+        },
+        {"name": "body", "fromTip": {"value": 20, "unit": "mm"}, "toTip": {"value": 650, "unit": "mm"}, "youngsModulus": {"value": 1.0, "unit": "GPa", "confidence": "placeholder", "note": "Effective modulus of a braided 5F shaft; unpublished."}}
+      ],
+      "restShape": [
+        {
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 8, "unit": "mm", "confidence": "placeholder", "note": "Primary curve of the double curve (dir-catheters-2023); its geometry is unpublished (item curveGeometry, placeholder): build from the manufacturer's drawing (spec 04 open question 4)."},
+          "bendAngle": {"value": 30, "unit": "deg", "confidence": "placeholder", "note": "Primary curve angle unpublished; review with an IR reviewer."},
+          "toward": "d1"
+        },
+        {
+          "fromTip": {"value": 25, "unit": "mm", "confidence": "placeholder", "note": "Straight run between the two curves, unpublished."},
+          "toTip": {"value": 45, "unit": "mm", "confidence": "placeholder", "note": "Secondary curve of the double curve; geometry unpublished."},
+          "bendAngle": {"value": 60, "unit": "deg", "confidence": "placeholder", "note": "Secondary curve angle unpublished; both curves turn the same way, as in a cobra's raised head. Review with an IR reviewer."},
+          "toward": "d1"
+        }
+      ],
+      "frictionId": "fr-uncoated-polymer-wall",
+      "lumenFrictionId": "fr-device-in-device",
+      "radiopacity": {"tipBoost": {"value": 1.2, "unit": "1", "confidence": "design"}, "body": {"value": 0.8, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-catheter-polymer"
+    },
+    {
+      "id": "rm-pigtail-5f-90",
+      "deviceId": "cath-pigtail",
+      "variant": {
+        "outerDiameter": {"value": 5, "unit": "Fr"},
+        "length": {"value": 90, "unit": "cm"},
+        "wireCompatibility": {"value": 0.038, "unit": "in", "confidence": "placeholder", "note": "The item states no wire compatibility; flush catheters of 5F are commonly 0.035 to 0.038 in compatible. Confirm from the instructions for use."}
+      },
+      "variantNote": "Outer diameter and length chosen from the item's sourced ranges. Added in M2 phase A.",
+      "innerDiameter": {"value": 0.039, "unit": "in", "confidence": "placeholder", "note": "Must exceed the largest compatible wire (0.038 in, placeholder); confirm from the instructions for use."},
+      "sections": [
+        {
+          "name": "loop",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 50, "unit": "mm", "confidence": "placeholder", "note": "The side holes lie in the last 5 cm (item sideHoles, sourced); the soft loop is taken to span them."},
+          "youngsModulus": {"value": 0.3, "unit": "GPa", "confidence": "placeholder", "note": "Soft loop; tune with play-testing."}
+        },
+        {"name": "body", "fromTip": {"value": 50, "unit": "mm"}, "toTip": {"value": 900, "unit": "mm"}, "youngsModulus": {"value": 1.0, "unit": "GPa", "confidence": "placeholder", "note": "Effective modulus of a braided 5F shaft; unpublished."}}
+      ],
+      "restShape": [
+        {
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 45, "unit": "mm", "confidence": "placeholder", "note": "Loop length unpublished: a full turn of 45 mm makes a loop about 14 mm across."},
+          "bendAngle": {"value": 360, "unit": "deg", "confidence": "placeholder", "note": "A pigtail curls through about one full turn; build the true shape from the manufacturer's drawing."},
+          "toward": "d1"
+        }
+      ],
+      "frictionId": "fr-uncoated-polymer-wall",
+      "lumenFrictionId": "fr-device-in-device",
+      "radiopacity": {"tipBoost": {"value": 1.0, "unit": "1", "confidence": "design"}, "body": {"value": 0.8, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-catheter-polymer"
+    },
+    {
+      "id": "rm-progreat-2.4-130",
+      "deviceId": "mc-progreat-2.4",
+      "variant": {"usableLength": {"value": 130, "unit": "cm"}},
+      "variantNote": "Usable length chosen from the item's sourced options. Added in M2 phase A.",
+      "sections": [
+        {
+          "name": "tip",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 150, "unit": "mm", "confidence": "placeholder", "note": "Length of the 2.4F distal segment unpublished; confirm from the instructions for use."},
+          "outerDiameterFrom": "geometry.outerDiameterDistal",
+          "youngsModulus": {"value": 0.3, "unit": "GPa", "confidence": "placeholder", "note": "Effective modulus of the flexible distal segment; unpublished. Tune with play-testing."}
+        },
+        {
+          "name": "body",
+          "fromTip": {"value": 150, "unit": "mm"},
+          "toTip": {"value": 1300, "unit": "mm"},
+          "outerDiameterFrom": "geometry.outerDiameterProximal",
+          "youngsModulus": {"value": 1.0, "unit": "GPa", "confidence": "placeholder", "note": "Effective modulus of a braided microcatheter shaft; unpublished."}
+        }
+      ],
+      "restShape": [],
+      "frictionId": "fr-hydrophilic-wet-wall",
+      "lumenFrictionId": "fr-device-in-device",
+      "radiopacity": {"tipBoost": {"value": 2.0, "unit": "1", "confidence": "design", "note": "Radiopaque tip marker drawn darker so it can be found."}, "body": {"value": 0.5, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-catheter-polymer"
+    },
+    {
+      "id": "rm-gt-016-angled-180",
+      "deviceId": "mw-glidewire-gt",
+      "variant": {"diameter": {"value": 0.016, "unit": "in"}, "length": {"value": 180, "unit": "cm"}, "tipShapes": "45 deg angle"},
+      "variantNote": "Diameter, length and tip shape chosen from the item's sourced options. Added in M2 phase A.",
+      "materialAssumption": {"text": "Nitinol core assumed", "confidence": "placeholder", "note": "The microwire item states no core material; the Glidewire's core is nitinol (terumo-glidewire-brochure)."},
+      "sections": [
+        {
+          "name": "tip",
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 30, "unit": "mm", "confidence": "placeholder", "note": "Length of the softest part of the 25 cm flexible tip unpublished."},
+          "youngsModulusRatio": {"value": 0.05, "unit": "1", "confidence": "placeholder", "note": "Tip stiffness relative to the body unpublished."}
+        },
+        {
+          "name": "flexible",
+          "fromTip": {"value": 30, "unit": "mm"},
+          "toTip": {"value": 250, "unit": "mm", "confidence": "sourced", "source": "terumo-glidewire-brochure", "note": "The item's 25 cm flexible tip length."},
+          "youngsModulusRatio": {"min": 0.05, "max": 1.0, "unit": "1", "confidence": "placeholder", "note": "Linear ramp from tip to body over the flexible length."}
+        },
+        {"name": "body", "fromTip": {"value": 250, "unit": "mm"}, "toTip": {"value": 1800, "unit": "mm"}, "youngsModulusRatio": {"value": 1.0, "unit": "1", "confidence": "design"}}
+      ],
+      "bodyYoungsModulusFrom": "mechanics.bodyFlexuralModulus",
+      "restShape": [
+        {
+          "fromTip": {"value": 0, "unit": "mm"},
+          "toTip": {"value": 2, "unit": "mm", "confidence": "placeholder", "note": "Factory angled-tip length unpublished."},
+          "bendAngle": {"value": 45, "unit": "deg", "confidence": "derived", "source": "terumo-glidewire-brochure", "note": "The selected tip shape option, 45 deg angle."},
+          "toward": "d1"
+        }
+      ],
+      "frictionId": "fr-hydrophilic-wet-wall",
+      "radiopacity": {"tipBoost": {"value": 1.5, "unit": "1", "confidence": "design", "note": "Tip drawn darker on fluoro so it can be found."}, "body": {"value": 0.6, "unit": "1", "confidence": "design"}},
+      "materialId": "mat-nitinol"
     }
   ],
   "ruleParameters": {"handHoldMargin": {"value": 15, "unit": "cm", "confidence": "design", "note": "Wire length that must stay outside the catheter hub to hold it; used by the limit-wire-length rule."}}

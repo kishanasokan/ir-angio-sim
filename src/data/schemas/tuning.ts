@@ -40,6 +40,8 @@ const sectionSchema = z
     // An absolute modulus, or a ratio to the item's body modulus; a {min, max} ratio is a linear ramp.
     youngsModulus: numberFactSchema.optional(),
     youngsModulusRatio: factSchema.optional(),
+    // An item path such as geometry.outerDiameterDistal: the section's own outer diameter (spec 04 §5).
+    outerDiameterFrom: z.string().min(1).optional(),
   })
   .refine(
     (section) => (section.youngsModulus === undefined) !== (section.youngsModulusRatio === undefined),
@@ -89,6 +91,8 @@ export const physicsTuningSchema = z.looseObject({
     frictionSlipSpeed: value,
     frictionSlipSpin: value,
     loadRelaxSteps: value,
+    symmetryBreak: value,
+    contactFallbackCompliance: value,
   }),
   tiers: z.array(tierSchema).min(1),
   feedback: z.looseObject({

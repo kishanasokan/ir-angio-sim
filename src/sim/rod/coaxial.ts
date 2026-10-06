@@ -8,8 +8,9 @@ import type { RodState } from './state';
  * node at arc distance u from the valve sits on the outer device's centerline at u while u is inside the outer
  * device. Where they overlap, the inner device's bending stiffness and rest curvature add to the outer device's
  * joints, so the stiffer member dominates the shared curvature: a wire straightens a curved catheter, and pulling it
- * back lets the curve re-form. Beyond the outer tip the inner device continues as its own rod, attached at the tip.
- * Axially each device follows its own hub, so the inner device slides freely inside the outer one.
+ * back lets the curve re-form. Beyond the outer tip the inner device continues as its own rod, attached at the tip
+ * like a combined beam (spec 04 §2.1). Each device follows its own hub, so sliding between devices is kinematic, and
+ * friction between them shows in the sliding device's hub force (spec 04 §2.3; friction.ts).
  */
 
 /** Arc distance of node i from the sheath valve. */

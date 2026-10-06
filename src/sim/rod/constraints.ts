@@ -361,12 +361,13 @@ function accumulate(
 /**
  * Assembles J·W·Jᵀ + α̃ (the lower triangle of each diagonal block, and the coupling blocks) and the right-hand side
  * −C − h²·J·W·f, solves for λ, and writes each variable's correction W·Jᵀ·λ + h²·W·f into `delta`. Returns false if
- * the system was not positive definite.
+ * the system was not positive definite. A positive `contactCompliance` (m/N) softens every active contact row; only the
+ * degenerate-contact fallback uses it.
  *
  * Like the block solve, this runs every substep for every unit, so it indexes typed arrays directly: entry, slot and
  * variable indices are in range by construction.
  */
-export function solveUnits(solver: Solver, h: number): boolean {
+export function solveUnits(solver: Solver, h: number, contactCompliance = 0): boolean {
   const { variables: vars, units, system } = solver;
   const h2 = h * h;
   const { entryCount, entryVariable, entryJacobian, entryWeighted, constraint, contactActive, lambda } =
@@ -488,11 +489,16 @@ export function solveUnits(solver: Solver, h: number): boolean {
       const t = base + c * UNIT_ROWS + c;
       diagonal[t] = diagonal[t]! + units.compliance[BEND_COMPONENTS * u + c]! / h2;
     }
+    const contactRow = GROUP_ROW[GROUP_CONTACT]!;
     if (contactActive[u] !== 1) {
       // Without contact the unit's last row, its contact row, drops out of the solve and its λ is 0.
-      const row = GROUP_ROW[GROUP_CONTACT]!;
-      system.sizes[u] = row;
-      rhs[UNIT_ROWS * u + row] = 0;
+      system.sizes[u] = contactRow;
+      rhs[UNIT_ROWS * u + contactRow] = 0;
+    } else if (contactCompliance > 0) {
+      // The fallback's compliant contact (spec 04 §3.2): it keeps the system positive definite when a contact row
+      // depends on the stretch rows.
+      const t = base + contactRow * UNIT_ROWS + contactRow;
+      diagonal[t] = diagonal[t]! + contactCompliance / h2;
     }
   }
 

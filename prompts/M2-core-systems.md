@@ -12,7 +12,7 @@ Extend the M1 sandbox into M2: a visceral arterial tree generated from sourced c
 
 1. Couple the coaxial junction fully in the solve (spec 04 §2.1).
 2. Device-in-device friction on the hub force (spec 04 §2.3), with `fr-device-in-device`.
-3. The degenerate-contact fallback chain (spec 04 §3.2), with design values `solver.symmetryBreak`, `solver.contactFallbackCompliance` and `solver.maxFallbackSubsteps`.
+3. The degenerate-contact fallback chain (spec 04 §3.2), with design values `solver.symmetryBreak` and `solver.contactFallbackCompliance`, and counters for each step.
 4. Per-section outer diameters in rod models (`outerDiameterFrom`, spec 04 §5) and per-segment stiffness, mass and contact radius from them.
 5. Rod models for the Cobra C2 (5F, 65 cm), the 5F pigtail (90 cm), the Progreat 2.4F (130 cm) and the GT 0.016 in angled microwire (180 cm), placeholders where unsourced.
 6. The rail fallback tier (spec 04 §6), chosen by the startup benchmark when the standard tier is over budget.

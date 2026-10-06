@@ -156,4 +156,51 @@ describe('unit test 8 · stiffness and catalog', () => {
     // Without a selection, a list of sizes cannot resolve to one value: rules report unknown, never a pass.
     expect(resolveItemPath(buildItemInstance(sheathItem), 'geometry.innerDiameter').status).toBe('missing');
   });
+
+  it('gives a tapered microcatheter per-section diameters, stiffness, mass and contact radius (spec 04 §5)', () => {
+    const high = tierSegmentLength('high');
+    const progreat = buildRodInstance(repository(), 'rm-progreat-2.4-130', high);
+    const distal = valueToSI(2.4, 'Fr');
+    const proximal = valueToSI(2.9, 'Fr');
+    const lumen = valueToSI(0.022, 'in');
+    const tip = section(progreat, 'tip');
+    const body = section(progreat, 'body');
+    expect(tip.outerDiameter.clinical).toEqual({ value: 2.4, unit: 'Fr' });
+    expect(tip.outerDiameter.provenance.confidence).toBe('sourced');
+    expect(body.outerDiameter.clinical).toEqual({ value: 2.9, unit: 'Fr' });
+    // The device's own outer diameter is the most proximal section's.
+    expect(progreat.outerDiameter.clinical).toEqual({ value: 2.9, unit: 'Fr' });
+    expect(
+      relativeError(tip.bendingStiffness.atFromTip, bendingStiffness(valueToSI(0.3, 'GPa'), distal, lumen)),
+    ).toBeLessThan(1e-12);
+    expect(
+      relativeError(body.bendingStiffness.atFromTip, bendingStiffness(valueToSI(1, 'GPa'), proximal, lumen)),
+    ).toBeLessThan(1e-12);
+    const segments = progreat.segments;
+    const last = segments.count - 1;
+    expect(segments.outerRadius[last]).toBe(distal / 2);
+    expect(segments.outerRadius[0]).toBe(proximal / 2);
+    expect(segments.innerRadius[last]).toBe(lumen / 2);
+    expect(segments.bendingStiffness[last]).toBeCloseTo(tip.bendingStiffness.atFromTip, 20);
+    expect(segments.massPerLength[last]).toBeCloseTo(1200 * crossSectionArea(distal, lumen), 15);
+    expect(segments.massPerLength[0]).toBeCloseTo(1200 * crossSectionArea(proximal, lumen), 15);
+    // The section diameters are inspector parameters with their provenance.
+    expect(progreat.parameters.map((parameter) => parameter.label)).toContain('tip section: outer diameter');
+    // fit-micro-parent keeps reading the proximal diameter from the item.
+    expect(resolveItemPath(progreat.item, 'geometry.outerDiameterProximal')).toMatchObject({
+      value: 2.9,
+      unit: 'Fr',
+    });
+  });
+
+  it.each(['high', 'standard'])('builds every rod model in /data on the %s tier', (tierId) => {
+    for (const id of repository().physics.rodModels.map((model) => model.id)) {
+      const instance = buildRodInstance(repository(), id, tierSegmentLength(tierId));
+      expect(instance.segments.count, id).toBeGreaterThan(1);
+      for (let j = 0; j < instance.segments.count; j += 1) {
+        expect(instance.segments.bendingStiffness[j], id).toBeGreaterThan(0);
+        expect(instance.segments.outerRadius[j], id).toBeGreaterThan(instance.segments.innerRadius[j] ?? 0);
+      }
+    }
+  });
 });

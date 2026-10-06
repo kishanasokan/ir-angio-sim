@@ -6,6 +6,7 @@ import {
   GROUPS_PER_UNIT,
   LENGTH_EPSILON,
   MAT3,
+  MAX_ENTRIES,
   PLACEMENT_VALUES,
   QUAT,
   STRETCH_ROW,
@@ -17,8 +18,8 @@ import {
   Y,
   Z,
 } from '../core/types';
-import { setIdentity3, setPerpendicularProjection3, setSkew3 } from '../math/mat3';
-import { quatApplyWorldRotation, quatCopy, quatFromAxisAngle, quatMultiply } from '../math/quat';
+import { setIdentity3, setSkew3 } from '../math/mat3';
+import { quatApplyWorldRotation, quatAxis, quatCopy, quatFromAxisAngle, quatMultiply } from '../math/quat';
 import {
   accumulateTwist,
   arcOfNode,
@@ -79,6 +80,10 @@ export interface PhysicsSettings {
   readonly slipSpin: number;
   /** Tip normal force sums the contact forces on this many most-distal nodes. */
   readonly tipForceNodes: number;
+  /** Degenerate-contact fallback (spec 04 §3.2): how far contact normals tilt toward d1, rad, and the compliance the
+   * contact rows then get, m/N. */
+  readonly symmetryBreak: number;
+  readonly contactFallbackCompliance: number;
 }
 
 export interface PhysicsDevice {
@@ -117,8 +122,12 @@ export interface PhysicsWorld {
   readonly solver: Solver;
   readonly hit: LumenHit;
   readonly query: ContactQuery;
-  /** Substeps whose system was not positive definite; they keep the predicted state. Zero in a healthy run. */
+  /** Substeps whose system stayed singular through the fallback; they keep the prediction, projected into the lumen. */
   solveFailures: number;
+  /** Substeps rescued by the degenerate-contact fallback: by tilting the contact normals alone, and by also making the
+   * contact rows compliant (spec 04 §3.2 steps 1 and 2). */
+  contactFallbacks: number;
+  compliantFallbacks: number;
   /** Linear solves so far, counting each contact pass: a measure of cost. */
   solves: number;
   readonly scratch: {
@@ -177,6 +186,8 @@ export function createPhysicsWorld(
     hit: createLumenHit(),
     query: createContactQuery(),
     solveFailures: 0,
+    contactFallbacks: 0,
+    compliantFallbacks: 0,
     solves: 0,
     scratch: {
       vector: new Float64Array(VEC3),
@@ -509,8 +520,10 @@ function buildChains(world: PhysicsWorld, h: number, firstUnit: Int32Array, pivo
       let py = rod.x[VEC3 * k + Y] ?? 0;
       let pz = rod.x[VEC3 * k + Z] ?? 0;
       if (k === first - 1 && junctionOwner >= 0) {
-        // The slaved node lies on the owner's tip segment, a lever e behind the owner's tip node; axially it follows
-        // its own hub, so only lateral motion of the owner moves it.
+        // The junction lies on the owner's tip segment, a lever e behind the owner's tip node, and follows the owner in
+        // every direction, as it is placed after the solve: coupling it only laterally let the owner's axial correction
+        // reappear each substep as a length error, which soft inner devices turned into an oscillation (spec 04
+        // §2.1). Sliding stays kinematic: the lever changes with the two insertion depths.
         const ownerDevice = devices[junctionOwner] as PhysicsDevice;
         const ownerRod = ownerDevice.rod;
         const ownerTip = ownerRod.segmentCount - 1;
@@ -526,7 +539,7 @@ function buildChains(world: PhysicsWorld, h: number, firstUnit: Int32Array, pivo
         rod.x[VEC3 * k] = px;
         rod.x[VEC3 * k + Y] = py;
         rod.x[VEC3 * k + Z] = pz;
-        setPerpendicularProjection3(jacobian, 0, ox, oy, oz, -1 / l);
+        setIdentity3(jacobian, 0, -1 / l);
         addEntry(
           solver,
           u,
@@ -670,6 +683,127 @@ function releaseAdhesiveContacts(world: PhysicsWorld): boolean {
   return released;
 }
 
+/**
+ * Solves the substep. Contact only pushes: rows are added for nodes that ended beyond the wall and released when they
+ * pulled a node onto it, and the substep is solved again until the set of contacts holds, at most contactPasses solves
+ * in all. Returns false if a solve was not positive definite.
+ */
+function solveWithContacts(world: PhysicsWorld, h: number, contactCompliance: number): boolean {
+  const { solver, settings } = world;
+  let solved = solveUnits(solver, h, contactCompliance);
+  world.solves += 1;
+  for (let pass = 1; solved && pass < settings.contactPasses; pass += 1) {
+    const added = activateMissedContacts(world);
+    const released = releaseAdhesiveContacts(world);
+    if (!added && !released) {
+      break;
+    }
+    solved = solveUnits(solver, h, contactCompliance);
+    world.solves += 1;
+  }
+  return solved;
+}
+
+/** Turns every active contact row's normal by `angle` (rad, small) toward its segment's d1 axis. */
+function tiltContactNormals(world: PhysicsWorld, angle: number): void {
+  const { solver, devices, scratch } = world;
+  const units = solver.units;
+  const d1 = scratch.vector;
+  for (let u = 0; u < units.count; u += 1) {
+    if (units.contactActive[u] !== 1) {
+      continue;
+    }
+    const device = devices[units.device[u] ?? 0] as PhysicsDevice;
+    quatAxis(device.rod.q, QUAT * (units.segment[u] ?? 0), X, d1, 0);
+    const j = MAT3 * MAX_ENTRIES * (GROUPS_PER_UNIT * u + GROUP_CONTACT);
+    const nx = units.entryJacobian[j] ?? 0;
+    const ny = units.entryJacobian[j + Y] ?? 0;
+    const nz = units.entryJacobian[j + Z] ?? 0;
+    // d1 without its component along n, so the tilt is sideways.
+    const along = (d1[0] ?? 0) * nx + (d1[1] ?? 0) * ny + (d1[2] ?? 0) * nz;
+    const tx = nx + angle * ((d1[0] ?? 0) - along * nx);
+    const ty = ny + angle * ((d1[1] ?? 0) - along * ny);
+    const tz = nz + angle * ((d1[2] ?? 0) - along * nz);
+    const length = Math.sqrt(tx * tx + ty * ty + tz * tz);
+    units.entryJacobian[j] = tx / length;
+    units.entryJacobian[j + Y] = ty / length;
+    units.entryJacobian[j + Z] = tz / length;
+  }
+}
+
+/**
+ * Re-linearizes every active contact row at its node's corrected position: the wall's plane there, evaluated at the
+ * prediction. Returns the largest distance a corrected node lies beyond the wall, m (0 when none does).
+ */
+function refreshContacts(world: PhysicsWorld): number {
+  const { solver, lumen, settings, query } = world;
+  if (lumen === null) {
+    return 0;
+  }
+  const units = solver.units;
+  const delta = solver.variables.delta;
+  let worst = 0;
+  for (let u = 0; u < units.count; u += 1) {
+    if (units.contactActive[u] !== 1) {
+      continue;
+    }
+    const d = units.device[u] ?? 0;
+    const device = world.devices[d] as PhysicsDevice;
+    const node = (units.segment[u] ?? 0) + 1;
+    const variable = device.nodeVariable[node] ?? -1;
+    const o = VEC3 * node;
+    const dx = delta[VEC3 * variable] ?? 0;
+    const dy = delta[VEC3 * variable + Y] ?? 0;
+    const dz = delta[VEC3 * variable + Z] ?? 0;
+    const x = (device.rod.x[o] ?? 0) + dx;
+    const y = (device.rod.x[o + Y] ?? 0) + dy;
+    const z = (device.rod.x[o + Z] ?? 0) + dz;
+    if (
+      variable < 0 ||
+      !probeLumen(
+        lumen,
+        world.hit,
+        x,
+        y,
+        z,
+        device.rod.outerRadius[node - 1] ?? 0,
+        settings.lumenMargin,
+        query,
+      )
+    ) {
+      continue;
+    }
+    const shift = (query.normal[0] ?? 0) * dx + (query.normal[1] ?? 0) * dy + (query.normal[2] ?? 0) * dz;
+    worst = Math.max(worst, Math.abs(query.violation));
+    units.entryCount[GROUPS_PER_UNIT * u + GROUP_CONTACT] = 0;
+    activateContact(world, u, d, node, shift);
+  }
+  return worst;
+}
+
+/** A substep that stayed singular keeps its prediction; this moves every free node that left the lumen back onto it. */
+function projectIntoLumen(world: PhysicsWorld): void {
+  const { lumen, settings, query } = world;
+  if (lumen === null) {
+    return;
+  }
+  for (const device of world.devices) {
+    const rod = device.rod;
+    for (let i = Math.max(1, device.firstOwned); i <= rod.segmentCount; i += 1) {
+      const o = VEC3 * i;
+      const x = rod.x[o] ?? 0;
+      const y = rod.x[o + Y] ?? 0;
+      const z = rod.x[o + Z] ?? 0;
+      const radius = rod.outerRadius[i - 1] ?? 0;
+      if (probeLumen(lumen, world.hit, x, y, z, radius, settings.lumenMargin, query) && query.violation > 0) {
+        rod.x[o] = x - query.violation * (query.normal[0] ?? 0);
+        rod.x[o + Y] = y - query.violation * (query.normal[1] ?? 0);
+        rod.x[o + Z] = z - query.violation * (query.normal[2] ?? 0);
+      }
+    }
+  }
+}
+
 /** Places every kinematic node and segment for the step's final L and φ: substeps place only those near the sheath. */
 export function placeKinematicParts(world: PhysicsWorld): void {
   for (const device of world.devices) {
@@ -752,21 +886,32 @@ export function physicsSubstep(world: PhysicsWorld, h: number, elapsed: number):
 
   const { firstUnit, pivotAxis } = world.scratch;
   buildChains(world, h, firstUnit, pivotAxis);
-  // Contact only pushes: add rows for nodes that ended beyond the wall, release rows that pulled a node onto it, and
-  // solve again until the set of contacts holds, at most contactPasses solves in all.
-  let solved = solveUnits(solver, h);
-  world.solves += 1;
-  for (let pass = 1; solved && pass < settings.contactPasses; pass += 1) {
-    const added = activateMissedContacts(world);
-    const released = releaseAdhesiveContacts(world);
-    if (!added && !released) {
-      break;
+  let solved = solveWithContacts(world, h, 0);
+  if (!solved) {
+    // Degenerate contact (spec 04 §3.2): a straight rod pressed end-on against a wall makes a contact row a
+    // combination of the stretch rows. Tilting each contact normal toward its segment's d1 breaks the symmetry a real
+    // wire's imperfections break; if the system is still singular, compliant contact rows make it positive definite.
+    tiltContactNormals(world, settings.symmetryBreak);
+    solved = solveWithContacts(world, h, 0);
+    if (solved) {
+      world.contactFallbacks += 1;
+      // The tilt only chooses the side the rod gives way to. Each contact then takes the wall's own plane at the
+      // corrected position and the substep is solved once more, so a tip that slid across a curved cap follows it; if
+      // that system is singular again, the tilted solution stands. Solving again until the nodes lie exactly on the
+      // wall diverges: each solve re-imposes the whole push on a rod whose first-order shortening is still zero.
+      if (refreshContacts(world) > 0) {
+        solveWithContacts(world, h, 0);
+      }
+    } else {
+      solved = solveWithContacts(world, h, settings.contactFallbackCompliance);
+      if (solved) {
+        world.compliantFallbacks += 1;
+      }
     }
-    solved = solveUnits(solver, h);
-    world.solves += 1;
   }
   if (!solved) {
     world.solveFailures += 1;
+    projectIntoLumen(world);
   } else {
     applyCorrections(
       solver,

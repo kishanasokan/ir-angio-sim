@@ -19,6 +19,7 @@ import {
 } from './imaging/carm';
 import { quatAxis } from './math/quat';
 import { buildRod, rodKineticEnergy } from './rod/build';
+import { slidingFriction } from './rod/friction';
 import { createAccessFrame, placeKinematic, placeStraight, type AccessFrame } from './rod/insertion';
 import {
   createPhysicsDevice,
@@ -80,6 +81,9 @@ export interface SimConfig {
     readonly slipSpin: number;
     /** Steps the devices relax into their rest shapes at load, before step 0. */
     readonly loadRelaxSteps: number;
+    /** Degenerate-contact fallback (spec 04 §3.2): contact-normal tilt, rad, and contact compliance, m/N. */
+    readonly symmetryBreak: number;
+    readonly contactFallbackCompliance: number;
   };
   readonly feedback: {
     readonly hubForceWarning: number;
@@ -111,6 +115,8 @@ interface DeviceRecord {
   readonly bendD1: number;
   readonly bendD2: number;
   hubForce: number;
+  /** The device-in-device friction part of hubForce (spec 04 §2.3), N. */
+  frictionForce: number;
   tipForce: number;
   wallStress: number;
   tipSegment: number;
@@ -129,7 +135,10 @@ export interface DeviceView {
   readonly rod: PhysicsDevice['rod'];
   readonly inserted: number;
   readonly rotation: number;
+  /** Axial force at the hub, N: positive while the hand pushes against resistance. */
   readonly hubForce: number;
+  /** The part of hubForce from friction against the devices around and inside it (spec 04 §2.3), N. */
+  readonly frictionForce: number;
   readonly tipForce: number;
   readonly wallStress: number;
   /** Index of the anatomy segment holding the tip, or −1 (inside the sheath, or free space). */
@@ -164,6 +173,7 @@ export class SimEngine {
   private swap: SwapState | null = null;
   private blocked = false;
   private readonly hit: LumenHit = createLumenHit();
+  private readonly frictionScratch = new Float64Array(2 * VEC3);
 
   load(config: SimConfig): void {
     this.config = config;
@@ -205,6 +215,16 @@ export class SimEngine {
   /** Substeps whose linear system was not positive definite; zero in a healthy run. */
   get solveFailures(): number {
     return this.world?.solveFailures ?? 0;
+  }
+
+  /** Substeps that the degenerate-contact fallback's tilted normals (spec 04 §3.2 step 1) let solve. */
+  get contactFallbacks(): number {
+    return this.world?.contactFallbacks ?? 0;
+  }
+
+  /** Substeps that also needed compliant contact rows (spec 04 §3.2 step 2). */
+  get compliantFallbacks(): number {
+    return this.world?.compliantFallbacks ?? 0;
   }
 
   /** Queues a step-stamped command; it applies at the start of its step (or the next step, if already past). */
@@ -309,6 +329,7 @@ export class SimEngine {
       inserted: physics.inserted,
       rotation: physics.rotation,
       hubForce: record.hubForce,
+      frictionForce: record.frictionForce,
       tipForce: record.tipForce,
       wallStress: record.wallStress,
       tipSegment: record.tipSegment,
@@ -529,6 +550,7 @@ export class SimEngine {
       bendD1: bendNorm > 0 ? bendD1 / bendNorm : 0,
       bendD2: bendNorm > 0 ? bendD2 / bendNorm : 0,
       hubForce: 0,
+      frictionForce: 0,
       tipForce: 0,
       wallStress: 0,
       tipSegment: -1,
@@ -610,6 +632,8 @@ export class SimEngine {
         slipSpeed: config.physics.slipSpeed,
         slipSpin: config.physics.slipSpin,
         tipForceNodes: config.feedback.tipForceNodes,
+        symmetryBreak: config.physics.symmetryBreak,
+        contactFallbackCompliance: config.physics.contactFallbackCompliance,
       },
     );
   }
@@ -758,6 +782,10 @@ export class SimEngine {
       record.tipForce = physics.tipForceSum / tier.substeps;
       physics.hubForceSum = 0;
       physics.tipForceSum = 0;
+    }
+    this.addDeviceFriction();
+    for (const record of this.records) {
+      const physics = record.physics;
       // Wall stress: ∫ max(0, tip normal force − threshold) dt (docs/M1-plan.md D16).
       record.wallStress += Math.max(0, record.tipForce - config.feedback.wallStressThreshold) * dt;
 
@@ -796,6 +824,52 @@ export class SimEngine {
       record.tipSegment = segment;
     }
     this.stepCount += 1;
+  }
+
+  /**
+   * Device-in-device friction (spec 04 §2.3). Each device rubs on the innermost device around it at every arc; where
+   * their insertion rates differ, the friction acts on both hubs, equal and opposite, against each one's motion
+   * relative to the other: the driven hand feels resistance, the pinning hand feels drag. Below frictionSlipSpeed the
+   * force grows linearly with the relative speed, as wall friction does.
+   */
+  private addDeviceFriction(): void {
+    const config = this.requireConfig();
+    const frame = this.requireFrame();
+    for (const record of this.records) {
+      record.frictionForce = 0;
+    }
+    for (let i = 1; i < this.records.length; i += 1) {
+      const inner = this.records[i] as DeviceRecord;
+      // Arcs held by a device between this pair belong to that device's pair.
+      let covered = frame.sheathLength;
+      for (let o = i - 1; o >= 0; o -= 1) {
+        const outer = this.records[o] as DeviceRecord;
+        const upper = Math.min(outer.physics.inserted, inner.physics.inserted);
+        const relative = inner.physics.insertRate - outer.physics.insertRate;
+        const slip = Math.min(1, Math.max(-1, relative / config.physics.slipSpeed));
+        if (upper > covered && slip !== 0) {
+          const force =
+            slip *
+            slidingFriction(
+              outer.physics.rod,
+              outer.physics.inserted,
+              inner.physics.rod,
+              inner.physics.inserted,
+              covered,
+              upper,
+              outer.physics.lumenFriction,
+              inner.hubForce,
+              this.frictionScratch,
+            );
+          inner.frictionForce += force;
+          outer.frictionForce -= force;
+        }
+        covered = Math.max(covered, outer.physics.inserted);
+      }
+    }
+    for (const record of this.records) {
+      record.hubForce += record.frictionForce;
+    }
   }
 
   /** The anatomy segment whose capsule holds the tip most deeply; −1 inside the sheath or in free space. */

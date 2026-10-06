@@ -22,7 +22,7 @@ import {
 // - scene 3's push-pull with full-speed rotation in phantom B, through wall contact at the bend, segments within 0.5%
 //   at every step.
 // A perfectly straight rod pushed end-on into a cap makes the solve singular whatever its stiffness; that is a contact
-// question for spec 04, recorded in docs/M2-notes.md, not a stiffness one.
+// question, answered by spec 04 §3.2 and golden scene 15, not a stiffness one.
 
 const STIFFEST = 'gw-lunderquist-cook';
 const WIRE_W_MODULUS = valueToSI(9.5, 'GPa');

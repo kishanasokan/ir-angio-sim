@@ -59,14 +59,19 @@ const UNITS = {
   // force; tip load is in gram-force, not grams
   N: { toSI: 1, si: 'N' },
   gf: { toSI: 9.80665e-3, si: 'N' },
+  // stiffness and compliance (spec 04: the rail model's cap, the contact fallback)
+  'N/mm': { toSI: 1e3, si: 'N/m' },
+  'mm/N': { toSI: 1e-3, si: 'm/N' },
   // mass
   g: { toSI: 1e-3, si: 'kg' },
   mg: { toSI: 1e-6, si: 'kg' },
   ug: { toSI: 1e-9, si: 'kg' },
   kg: { toSI: 1, si: 'kg' },
-  // density, kinematic viscosity, energy
+  // density, viscosity, energy
   'kg/m3': { toSI: 1, si: 'kg/m3' },
   cSt: { toSI: 1e-6, si: 'm2/s' },
+  'Pa*s': { toSI: 1, si: 'Pa*s' },
+  'mPa*s': { toSI: 1e-3, si: 'Pa*s' },
   J: { toSI: 1, si: 'J' },
   // dose, kerma-area product, activity
   mGy: { toSI: 1e-3, si: 'Gy' },

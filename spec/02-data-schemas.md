@@ -91,9 +91,11 @@ In `ir-sim/tuning@1` files, unit-bearing objects without a confidence default to
 | `mL/s`, `mL/min`, `L/min` | flow | 1e-6, 1.6667e-8, 1.6667e-5 m³/s |
 | `psi`, `atm`, `mmHg`, `Pa`, `kPa`, `MPa`, `GPa` | pressure, modulus | 6894.757293168, 101325, 133.322387415, 1, 1e3, 1e6, 1e9 Pa |
 | `N`, `gf` | force | 1, 9.80665e-3 N |
+| `N/mm`, `mm/N` | stiffness, compliance (M2) | 1e3 N/m, 1e-3 m/N |
 | `g`, `mg`, `ug`, `kg` | mass | 1e-3, 1e-6, 1e-9, 1 kg |
 | `kg/m3` | density | 1 |
 | `cSt` | kinematic viscosity | 1e-6 m²/s |
+| `Pa*s`, `mPa*s` | dynamic viscosity (M2) | 1, 1e-3 Pa·s |
 | `J` | energy | 1 |
 | `mGy`, `Gy`, `Gy*cm2`, `Bq`, `GBq` | dose, kerma-area product, activity | 1e-3 Gy, 1 Gy, 1e-4 Gy·m², 1 Bq, 1e9 Bq |
 | `%`, `1`, `count`, `px` | ratios, counts, screen pixels | dimensionless (`%` ÷ 100) |
@@ -219,6 +221,7 @@ type RodModel = {
     name: string; fromTip: Length; toTip: Length;
     youngsModulus?: Fact;                            // absolute, or
     youngsModulusRatio?: Fact;                       // relative to the item's body modulus (bodyYoungsModulusFrom)
+    outerDiameterFrom?: string;                      // (M2) item path of this section's own outer diameter
   }[];                                               // a range ratio {min, max} means a linear ramp
   bodyYoungsModulusFrom?: string;                    // path in the item, e.g. mechanics.bodyFlexuralModulus
   restShape: { fromTip: Length; toTip: Length; bendAngle: Fact; toward?: "d1" | "d2" }[];   // uniform curvature turning the tip toward material axis d1 (default)
@@ -228,6 +231,8 @@ type RodModel = {
 ```
 
 Bending stiffness is computed, not stored: `EI = E·π·d⁴/64` for a wire and `EI = E·π·(dₒ⁴ − dᵢ⁴)/64` for a tube; torsional stiffness `GJ` with `J = 2I` and `G = E / (2(1 + ν))`.
+
+A section with `outerDiameterFrom` (M2, spec 04 §5), such as `geometry.outerDiameterDistal`, uses that item property as its outer diameter for stiffness, mass and the contact radius; other sections use the item's `diameter` or `outerDiameter`. An item with neither, such as a tapered microcatheter, needs `outerDiameterFrom` on every section, and the device's outer diameter is then its most proximal section's.
 
 A rest-shape region turns the tip by exactly `bendAngle`: the rotation is shared equally among the rod joints whose midpoints fall inside `[fromTip, toTip]` (if none does, the nearest joint takes all of it), so the total survives any segment length. A region's bend angle is measured as the angle between the tangent of the segment just proximal to the region and the tangent of the most distal segment.
 

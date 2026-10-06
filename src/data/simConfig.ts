@@ -47,6 +47,8 @@ export function engineSettings(repository: Repository): Pick<SimConfig, 'physics
       slipSpeed: si(solver.frictionSlipSpeed),
       slipSpin: si(solver.frictionSlipSpin),
       loadRelaxSteps: solver.loadRelaxSteps.value,
+      symmetryBreak: si(solver.symmetryBreak),
+      contactFallbackCompliance: si(solver.contactFallbackCompliance),
     },
     feedback: {
       hubForceWarning: si(feedback.hubForceWarning),
