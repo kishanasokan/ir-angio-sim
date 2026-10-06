@@ -208,6 +208,8 @@ export interface CaseSI {
   readonly inventory: readonly string[];
   /** Movable devices, outermost first. */
   readonly initialStack: readonly string[];
+  /** The starting stacks setup offers, the default first; one built from initialStack when the case lists none. */
+  readonly stackOptions: readonly { readonly id: string; readonly label: string; readonly stack: readonly string[] }[];
   readonly targetDistance: ResolvedValue | null;
   readonly autopilot: readonly {
     readonly id: string;
@@ -246,6 +248,7 @@ export function loadCase(repository: Repository, id: string): CaseSI {
     })),
     inventory: data.inventory.map((entry) => entry.rodModel),
     initialStack: data.initialStack,
+    stackOptions: data.stackOptions ?? [{ id: 'default', label: 'Default stack', stack: data.initialStack }],
     targetDistance:
       data.targetDistance === undefined
         ? null

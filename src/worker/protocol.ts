@@ -13,7 +13,8 @@ export interface InitMessage {
   readonly type: 'init';
   readonly caseId: string;
   readonly anatomyId?: string;
-  /** Sandbox setup's wire: a case inventory rod model for the innermost slot of the starting stack. */
+  /** Sandbox setup's stack option and wire: a case inventory rod model for the innermost slot of that stack. */
+  readonly stackId?: string;
   readonly innerDevice?: string;
   /** A tier chosen in Settings; without one, the worker benchmarks and chooses (docs/M1-plan.md D17). */
   readonly tierId?: string;

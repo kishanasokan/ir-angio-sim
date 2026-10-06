@@ -30,10 +30,15 @@ describe('loop timing', () => {
     expect(targetStep(clock, 4100, 500)).toBe(300);
   });
 
-  it('chooses the standard tier when the high tier costs more than the budget', () => {
+  it('chooses the first tier within the budget, else the fallback', () => {
     expect(physicsPerFrame(0.25, 1000, 60)).toBeCloseTo(4.1667, 4);
-    expect(chooseTier(4.2, 4, 'high', 'standard')).toBe('standard');
-    expect(chooseTier(3.9, 4, 'high', 'standard')).toBe('high');
+    expect(chooseTier([{ id: 'high', msPerFrame: 3.9 }], 4, 'fallback')).toBe('high');
+    const costs = [
+      { id: 'high', msPerFrame: 4.2 },
+      { id: 'standard', msPerFrame: 1.5 },
+    ];
+    expect(chooseTier(costs, 4, 'fallback')).toBe('standard');
+    expect(chooseTier(costs, 1, 'fallback')).toBe('fallback');
   });
 
   it('benchmarks the high tier at depth with the clock it is given', () => {
@@ -42,9 +47,20 @@ describe('loop timing', () => {
     const cheap = benchmarkTier(repository(), () => (fake += 1));
     expect(cheap.tierId).toBe('high');
     expect(cheap.highMsPerFrame).toBeCloseTo(physicsPerFrame(1 / 300, 1000, 60), 9);
-    // A clock that advances 2 s per reading: far over the 4 ms budget.
+    // A clock that advances 2 s per reading: far over the 4 ms budget on both rod tiers, so the rail fallback.
     let slow = 0;
-    expect(benchmarkTier(repository(), () => (slow += 2000)).tierId).toBe('standard');
+    const choice = benchmarkTier(repository(), () => (slow += 2000));
+    expect(choice.costs.map((cost) => cost.id)).toEqual(['high', 'standard']);
+    expect(choice.tierId).toBe('fallback');
+    // A clock that is slow only for the high tier's run: the standard tier.
+    let reading = 0;
+    let calls = 0;
+    const mixed = benchmarkTier(repository(), () => {
+      calls += 1;
+      reading += calls <= 2 ? 2000 : 1;
+      return reading;
+    });
+    expect(mixed.tierId).toBe('standard');
   });
 });
 

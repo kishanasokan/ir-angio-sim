@@ -85,12 +85,12 @@ export class DeviceTube {
       return;
     }
     const first = segments - inside;
-    const { radiopacity, outerRadiusMm } = this.look;
+    const { radiopacity, outerRadiiMm } = this.look;
     this.tube.write(
       device.positionsMm,
       first,
       inside + 1,
-      () => outerRadiusMm,
+      (i) => outerRadiiMm[Math.min(segments - 1, first + i)] ?? 0,
       (i) => radiopacity[Math.min(segments - 1, first + i)] ?? 1,
     );
   }

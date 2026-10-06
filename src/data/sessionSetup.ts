@@ -36,6 +36,9 @@ export function sandboxSession(repository: Repository, options: SandboxSessionOp
       appVersion: options.appVersion,
       dataHash: dataHash(options.files),
       caseId,
+      // The starting stack is part of the session, so a replay starts with the same devices.
+      ...(options.stackId === undefined ? {} : { stackId: options.stackId }),
+      ...(options.innerDevice === undefined ? {} : { innerDevice: options.innerDevice }),
       settings: settingsRecord(settings),
     },
   };

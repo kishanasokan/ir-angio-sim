@@ -100,6 +100,8 @@ export function checkLog(value: unknown, currentDataHash: string): InputLog {
     typeof value.seed !== 'number' ||
     typeof value.caseId !== 'string' ||
     typeof value.anatomyId !== 'string' ||
+    (value.stackId !== undefined && typeof value.stackId !== 'string') ||
+    (value.innerDevice !== undefined && typeof value.innerDevice !== 'string') ||
     !Array.isArray(value.frames) ||
     !Array.isArray(value.commands)
   ) {

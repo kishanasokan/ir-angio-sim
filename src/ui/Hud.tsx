@@ -60,12 +60,19 @@ export function ModeBadge({ hud }: { readonly hud: HudView }) {
   );
 }
 
-function DeviceRow({ device }: { readonly device: DeviceHud }) {
-  const role = device.tube ? 'catheter' : 'wire';
+function DeviceRow({
+  device,
+  stick,
+}: {
+  readonly device: DeviceHud;
+  readonly stick: 'left' | 'right' | null;
+}) {
+  const { role } = device;
   return (
     <li
       data-testid={`device-${role}`}
       data-rod-model={device.rodModelId}
+      data-stick={stick ?? ''}
       data-depth-mm={device.depthMm.toFixed(3)}
       data-rotation-deg={device.rotationDeg.toFixed(3)}
       data-tip-in={device.tipIn ?? ''}
@@ -79,7 +86,14 @@ function DeviceRow({ device }: { readonly device: DeviceHud }) {
       <p className="text-sm font-semibold text-ink-100">
         {device.name} <span className="font-normal text-ink-500">· {device.generic}</span>
       </p>
-      <p className="font-mono text-[11px] text-ink-500">{device.size}</p>
+      <p className="font-mono text-[11px] text-ink-500">
+        {device.size}
+        {stick !== null && (
+          <span className="ml-2 rounded bg-accent-400/15 px-1.5 py-0.5 text-[10px] text-accent-400">
+            {stick === 'left' ? 'Left stick' : 'Right stick'}
+          </span>
+        )}
+      </p>
       <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-xs">
         <dt className="text-ink-500">Depth</dt>
         <dd data-testid={`depth-${role}`} className="text-right text-ink-100 tabular-nums">
@@ -109,8 +123,21 @@ export function DeviceStack({ hud }: { readonly hud: HudView }) {
             {formatNumber(hud.sheath.lengthCm, 3)} cm · fixed
           </p>
         </li>
-        {hud.devices.map((device) => (
-          <DeviceRow key={device.rodModelId} device={device} />
+        {hud.devices.map((device, d) => (
+          <DeviceRow
+            key={device.rodModelId}
+            device={device}
+            // Shown only when the stack has a choice of pair (three or more devices).
+            stick={
+              hud.devices.length < 3
+                ? null
+                : d === hud.activeOuter
+                  ? 'left'
+                  : d === hud.activeOuter + 1
+                    ? 'right'
+                    : null
+            }
+          />
         ))}
       </ol>
     </Card>

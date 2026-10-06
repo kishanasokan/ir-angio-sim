@@ -17,9 +17,11 @@ import { Button, Eyebrow } from './primitives';
 import { useMenuPad } from './useMenuPad';
 
 /**
- * Sandbox setup (prompts/M1-foundations.md §7): phantom A, B or C, sheath size and wire, with the 5F catheter fixed in
- * M1. Each pairing runs the compatibility rules; a blocked combination shows the rule's message and source, and Start
- * stays disabled (CLAUDE.md rule 7). A 4F sheath with the 5F catheter, for example, shows fit-catheter-sheath.
+ * Sandbox setup (prompts/M1-foundations.md §7, prompts/M2-core-systems.md §1.7): the anatomy, the sheath size, the
+ * device stack (catheter and wire, or catheter, microcatheter and microwire) and the innermost wire. Every adjacent
+ * pairing runs the compatibility rules; a blocked combination shows the rule's message and source, and Start stays
+ * disabled (CLAUDE.md rule 7). A 4F sheath with the 5F catheter, for example, shows fit-catheter-sheath, and a
+ * 0.035 in wire in a microcatheter shows fit-wire-microcatheter.
  */
 
 function Choice({
@@ -103,17 +105,20 @@ export function SandboxSetup() {
   const sandbox = data.sandbox;
   const [anatomyId, setAnatomy] = useState(sandbox.anatomy.default);
   const [french, setFrench] = useState(defaultSheathFrench(sandbox));
-  const [wire, setWire] = useState(sandbox.initialStack.at(-1) ?? '');
+  const [stackId, setStackId] = useState(sandbox.stackOptions[0]?.id ?? '');
+  const option = sandbox.stackOptions.find((entry) => entry.id === stackId) ?? sandbox.stackOptions[0];
+  const [wire, setWire] = useState(option?.stack.at(-1) ?? '');
   const root = useRef<HTMLElement>(null);
   const back = useCallback(() => goTo('start'), [goTo]);
   const pad = useMenuPad(root, back);
 
-  const catheterId = sandbox.initialStack[0] ?? '';
   const segment = tierParams(data.repository, data.limits.tiers[0] ?? 'high').segmentLength;
-  const catheter = useMemo(
-    () => buildRodInstance(data.repository, catheterId, segment),
-    [data, catheterId, segment],
+  // The stack's devices around the wire, outermost first: fixed for each stack option.
+  const fixed = useMemo(
+    () => (option?.stack.slice(0, -1) ?? []).map((id) => buildRodInstance(data.repository, id, segment)),
+    [data, option, segment],
   );
+  const catheter = fixed[0];
   const wires = useMemo(
     () =>
       sandbox.inventory
@@ -122,14 +127,29 @@ export function SandboxSetup() {
     [data, sandbox, segment],
   );
   const sheathCheck = choiceCheck(
-    pairChecks(data.repository, CASE_ID, sheathInstance(data.repository, CASE_ID, french), catheter.item),
+    catheter === undefined
+      ? []
+      : pairChecks(data.repository, CASE_ID, sheathInstance(data.repository, CASE_ID, french), catheter.item),
+  );
+  // Each fixed device inside the one around it.
+  const stackCheck = choiceCheck(
+    fixed.slice(1).flatMap((inner, i) => {
+      const outer = fixed[i];
+      return outer === undefined ? [] : pairChecks(data.repository, CASE_ID, outer.item, inner.item);
+    }),
   );
   const wireInstance = wires.find((instance) => instance.rodModelId === wire);
+  const holder = fixed.at(-1);
   const wireCheck = choiceCheck(
-    wireInstance === undefined ? [] : pairChecks(data.repository, CASE_ID, catheter.item, wireInstance.item),
+    wireInstance === undefined || holder === undefined
+      ? []
+      : pairChecks(data.repository, CASE_ID, holder.item, wireInstance.item),
   );
-  const blocked = sheathCheck.blocked || wireCheck.blocked;
-  const catheterLabel = data.labels[catheterId];
+  const blocked = sheathCheck.blocked || stackCheck.blocked || wireCheck.blocked;
+  const chooseStack = (id: string) => {
+    setStackId(id);
+    setWire(sandbox.stackOptions.find((entry) => entry.id === id)?.stack.at(-1) ?? '');
+  };
 
   return (
     <main ref={root} className="flex min-h-full items-center justify-center px-4 py-10">
@@ -179,15 +199,41 @@ export function SandboxSetup() {
                 </Choice>
               ))}
             </div>
-            <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
-              <p className="text-xs tracking-[0.15em] text-ink-500 uppercase">Catheter (fixed in M1)</p>
-              <p className="mt-1 text-ink-100">
-                {catheterLabel?.name} <span className="text-ink-500">· {catheterLabel?.generic}</span>
-              </p>
-              <p className="font-mono text-xs text-ink-300">{catheterLabel?.size}</p>
-            </div>
             <div className="mt-3 space-y-2">
               <Problems check={sheathCheck} />
+            </div>
+            <h2 className="mt-6 mb-3 text-xs font-semibold tracking-[0.2em] text-ink-500 uppercase">
+              Device stack
+            </h2>
+            <div className="grid gap-2">
+              {sandbox.stackOptions.map((entry) => (
+                <Choice
+                  key={entry.id}
+                  testId={`setup-stack-${entry.id}`}
+                  selected={option?.id === entry.id}
+                  onSelect={() => chooseStack(entry.id)}
+                >
+                  <span className="block text-ink-100">{entry.label}</span>
+                </Choice>
+              ))}
+            </div>
+            <div className="mt-3 space-y-2">
+              {fixed.map((instance) => {
+                const label = data.labels[instance.rodModelId];
+                return (
+                  <div
+                    key={instance.rodModelId}
+                    data-testid={`setup-fixed-${instance.rodModelId}`}
+                    className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-sm"
+                  >
+                    <p className="text-ink-100">
+                      {label?.name} <span className="text-ink-500">· {label?.generic}</span>
+                    </p>
+                    <p className="font-mono text-xs text-ink-300">{label?.size}</p>
+                  </div>
+                );
+              })}
+              <Problems check={stackCheck} />
             </div>
           </section>
 
@@ -231,7 +277,9 @@ export function SandboxSetup() {
               variant="primary"
               data-testid="setup-start"
               disabled={blocked}
-              onClick={() => start({ anatomyId, sheathFrench: french, wire, demo: null })}
+              onClick={() =>
+                start({ anatomyId, sheathFrench: french, stackId: option?.id ?? '', wire, demo: null })
+              }
             >
               Start
             </Button>

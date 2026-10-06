@@ -156,7 +156,10 @@ export function renderConfig(repository: Repository): RenderConfig {
 export interface DeviceLook {
   readonly rodModelId: string;
   readonly tube: boolean;
+  /** At the tip; a tapered device is wider toward the handle (outerRadiiMm). */
   readonly outerRadiusMm: number;
+  /** Outer radius per segment, handle (0) to tip. */
+  readonly outerRadiiMm: Float32Array;
   /** 0 for a solid wire. */
   readonly innerRadiusMm: number;
   readonly segmentLengthMm: number;
@@ -172,15 +175,18 @@ export function deviceLook(instance: RodDeviceInstance, config: RenderConfig): D
   const { segments } = instance;
   const tube = instance.innerDiameter !== null;
   const radiopacity = new Float32Array(segments.count);
+  const outerRadiiMm = new Float32Array(segments.count);
   const tipBoost = instance.radiopacity.tipBoost.value;
   const body = instance.radiopacity.body.value;
   for (let j = 0; j < segments.count; j += 1) {
     radiopacity[j] = segments.section[j] === 0 ? tipBoost : body;
+    outerRadiiMm[j] = fromSI(segments.outerRadius[j] ?? 0, 'mm');
   }
   return {
     rodModelId: instance.rodModelId,
     tube,
-    outerRadiusMm: fromSI(segments.outerRadius[0] ?? 0, 'mm'),
+    outerRadiusMm: fromSI(segments.outerRadius[segments.count - 1] ?? 0, 'mm'),
+    outerRadiiMm,
     innerRadiusMm: fromSI(segments.innerRadius[0] ?? 0, 'mm'),
     segmentLengthMm: fromSI(segments.length, 'mm'),
     radiopacity,

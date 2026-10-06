@@ -10,6 +10,8 @@ export type Screen = 'start' | 'setup' | 'sandbox';
 export interface Launch {
   readonly anatomyId: string;
   readonly sheathFrench: number;
+  /** One of the case's stack options; the case's first when absent. */
+  readonly stackId?: string;
   /** The rod model in the stack's inner slot. */
   readonly wire: string;
   /** An autopilot script to watch, or null for free play. */

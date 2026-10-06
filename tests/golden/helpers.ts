@@ -296,6 +296,11 @@ export function wireV(tierId = 'high'): SimDeviceSpec {
   return buildRodInstance(fixtureSource, 'rm-fixture-v', tierParams(repository(), tierId).segmentLength);
 }
 
+/** A repository rod model on a tier. */
+export function rodModelOn(id: string, tierId: string): SimDeviceSpec {
+  return buildRodInstance(repository(), id, tierParams(repository(), tierId).segmentLength);
+}
+
 /** A repository rod model on the high tier. */
 export function rodModel(id: string): SimDeviceSpec {
   return buildRodInstance(repository(), id, highTier().segmentLength);

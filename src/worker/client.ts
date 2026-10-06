@@ -36,6 +36,7 @@ export function mergeFrames(held: LiveFrame | null, frame: LiveFrame): LiveFrame
 export interface PhysicsClientOptions {
   readonly caseId: string;
   readonly anatomyId?: string;
+  readonly stackId?: string;
   readonly innerDevice?: string;
   readonly tierId?: string;
   readonly seed: number;
@@ -68,6 +69,7 @@ export class PhysicsClient {
       type: 'init',
       caseId: options.caseId,
       ...(options.anatomyId === undefined ? {} : { anatomyId: options.anatomyId }),
+      ...(options.stackId === undefined ? {} : { stackId: options.stackId }),
       ...(options.innerDevice === undefined ? {} : { innerDevice: options.innerDevice }),
       ...(options.tierId === undefined ? {} : { tierId: options.tierId }),
       seed: options.seed,

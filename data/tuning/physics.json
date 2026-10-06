@@ -53,6 +53,9 @@
       "availableFrom": "M2"
     }
   ],
+  "rail": {
+    "capStiffness": {"value": 0.025, "unit": "N/mm", "confidence": "design", "note": "Rail tier (spec 04 §6): hub force per millimetre of push beyond a cap. Matches the rod tiers' Glidewire in sandbox-a-buckle, whose hub force passes the 0.8 N danger level about 33 mm past the stall (golden scene 12). Added in M2 phase A."}
+  },
   "feedback": {
     "hubForceFullScale": {"value": 1.0, "unit": "N", "confidence": "design", "note": "Resistance meter full scale. A display scale, not an injury threshold."},
     "hubForceWarning": {"value": 0.5, "unit": "N", "confidence": "design", "note": "Resistance meter turns amber. A display threshold, not an injury threshold."},

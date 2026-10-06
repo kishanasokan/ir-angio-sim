@@ -39,16 +39,15 @@ export function physicsPerFrame(msPerStep: number, stepRate: number, frameRate: 
 }
 
 /**
- * The startup tier choice (docs/M1-plan.md D17): the high tier unless its physics costs more than
- * `maxPhysicsPerFrame` per frame, then the fallback.
+ * The startup tier choice (docs/M1-plan.md D17; spec 04 §6): the first tier, in order, whose physics costs no more
+ * than `maxPhysicsPerFrame` per frame, else the fallback.
  */
 export function chooseTier(
-  highMsPerFrame: number,
+  costs: readonly { readonly id: string; readonly msPerFrame: number }[],
   maxPhysicsPerFrame: number,
-  high: string,
   fallback: string,
 ): string {
-  return highMsPerFrame > maxPhysicsPerFrame ? fallback : high;
+  return costs.find((cost) => cost.msPerFrame <= maxPhysicsPerFrame)?.id ?? fallback;
 }
 
 /**

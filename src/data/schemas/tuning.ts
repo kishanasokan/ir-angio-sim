@@ -95,6 +95,8 @@ export const physicsTuningSchema = z.looseObject({
     contactFallbackCompliance: value,
   }),
   tiers: z.array(tierSchema).min(1),
+  // The rail fallback tier (spec 04 §6).
+  rail: z.looseObject({ capStiffness: value }),
   feedback: z.looseObject({
     hubForceFullScale: value,
     hubForceWarning: value,

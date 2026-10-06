@@ -720,6 +720,25 @@ function checkCase(file: string, data: CaseFile, refs: References, fail: Fail): 
   data.initialStack.forEach((id, i) => {
     checkRodModel(id, `initialStack[${i}]`);
   });
+  // Every stack setup offers starts from insertion entries and draws on the inventory; the first is initialStack.
+  const inserted = new Set(start.insertion.map((entry) => entry.rodModel));
+  const inventory = new Set(data.inventory.map((entry) => entry.rodModel));
+  data.stackOptions?.forEach((option, i) => {
+    option.stack.forEach((id, k) => {
+      const path = `stackOptions[${i}].stack[${k}]`;
+      checkRodModel(id, path);
+      if (!inserted.has(id)) {
+        fail('bad-reference', at(file, path), `"${id}" has no start.insertion entry`);
+      }
+      if (!inventory.has(id)) {
+        fail('bad-reference', at(file, path), `"${id}" is not in the inventory`);
+      }
+    });
+  });
+  const first = data.stackOptions?.[0]?.stack;
+  if (first !== undefined && first.join(',') !== data.initialStack.join(',')) {
+    fail('bad-reference', at(file, 'stackOptions[0].stack'), 'the first stack option must be initialStack');
+  }
   data.autopilot.forEach((script, i) => {
     if (!refs.graphs.has(script.anatomy)) {
       fail(

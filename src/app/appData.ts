@@ -71,7 +71,12 @@ export function appData(): AppData {
       muted: false,
       pulseRate: render.fluoro.defaultPulseRate,
     },
-    limits: { tiers: rodTiers, pulseRates: render.fluoro.pulseRates, ...settingRanges(repository) },
+    // Every tier, the rail fallback included, so Settings can force any (spec 04 §6).
+    limits: {
+      tiers: repository.physics.tiers.map((tier) => tier.id),
+      pulseRates: render.fluoro.pulseRates,
+      ...settingRanges(repository),
+    },
     physicsBudgetMs: budget === undefined ? null : fromSI(valueToSI(budget.value, budget.unit), 'ms'),
   };
   return cached;

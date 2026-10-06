@@ -39,12 +39,16 @@ scope.onmessage = (event: MessageEvent<MainToWorker>) => {
             ? benchmarkTier(repository, () => performance.now())
             : null;
         const anatomyId = replay?.anatomyId ?? message.anatomyId;
+        // A replay starts with the stack it recorded; logs from before stacks were recorded use the case's defaults.
+        const stackId = replay === undefined ? message.stackId : replay.stackId;
+        const innerDevice = replay === undefined ? message.innerDevice : replay.innerDevice;
         const setup = sandboxSession(repository, {
           appVersion: message.appVersion,
           files: BUNDLED_DATA_FILES,
           caseId: replay?.caseId ?? message.caseId,
           ...(anatomyId === undefined ? {} : { anatomyId }),
-          ...(message.innerDevice === undefined ? {} : { innerDevice: message.innerDevice }),
+          ...(stackId === undefined ? {} : { stackId }),
+          ...(innerDevice === undefined ? {} : { innerDevice }),
           tierId: message.tierId ?? choice?.tierId ?? 'high',
           seed: replay?.seed ?? message.seed,
           settings: message.settings,

@@ -84,6 +84,9 @@ export interface InputLog {
   readonly seed: number;
   readonly caseId: string;
   readonly anatomyId: string;
+  /** The case's stack option and the innermost device chosen in setup; absent means the case's defaults. */
+  readonly stackId?: string;
+  readonly innerDevice?: string;
   readonly settings: Readonly<Record<string, number | boolean>>;
   readonly frames: readonly InputFrame[];
   readonly commands: readonly Command[];

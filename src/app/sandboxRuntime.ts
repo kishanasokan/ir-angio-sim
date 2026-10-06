@@ -95,10 +95,14 @@ export class SandboxRuntime {
     const settings = currentSettings();
     const demo =
       launch.demo === null ? undefined : data.sandbox.autopilot.find((script) => script.id === launch.demo);
-    const defaultWire = data.sandbox.initialStack.at(-1);
+    const options = data.sandbox.stackOptions;
+    const stack = options.find((option) => option.id === launch.stackId) ?? options[0];
+    const defaultWire = stack?.stack.at(-1);
     this.client = new PhysicsClient({
       caseId: CASE_ID,
       anatomyId: demo?.anatomy ?? launch.anatomyId,
+      // A demo runs on the case's first stack; setup's choices only differ from it when they name another.
+      ...(demo !== undefined || stack === options[0] ? {} : { stackId: stack?.id }),
       ...(launch.wire === defaultWire ? {} : { innerDevice: launch.wire }),
       ...(settings.tier === 'auto' ? {} : { tierId: settings.tier }),
       seed: SESSION_SEED,
@@ -526,6 +530,7 @@ export class SandboxRuntime {
         mode: this.mapper.mode,
         fine: this.mapper.fine || shiftHeld,
         locked: false,
+        activeOuter: -1,
         demo: this.launch.demo,
         sheath,
         devices: [],
@@ -559,6 +564,7 @@ export class SandboxRuntime {
         generic: label?.generic ?? '',
         size: label?.size ?? '',
         tube: label?.tube ?? false,
+        role: label?.kind === 'microcatheter' ? 'microcatheter' : label?.tube === true ? 'catheter' : 'wire',
         depthMm: device.pastSheathTipMm,
         rotationDeg: device.hubRotationDeg,
         tipIn: tipLocation(device),
@@ -576,6 +582,7 @@ export class SandboxRuntime {
       mode: demo === null ? this.mapper.mode : snapshot.input.mode,
       fine: this.mapper.fine || shiftHeld,
       locked: snapshot.stack.locked,
+      activeOuter: snapshot.stack.activeOuter,
       demo,
       sheath,
       devices,

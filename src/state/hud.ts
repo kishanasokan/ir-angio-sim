@@ -15,6 +15,8 @@ export interface DeviceHud {
   readonly generic: string;
   readonly size: string;
   readonly tube: boolean;
+  /** What the device is in the stack, for labels and test ids. */
+  readonly role: 'catheter' | 'microcatheter' | 'wire';
   /** Depth past the sheath tip, mm (negative inside the sheath). */
   readonly depthMm: number;
   readonly rotationDeg: number;
@@ -34,6 +36,8 @@ export interface HudView {
   readonly mode: InputMode;
   readonly fine: boolean;
   readonly locked: boolean;
+  /** Index of the outer device of the pair the sticks drive (left stick outer, right stick inner); −1 without one. */
+  readonly activeOuter: number;
   readonly demo: string | null;
   readonly sheath: { readonly name: string; readonly french: number; readonly lengthCm: number };
   /** Outermost first. */

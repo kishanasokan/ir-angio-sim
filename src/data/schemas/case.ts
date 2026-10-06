@@ -34,6 +34,11 @@ export const caseSchema = z.looseObject({
   inventory: z.array(z.looseObject({ rodModel: idSchema })).min(1),
   // Movable devices, outermost first; the sheath is fixed.
   initialStack: z.array(idSchema).min(1),
+  // (M2) Alternative starting stacks sandbox setup offers; the first is the default and initialStack is its stack.
+  stackOptions: z
+    .array(z.looseObject({ id: idSchema, label: z.string().min(1), stack: z.array(idSchema).min(1) }))
+    .min(1)
+    .optional(),
   // Read by rules as case.targetDistance.
   targetDistance: numberFactSchema.optional(),
   autopilot: z.array(

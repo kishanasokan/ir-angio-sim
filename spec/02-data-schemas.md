@@ -257,6 +257,7 @@ type CaseV0 = {
   };
   inventory: { rodModel: string }[];
   initialStack: string[];                                      // movable devices (rod-model ids), outermost first; the sheath is fixed
+  stackOptions?: { id: string; label: string; stack: string[] }[];   // (M2) starting stacks setup offers; the first is initialStack
   targetDistance?: Fact;                                       // read by rules as case.targetDistance
   autopilot: { id: string; anatomy: string; description: string; params: Record<string, Fact> }[];   // scripts live in src/sim/autopilot/
   disclaimer: "required";
@@ -277,11 +278,13 @@ type InputFrame = {
   source: "gamepad" | "keyboard" | "pointer" | "autopilot" | "replay";
 };
 type Command = { step: number; cmd: "swap-device" | "set-anatomy" | "reset" | "set-tier" | "start-autopilot" | "stop-autopilot"; args: Record<string, string | number> };
-type InputLog = { schema: "ir-sim/input-log@1"; appVersion: string; dataHash: string; seed: number; caseId: string; anatomyId: string; settings: Record<string, number | boolean>; frames: InputFrame[]; commands: Command[] };
+type InputLog = { schema: "ir-sim/input-log@1"; appVersion: string; dataHash: string; seed: number; caseId: string; anatomyId: string;
+                 stackId?: string; innerDevice?: string;      // (M2) setup's stack option and innermost device; absent means the case's defaults
+                 settings: Record<string, number | boolean>; frames: InputFrame[]; commands: Command[] };
 type Snapshot = { step: number; devices: { rodModel: string; positionsMm: Float32Array; insertedMm: number; hubRotationDeg: number; tipSegment: string | null; tipNormalForceN: number; hubForceN: number }[]; events: SimEvent[] };
 ```
 
-Only frames that differ from the previous one are logged. Commands (device swaps, anatomy changes, resets, autopilot start and stop) are step-stamped and logged too, so a replay reproduces them. `dataHash` is a hash of `/data` so a replay refuses to run against different data.
+Only frames that differ from the previous one are logged. Commands (device swaps, anatomy changes, resets, autopilot start and stop) are step-stamped and logged too, so a replay reproduces them. `dataHash` is a hash of `/data` so a replay refuses to run against different data. Every stack in `stackOptions` must name rod models in the inventory with a `start.insertion` entry (validator: `bad-reference`); the setup's choice of stack and innermost device is recorded in the log header so a replay starts with the same devices (M2; M1 logs, which lack it, replay with the case's defaults).
 
 Local saves (`localStorage`, keys prefixed `irsim:`): `settings` (input curves, dead zones, rumble strength, tier override, units display), `highscores` (case id and mode → best score and date), `replays` (recent input logs, capped by size). IndexedDB is used if replays outgrow `localStorage`.
 

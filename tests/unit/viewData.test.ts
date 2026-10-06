@@ -46,10 +46,12 @@ describe('sandbox setup and picker checks', () => {
     const wires = inventoryInstances(repository(), CASE, 'high').filter(
       (instance) => instance.innerDiameter === null,
     );
+    // M2 added the GT microwire to the inventory for the three-device stack; it also fits the 5F catheter.
     expect(wires.map((wire) => wire.rodModelId)).toEqual([
       'rm-glidewire-035-angled-150',
       'rm-bentson-035-145',
       'rm-amplatz-bard-035-180',
+      'rm-gt-016-angled-180',
     ]);
     for (const wire of wires) {
       expect(choiceCheck(pairChecks(repository(), CASE, catheter().item, wire.item)).blocked).toBe(false);

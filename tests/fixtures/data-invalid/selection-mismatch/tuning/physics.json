@@ -95,6 +95,13 @@
       }
     }
   ],
+  "rail": {
+    "capStiffness": {
+      "value": 0.025,
+      "unit": "N/mm",
+      "confidence": "design"
+    }
+  },
   "feedback": {
     "hubForceFullScale": {
       "value": 1,

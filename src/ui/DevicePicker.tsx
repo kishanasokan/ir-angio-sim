@@ -7,10 +7,11 @@ import { Panel } from './primitives';
 import { useRuntime } from './runtimeContext';
 
 /**
- * The device picker (RB, or B on the keyboard; prompts/M1-foundations.md §7): the case inventory with each item's
- * compatibility with the catheter in use. Blocked entries are greyed out with the rule's reason. Picking another wire
- * issues one swap-device command: the engine withdraws the current wire to the sheath valve at full speed and feeds the
- * new one to the catheter tip, animated and logged for replay.
+ * The device picker (RB, or B on the keyboard; prompts/M1-foundations.md §7): the case inventory with each wire's
+ * compatibility with the device that holds the innermost one (the catheter, or the microcatheter in a three-device
+ * stack). Blocked entries are greyed out with the rule's reason. Picking another wire issues one swap-device command:
+ * the engine withdraws the current wire to the sheath valve at full speed and feeds the new one to the holder's tip,
+ * animated and logged for replay.
  */
 
 export function DevicePicker({ hud }: { readonly hud: HudView }) {
@@ -19,14 +20,14 @@ export function DevicePicker({ hud }: { readonly hud: HudView }) {
   const close = useSession((state) => state.closePanel);
   const tier = hud.tier ?? data.limits.tiers[0] ?? 'high';
   const instances = useMemo(() => inventoryInstances(data.repository, CASE_ID, tier), [data, tier]);
-  const outer = hud.devices[0];
   const inner = hud.devices.at(-1);
-  const catheter = instances.find((instance) => instance.rodModelId === outer?.rodModelId);
+  const holder = hud.devices.at(-2);
+  const holderInstance = instances.find((instance) => instance.rodModelId === holder?.rodModelId);
 
   return (
     <Panel
       title="Device picker"
-      subtitle="Choose a wire to exchange over the catheter. D-pad or Tab to move, A or Enter to pick, B to close."
+      subtitle="Choose a wire to exchange through the device that holds it. D-pad or Tab to move, A or Enter to pick, B to close."
       testId="device-picker"
       onClose={close}
       className="w-[min(36rem,92vw)]"
@@ -34,12 +35,11 @@ export function DevicePicker({ hud }: { readonly hud: HudView }) {
       <ul className="space-y-2 p-4">
         {instances.map((instance) => {
           const label = data.labels[instance.rodModelId];
-          const inUse =
-            instance.rodModelId === inner?.rodModelId || instance.rodModelId === outer?.rodModelId;
+          const inUse = hud.devices.some((device) => device.rodModelId === instance.rodModelId);
           const isWire = instance.innerDiameter === null;
           const check =
-            isWire && catheter !== undefined
-              ? choiceCheck(pairChecks(data.repository, CASE_ID, catheter.item, instance.item))
+            isWire && holderInstance !== undefined
+              ? choiceCheck(pairChecks(data.repository, CASE_ID, holderInstance.item, instance.item))
               : null;
           const blocked = check?.blocked ?? false;
           const reason =
@@ -49,9 +49,9 @@ export function DevicePicker({ hud }: { readonly hud: HudView }) {
           const source = reason === null ? null : ruleSource(data.repository, reason.ruleId);
           const disabled = inUse || blocked || !isWire;
           const status = inUse
-            ? instance.rodModelId === outer?.rodModelId
-              ? 'In use · outer device'
-              : 'In use'
+            ? instance.rodModelId === inner?.rodModelId
+              ? 'In use'
+              : 'In use · outer device'
             : !isWire
               ? 'Catheter exchange arrives in a later milestone'
               : blocked

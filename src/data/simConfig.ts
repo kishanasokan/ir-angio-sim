@@ -27,6 +27,7 @@ export function tierParams(repository: Repository, tierId: string): TierParams {
     stepRate: si(tier.stepRate),
     substeps: tier.substeps.value,
     segmentLength: si(tier.segmentLength),
+    model: tier.model,
   };
 }
 
@@ -49,6 +50,7 @@ export function engineSettings(repository: Repository): Pick<SimConfig, 'physics
       loadRelaxSteps: solver.loadRelaxSteps.value,
       symmetryBreak: si(solver.symmetryBreak),
       contactFallbackCompliance: si(solver.contactFallbackCompliance),
+      railCapStiffness: si(repository.physics.rail.capStiffness),
     },
     feedback: {
       hubForceWarning: si(feedback.hubForceWarning),
@@ -147,6 +149,8 @@ export interface SandboxOptions {
   readonly frictionOverride?: number | null;
   /** Start the innermost device's tip this far past the sheath tip (m), the others keeping their distance behind it. */
   readonly startDepth?: number;
+  /** One of the case's stack options (sandbox setup's stack choice); the case's first when absent. */
+  readonly stackId?: string;
   /**
    * A rod model from the case inventory for the innermost slot of the starting stack (sandbox setup's wire choice). It
    * starts where the case puts that slot's device: the same depth and hub rotation.
@@ -166,7 +170,15 @@ export function sandboxConfig(repository: Repository, options: SandboxOptions = 
     throw new Error(`Case ${caseId} has no anatomy "${anatomyId}".`);
   }
   const sheath = sheathLength(repository, caseId);
-  const starts = sandbox.initialStack.map(
+  const option =
+    options.stackId === undefined
+      ? sandbox.stackOptions[0]
+      : sandbox.stackOptions.find((entry) => entry.id === options.stackId);
+  if (option === undefined) {
+    throw new Error(`Case ${caseId} has no stack option "${options.stackId ?? ''}".`);
+  }
+  const slots = option.stack;
+  const starts = slots.map(
     (rodModelId) => sandbox.insertion.find((entry) => entry.rodModelId === rodModelId)?.tipBeyondAccess.value ?? 0,
   );
   const shift = options.startDepth === undefined ? 0 : options.startDepth - (starts.at(-1) ?? 0);
@@ -174,8 +186,8 @@ export function sandboxConfig(repository: Repository, options: SandboxOptions = 
   if (inner !== undefined && (!sandbox.inventory.includes(inner) || !repository.rodModels.has(inner))) {
     throw new Error(`Case ${caseId}: "${inner}" is not a rod model in its inventory.`);
   }
-  const last = sandbox.initialStack.length - 1;
-  const stack: StackEntry[] = sandbox.initialStack.map((slotId, i) => {
+  const last = slots.length - 1;
+  const stack: StackEntry[] = slots.map((slotId, i) => {
     const start = sandbox.insertion.find((entry) => entry.rodModelId === slotId);
     return {
       rodModelId: i === last && inner !== undefined ? inner : slotId,
@@ -183,7 +195,8 @@ export function sandboxConfig(repository: Repository, options: SandboxOptions = 
       rotation: start?.hubRotation.value ?? 0,
     };
   });
-  const rodTiers = repository.physics.tiers.filter((tier) => tier.model === 'rod').map((tier) => tier.id);
+  // Every tier, the rail fallback included: Settings can force any of them (spec 04 §6).
+  const tierIds = repository.physics.tiers.map((tier) => tier.id);
   return {
     seed: options.seed ?? 1,
     tier: tierParams(repository, tierId),
@@ -198,7 +211,7 @@ export function sandboxConfig(repository: Repository, options: SandboxOptions = 
     carm: carmParams(repository),
     anatomies,
     tiers: Object.fromEntries(
-      rodTiers.map((id) => [id, { tier: tierParams(repository, id), devices: deviceInstances(repository, id) }]),
+      tierIds.map((id) => [id, { tier: tierParams(repository, id), devices: deviceInstances(repository, id) }]),
     ),
   };
 }

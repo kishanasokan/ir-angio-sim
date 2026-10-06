@@ -19,6 +19,7 @@ import {
 } from './imaging/carm';
 import { quatAxis } from './math/quat';
 import { buildRod, rodKineticEnergy } from './rod/build';
+import { createRailWorld, railStep, restBendAngle, type RailDevice, type RailWorld } from './rail/rail';
 import { slidingFriction } from './rod/friction';
 import { createAccessFrame, placeKinematic, placeStraight, type AccessFrame } from './rod/insertion';
 import {
@@ -45,6 +46,8 @@ export interface TierParams {
   readonly substeps: number;
   /** m. */
   readonly segmentLength: number;
+  /** Rods (the default) or the rail fallback (spec 04 §6). */
+  readonly model?: 'rod' | 'rail';
 }
 
 export interface StackEntry {
@@ -84,6 +87,8 @@ export interface SimConfig {
     /** Degenerate-contact fallback (spec 04 §3.2): contact-normal tilt, rad, and contact compliance, m/N. */
     readonly symmetryBreak: number;
     readonly contactFallbackCompliance: number;
+    /** Rail tier: hub force per metre of push beyond a cap, N/m (spec 04 §6). */
+    readonly railCapStiffness: number;
   };
   readonly feedback: {
     readonly hubForceWarning: number;
@@ -156,6 +161,10 @@ export class SimEngine {
   private lumen: Lumen | null = null;
   private frame: AccessFrame | null = null;
   private world: PhysicsWorld | null = null;
+  /** The rail fallback's path and inputs, on a rail tier only. */
+  private rail: RailWorld | null = null;
+  private railDevices: RailDevice[] = [];
+  private accessNode = '';
   private records: DeviceRecord[] = [];
   private stack: StackState = createStack(0);
   private carm: CarmState | null = null;
@@ -304,11 +313,15 @@ export class SimEngine {
     this.lastFluoro = frame.triggers.fluoro;
     this.lastInject = frame.triggers.inject;
 
-    const h = dt / tier.substeps;
-    for (let s = 0; s < tier.substeps; s += 1) {
-      physicsSubstep(world, h, (s + 1) * h);
+    if (this.rail !== null) {
+      this.stepRail(dt);
+    } else {
+      const h = dt / tier.substeps;
+      for (let s = 0; s < tier.substeps; s += 1) {
+        physicsSubstep(world, h, (s + 1) * h);
+      }
+      placeKinematicParts(world);
     }
-    placeKinematicParts(world);
     this.finishStep(dt);
   }
 
@@ -566,6 +579,7 @@ export class SimEngine {
       throw new Error(`SimEngine: anatomy ${anatomy.id} has no access "${config.accessId}".`);
     }
     this.anatomy = anatomy;
+    this.accessNode = access.node;
     this.lumen = anatomy.segments.length > 0 ? buildLumen(anatomy, config.physics.lumenGridCell) : null;
     this.frame = createAccessFrame(access.position, access.direction, config.sheathLength);
     this.resetDevices();
@@ -603,11 +617,15 @@ export class SimEngine {
       record.physics.insertRate = 0;
       record.physics.rotateRate = 0;
     }
-    for (let n = 0; n < config.physics.loadRelaxSteps; n += 1) {
+    // Rail devices have no rest shape to relax into: they are placed on the path.
+    for (let n = 0; n < (this.rail === null ? config.physics.loadRelaxSteps : 0); n += 1) {
       for (let s = 0; s < tier.substeps; s += 1) {
         physicsSubstep(world, h, (s + 1) * h);
       }
       placeKinematicParts(world);
+    }
+    if (this.rail !== null) {
+      this.stepRail(0);
     }
     for (const record of this.records) {
       record.physics.hubForceSum = 0;
@@ -616,8 +634,77 @@ export class SimEngine {
     }
   }
 
-  private rebuildWorld(): void {
+  /**
+   * One rail step (spec 04 §6): each device's depth and rotation follow its rates, the rail places it on the shared
+   * path, and push beyond a cap becomes its hub force and tip force.
+   */
+  private stepRail(dt: number): void {
+    const rail = this.rail;
+    if (rail === null) {
+      return;
+    }
+    const tier = this.requireTier();
+    this.records.forEach((record, d) => {
+      const physics = record.physics;
+      const rod = physics.rod;
+      physics.currentInserted = Math.min(
+        rod.segmentCount * rod.segmentLength,
+        Math.max(0, physics.inserted + physics.insertRate * dt),
+      );
+      physics.currentRotation = physics.rotation + physics.rotateRate * dt;
+      const input = this.railDevices[d];
+      if (input !== undefined) {
+        input.rod = rod;
+        input.inserted = physics.currentInserted;
+        input.rotation = physics.currentRotation;
+        input.bendD1 = record.bendD1;
+        input.bendD2 = record.bendD2;
+        // A curl (a pigtail) chooses like a tip bent square to the shaft.
+        input.bendAngle = Math.min(Math.PI / 2, restBendAngle(rod));
+      }
+    });
+    const result = railStep(rail, this.railDevices, dt);
+    this.records.forEach((record, d) => {
+      const physics = record.physics;
+      const force = result.hubForce[d] ?? 0;
+      physics.hubForceSum = force * tier.substeps;
+      physics.tipForceSum = force * tier.substeps;
+      physics.firstOwned = result.firstFree[d] ?? physics.rod.segmentCount + 1;
+      physics.firstDynamic = physics.firstOwned;
+    });
+  }
+
+  /** The rail world for a rail tier; a device swap keeps the path its tips have chosen. */
+  private rebuildRail(keepPath: boolean): void {
     const config = this.requireConfig();
+    if (this.requireTier().model !== 'rail') {
+      this.rail = null;
+      this.railDevices = [];
+      return;
+    }
+    if (!keepPath || this.rail === null) {
+      this.rail = createRailWorld(
+        this.currentAnatomy,
+        this.requireFrame(),
+        this.accessNode,
+        this.records.length,
+        config.physics.railCapStiffness,
+        config.physics.lumenMargin,
+      );
+    }
+    this.railDevices = this.records.map((record) => ({
+      rod: record.physics.rod,
+      inserted: record.physics.inserted,
+      rotation: record.physics.rotation,
+      bendD1: record.bendD1,
+      bendD2: record.bendD2,
+      bendAngle: 0,
+    }));
+  }
+
+  private rebuildWorld(keepRailPath = false): void {
+    const config = this.requireConfig();
+    this.rebuildRail(keepRailPath);
     this.world = createPhysicsWorld(
       this.records.map((record) => record.physics),
       this.requireFrame(),
@@ -718,7 +805,7 @@ export class SimEngine {
     if (swap.phase === 'withdraw') {
       if (inner.physics.inserted <= 0) {
         this.records[index] = this.makeRecord(this.spec(swap.target), 0, inner.physics.rotation);
-        this.rebuildWorld();
+        this.rebuildWorld(true);
         swap.phase = 'feed';
       } else {
         inner.physics.insertRate = -Math.min(speed, inner.physics.inserted / dt);

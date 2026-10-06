@@ -22,6 +22,21 @@
         "rodModel": "rm-glidewire-035-angled-150",
         "tipBeyondAccess": {"value": 30, "unit": "mm", "confidence": "design", "note": "Wire tip 10 mm beyond the catheter tip."},
         "hubRotation": {"value": 180, "unit": "deg", "confidence": "design", "note": "Tip bend starts facing -x, so the demo has to turn it."}
+      },
+      {
+        "rodModel": "rm-cobra-c2-5f-65",
+        "tipBeyondAccess": {"value": 20, "unit": "mm", "confidence": "design", "note": "Catheter tip 20 mm past the sheath tip into the vessel. Added in M2."},
+        "hubRotation": {"value": 0, "unit": "deg", "confidence": "design"}
+      },
+      {
+        "rodModel": "rm-progreat-2.4-130",
+        "tipBeyondAccess": {"value": 30, "unit": "mm", "confidence": "design", "note": "Microcatheter tip 10 mm beyond the catheter tip. Added in M2."},
+        "hubRotation": {"value": 0, "unit": "deg", "confidence": "design"}
+      },
+      {
+        "rodModel": "rm-gt-016-angled-180",
+        "tipBeyondAccess": {"value": 40, "unit": "mm", "confidence": "design", "note": "Microwire tip 10 mm beyond the microcatheter tip. Added in M2."},
+        "hubRotation": {"value": 180, "unit": "deg", "confidence": "design", "note": "Tip bend starts facing -x, as the guidewire's does."}
       }
     ]
   },
@@ -29,9 +44,17 @@
     {"rodModel": "rm-glidewire-035-angled-150"},
     {"rodModel": "rm-bentson-035-145"},
     {"rodModel": "rm-amplatz-bard-035-180"},
-    {"rodModel": "rm-berenstein-5f-65"}
+    {"rodModel": "rm-gt-016-angled-180"},
+    {"rodModel": "rm-berenstein-5f-65"},
+    {"rodModel": "rm-cobra-c2-5f-65"},
+    {"rodModel": "rm-pigtail-5f-90"},
+    {"rodModel": "rm-progreat-2.4-130"}
   ],
   "initialStack": ["rm-berenstein-5f-65", "rm-glidewire-035-angled-150"],
+  "stackOptions": [
+    {"id": "catheter-wire", "label": "Catheter and guidewire", "stack": ["rm-berenstein-5f-65", "rm-glidewire-035-angled-150"]},
+    {"id": "catheter-microcatheter-microwire", "label": "Catheter, microcatheter and microwire", "stack": ["rm-cobra-c2-5f-65", "rm-progreat-2.4-130", "rm-gt-016-angled-180"]}
+  ],
   "autopilot": [
     {
       "id": "sandbox-c-left",
